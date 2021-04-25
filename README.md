@@ -20,11 +20,11 @@ If you anyhow want to _copy_ my code, please do so with my permission.\
 You can find me at the [support server](https://discord.gg/ANbxZmqyK5) for Groot, or just shoot me a DM.
 
 ## Features
-```
-Fun               -> Funny commands\
-Utilities         -> Handy utilities\
-Information       -> Information about the bot\
-Moderation        -> Powerful moderation commands\
+```css
+Fun               -> Funny commands
+Utilities         -> Handy utilities
+Information       -> Information about the bot
+Moderation        -> Powerful moderation commands
 Admin             -> Admin commands and not available for the public
 ```
 
