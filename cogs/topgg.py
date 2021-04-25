@@ -1,7 +1,7 @@
 import dbl
 import discord
 from discord.ext import commands, tasks
-
+from os import environ
 import asyncio
 
 
@@ -10,7 +10,7 @@ class TopGG(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjgxMjM5NTg3OTE0NjcxNzIxNCIsImJvdCI6dHJ1ZSwiaWF0IjoxNjE4MjEzOTI0fQ.iQtsqVJbONgYMY51uYBHfVAcdwFBRuIEvaTMMI1li9g' # set this to your DBL token
+        self.token = environ.get("topgg") # set this to your DBL token
         self.dblpy = dbl.DBLClient(self.bot, self.token)
 
     # The decorator below will work only on discord.py 1.1.0+
