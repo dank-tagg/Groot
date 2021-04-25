@@ -3,7 +3,7 @@
 [![Discord Bots](https://top.gg/api/widget/owner/812395879146717214.svg)](https://top.gg/bot/812395879146717214)
 
 # Groot
-A multipurpose discord bot, for educational and experimental purposes.\
+A multipurpose discord bot, for educational and experimental purposes.<br>
 Made by `dank tagg#6017`
 
 ## List of contents
@@ -16,7 +16,7 @@ Made by `dank tagg#6017`
 
 
 ## Usage
-If you anyhow want to _copy_ my code, feel free to. Be sure to read the [license](#licensing-information) though.\
+If you anyhow want to _copy_ my code, feel free to. Be sure to read the [license](#licensing-information) though.<br>
 You can find me at the [support server](https://discord.gg/ANbxZmqyK5) for Groot, or just shoot me a DM.
 
 ## Features
@@ -56,8 +56,8 @@ My discord is anUser#6969, you can ask me about it there.
 '''
 ```
 
-For more information, contact me on discord.\
-If you want to contribute anything big, please DM me too.\
+For more information, contact me on discord.<br>
+If you want to contribute anything big, please DM me too.<br>
 I would be more than happy to talk to you.
 
 
@@ -69,9 +69,9 @@ I would be more than happy to talk to you.
 
 
 ## Contact me
-**DISCORD:\**
+**DISCORD:**<br>
 dank tagg#6017 _or_ [support server](https://discord.gg/ANbxZmqyK5)\
-**EMAIL:\**
+**EMAIL:**<br>
 grootdiscordbot@gmail.com
 
 ## Licensing Information
