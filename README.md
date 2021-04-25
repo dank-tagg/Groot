@@ -9,14 +9,14 @@ Made by `dank tagg#6017`
 ## List of contents
 - [Usage](#usage)
 - [Features](#features)
-- [How Do I Contribute?](#how-do-i-contribute)
-    - [Installation](#installation)
-    - [Testing](#testing)
+- [How do I contribute?](#how-do-i-contribute)
+  - [Requirements](#requirements-to-contribute)
+- [Contact me](#contact-me)
 - [Licensing Information](#licensing-information)
 
 
 ## Usage
-If you anyhow want to _copy_ my code, please do so with my permission.\
+If you anyhow want to _copy_ my code, feel free to. Be sure to read the [license](#licensing-information) though.\
 You can find me at the [support server](https://discord.gg/ANbxZmqyK5) for Groot, or just shoot me a DM.
 
 ## Features
@@ -28,5 +28,73 @@ Moderation        -> Powerful moderation commands
 Admin             -> Admin commands and not available for the public
 ```
 
+## How do I contribute?
+If you somehow have interest in contributing, please start an issue.\
+State in it the code and a short description.\
+It should look like the following:
+
+```py
+# The code you want to add:
+import discord
+from discord.ext import commands
+
+class aNewCog(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+    
+    @commands.command(name="Thank", aliases=["You"])
+    async def hello(self, ctx):
+        await ctx.send(f"Hello {ctx.author.mention}")
+    
+def setup(bot):
+    bot.add_cog(aNewCog(bot))
+
+# A short description
+'''
+This code adds a new command that sends 'Hello {ctx.author.mention}' when invoked.
+My discord is anUser#6969, you can ask me about it there.
+'''
+```
+
+For more information, contact me on discord.\
+If you want to contribute anything big, please DM me too.\
+I would be more than happy to talk to you.
+
+
+
+### Requirements to contribute
+- [ ] It must be written in Python
+- [ ] It must be able to run on `python 3.9.4` and `discord.py 1.7.1`
+
+
+
 ## Contact me
-![image](https://user-images.githubusercontent.com/79766992/111597690-bb47f500-87ce-11eb-8551-17c3002b9421.png)
+**DISCORD:\**
+dank tagg#6017 _or_ [support server](https://discord.gg/ANbxZmqyK5)\
+**EMAIL:\**
+grootdiscordbot@gmail.com
+
+## Licensing Information
+```
+MIT License
+
+Copyright (c) 2021 dank tagg
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
