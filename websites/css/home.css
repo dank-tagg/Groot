@@ -1,0 +1,40 @@
+body {
+    background-color: #2C2F33;
+    font-family: Helvetica, sans-serif;
+}
+
+.navbar {
+    padding-top: .625rem;
+    padding-bottom: .625rem;
+    min-height: 53px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 20px 0 rgb(0 0 0 / 15%);
+}
+
+.navbar-clickables {
+    color: #fff
+}
+
+.textContainer {
+    grid-column: span 4;
+    grid-column: span var(--num-grid-columns);
+    color: #fff;
+}
+
+.boldText {
+    font-size: 48px;
+}
+.normalText {
+    font-size: 24px;
+    line-height: 140%;
+}
+
+.nav-item {
+    color: #ffffff;
+}
+
+footer {
+    position: relative;
+    color: #99AAB5;
+}
+

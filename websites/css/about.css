@@ -1,0 +1,23 @@
+:root {
+    font-size: 16px;
+    font-family: 'JetBrains Mono';
+}
+body {
+    color: #fff;
+    background-color: #2C2F33;
+}
+html, body, .row {
+    height: 100%;
+    text-align: center;
+}
+.pen-info {
+    color: #d4d3d4;
+    font-size: 80%;
+    text-transform: uppercase;
+}
+
+#intro {
+    color: #fff;
+    position: absolute;
+    padding: left;
+}
