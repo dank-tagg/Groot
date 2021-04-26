@@ -12,6 +12,7 @@ Made by `dank tagg#6017`
 - [How do I contribute?](#how-do-i-contribute)
   - [Requirements](#requirements-to-contribute)
 - [Contact me](#contact-me)
+- [Links](#links)
 - [Licensing Information](#licensing-information)
 
 
@@ -75,6 +76,12 @@ I would be more than happy to talk to you.
 dank tagg#6017 _or_ [support server](https://discord.gg/ANbxZmqyK5)\
 **EMAIL:**<br>
 grootdiscordbot@gmail.com
+
+## Links
+- [Vote](https://top.gg/bot/812395879146717214/vote)
+- [Source](https://github.com/dank-tagg/Groot)
+- [Website](https://dank-tagg.github.io/website/)
+
 
 ## Licensing Information
 ```
