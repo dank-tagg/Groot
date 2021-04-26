@@ -1,0 +1,3 @@
+[submodule "Groot-Website"]
+	path = Groot-Website
+	url = https://github.com/dank-tagg/Groot-Website.git
