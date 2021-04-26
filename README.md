@@ -55,9 +55,11 @@ This code adds a new command that sends 'Hello {ctx.author.mention}' when invoke
 My discord is anUser#6969, you can ask me about it there.
 '''
 ```
+**Note that this is not required. It can also be pseudocode, and a small explaination.**
+
 
 For more information, contact me on discord.<br>
-If you want to contribute anything big, please DM me too.<br>
+If you want to contribute anything big, please DM me.<br>
 I would be more than happy to talk to you.
 
 
