@@ -17,7 +17,7 @@ Made by `dank tagg#6017`
 
 ## Usage
 If you anyhow want to _copy_ my code, feel free to. Be sure to read the [license](#licensing-information) though.<br>
-You can find me at the [support server](https://discord.gg/ANbxZmqyK5) for Groot, or just shoot me a DM.
+You can find me at the [support server](https://discord.gg/ANbxZmqyK5) for Groot, or just shoot me a DM.<br>
 
 ## Features
 ```css
