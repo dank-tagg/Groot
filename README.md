@@ -80,7 +80,7 @@ grootdiscordbot@gmail.com
 ## Links
 - [Vote](https://top.gg/bot/812395879146717214/vote)
 - [Source](https://github.com/dank-tagg/Groot)
-- [Website](https://dank-tagg.github.io/website/)
+- [Website](https://dank-tagg.github.io/groot-website/)
 
 
 ## Licensing Information
