@@ -1,27 +1,29 @@
-import random
 import datetime
+import itertools
+import logging
+import operator
 import os
+import random
 import re
 import time
 from os import environ, getenv
 from os.path import dirname, join
 from pathlib import Path
-import aiosqlite
-import aiohttp
-import discord
-from discord.ext import commands, tasks
-from dotenv import load_dotenv
-from utils.useful import *
-from utils.subclasses import customContext
-import itertools
-import operator
-import logging
 
+import aiohttp
+import aiosqlite
+import discord
+from discord.ext import commands, ipc, tasks
+from dotenv import load_dotenv
+
+from utils.subclasses import customContext
+from utils.useful import *
 
 to_call = ListCall()
 
 class GrootBot(commands.Bot):
     def __init__(self, **kwargs):
+        super().__init__(self.get_prefix, **kwargs)
         self.existing_prefix = {}
         self.greenTick = "<:greenTick:814504388139155477>"
         self.redTick = "<:redTick:814774960852566026>"
@@ -34,8 +36,7 @@ class GrootBot(commands.Bot):
         self.cached_users = {}
         self.cached_disabled = {}
         self.tips_on_cache = set()
-        
-        super().__init__(self.get_prefix, **kwargs)
+        self.ipc = ipc.Server(self, secret_key="GrootBotAdmin")
 
     async def after_db(self):
         """Runs after the db is connected"""
@@ -162,4 +163,19 @@ class GrootBot(commands.Bot):
             self.launch_time = datetime.datetime.utcnow()
             self.db = db
             self.loop.run_until_complete(self.after_db())
+            self.ipc.start()
             self.run(self.token)
+    
+
+
+    # Events
+    async def on_ready(self):
+        logging.warning(f"Logged in as {self.user}, SQLite3 database initialized.")
+        print(f"CHECK: Bot ready 1/2")
+    
+    async def on_ipc_ready(self):
+        logging.warning(f"IPC is ready to go!")
+        print("CHECK: IPC ready 2/2")
+
+    async def on_ipc_error(self, endpoint, error):
+        logging.warning(f"{endpoint} raised {error}")

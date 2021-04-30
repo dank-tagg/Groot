@@ -42,11 +42,6 @@ logging.basicConfig(
         )
 
 @bot.event
-async def on_ready():
-    logging.warning(f"Logged in as {bot.user}, SQLite3 database initialized.")
-    print(f"Logged in as {bot.user}, SQLite3 database initialized.")
-
-@bot.event
 @wait_ready(bot=bot)
 async def on_message(message):
     if re.fullmatch("<@(!)?812395879146717214>", message.content):
@@ -62,5 +57,11 @@ async def on_message(message):
         if ctx.valid and message.channel.id in bot.cached_disabled[ctx.command.name] or ctx.valid and message.guild.id in bot.cached_disabled[ctx.command.name]:
             return
     await bot.process_commands(message)
+
+# IPC server functions
+
+@bot.ipc.route()
+async def get_usage_data(data):
+    return {"guilds": len(bot.guilds), "users": len(bot.users)}
 
 bot.starter()
