@@ -17,8 +17,6 @@ python-dotenv==0.17.0
 discord.ext.menus
 discord.ext.flags
 mystbin.py
-discord_ext_menus==1.0
 Quart_Discord==2.1.4
 Quart==0.14.1
-discord==1.0.1
-discord_ext_ipoc
+discord_ext_ipc
