@@ -326,6 +326,16 @@ class information(commands.Cog):
         em.set_author(name="Uptime")
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
+    
+    @commands.command(name="source")
+    async def _source(self, ctx):
+        em = Embed(title="Be sure to read the licenses.")
+        em.set_thumbnail(url="https://i.imgur.com/AyoXstG.png")
+        em.add_field(name="Source of Groot:", value="https://github.com/dank-tagg/Groot")
+        em.add_field(name="Source of Groot-Website:", value="https://github.com/dank-tagg/Groot-Website/", inline=False)
+        em.add_field(name="More links", value="[Website](https://dank-tagg.github.io/Groot-Website) | "
+                                              "[Advanced website](https://github.com/dank-tagg/GrootWebsiteFlask)")
+        return await ctx.send(embed=em)
 
 def setup(bot):
     bot.add_cog(information(bot))

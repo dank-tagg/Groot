@@ -22,7 +22,7 @@ load_dotenv(dotenv_path)
 intent_data = {x: True for x in ('guilds', 'members', 'emojis', 'messages', 'reactions')}
 intents = discord.Intents(**intent_data)
 mentions = discord.AllowedMentions(roles=False, users=True, everyone=False, replied_user=True)
-bot_data = {"token": environ.get("main"),
+bot_data = {"token": environ.get("dev"),
             "intents": intents,
             "case_insensitive": True,
             "help_command": None,
@@ -57,11 +57,5 @@ async def on_message(message):
         if ctx.valid and message.channel.id in bot.cached_disabled[ctx.command.name] or ctx.valid and message.guild.id in bot.cached_disabled[ctx.command.name]:
             return
     await bot.process_commands(message)
-
-# IPC server functions
-
-@bot.ipc.route()
-async def get_usage_data(data):
-    return {"guilds": len(bot.guilds), "users": len(bot.users)}
 
 bot.starter()
