@@ -1,5 +1,4 @@
 import discord
-from discord.ext import commands
 
 
 def bold(text: str, escape_formatting: bool = True) -> str:
@@ -36,6 +35,7 @@ def box(text: str, lang: str = "") -> str:
     ret = "```{}\n{}\n```".format(lang, text)
     return ret
 
+
 def escape(text: str, *, mass_mentions: bool = False, formatting: bool = False) -> str:
     """Get text with all mass mentions or markdown escaped.
     Parameters
@@ -57,6 +57,7 @@ def escape(text: str, *, mass_mentions: bool = False, formatting: bool = False) 
     if formatting:
         text = discord.utils.escape_markdown(text)
     return text
+
 
 def hyperlink(text: str, link: str):
     """Turns text into a hyperlink.

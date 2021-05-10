@@ -1,8 +1,7 @@
-import dbl
-import discord
-from discord.ext import commands, tasks
 from os import environ
-import asyncio
+
+import dbl
+from discord.ext import commands, tasks
 
 
 class TopGG(commands.Cog):
@@ -10,7 +9,7 @@ class TopGG(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.token = environ.get("topgg") # set this to your DBL token
+        self.token = environ.get("topgg")  # set this to your DBL token
         self.dblpy = dbl.DBLClient(self.bot, self.token)
 
     # The decorator below will work only on discord.py 1.1.0+
@@ -21,14 +20,14 @@ class TopGG(commands.Cog):
         """This function runs every 30 minutes to automatically update your server count"""
         try:
             await self.dblpy.post_guild_count()
-           
+
         except Exception as e:
             print(e)
-
 
     @commands.Cog.listener()
     async def on_dbl_vote(self, data):
         print(data)
+
 
 def setup(bot):
     bot.add_cog(TopGG(bot))

@@ -3,23 +3,19 @@ import itertools
 import logging
 import operator
 import os
-import random
 import re
-import time
-from os import environ, getenv
-from os.path import dirname, join
+from os import environ
 from pathlib import Path
 
 import aiohttp
 import aiosqlite
 import discord
-from discord.ext import commands, ipc, tasks
-from dotenv import load_dotenv
-
+from discord.ext import commands, ipc
 from utils.subclasses import customContext
 from utils.useful import *
 
 to_call = ListCall()
+
 
 class GrootBot(commands.Bot):
     def __init__(self, **kwargs):
@@ -45,8 +41,11 @@ class GrootBot(commands.Bot):
     def add_command(self, command):
         super().add_command(command)
         command.cooldown_after_parsing = True
-        
-        if discord.utils.find(lambda c:isinstance(c, grootCooldown), command.checks) is None:
+
+        if (
+            discord.utils.find(lambda c: isinstance(c, grootCooldown), command.checks)
+            is None
+        ):
             command.checks.append(grootCooldown(1, 3, 1, 1, commands.BucketType.user))
 
     @property
@@ -57,12 +56,14 @@ class GrootBot(commands.Bot):
     def owner(self):
         """Gets the discord.User of the owner"""
         return self.get_user(396805720353275924)
-    
+
     @property
     def error_channel(self):
         """Gets the error channel for the bot to log."""
-        return self.get_guild(int(environ.get("SUPPORT_SERVER"))).get_channel(int(environ.get("ERROR_LOG_CHANNEL")))
-        
+        return self.get_guild(int(environ.get("SUPPORT_SERVER"))).get_channel(
+            int(environ.get("ERROR_LOG_CHANNEL"))
+        )
+
     @to_call.append
     def loading_cog(self):
         """Loads the cog"""
@@ -72,11 +73,13 @@ class GrootBot(commands.Bot):
                 cogs += (file[:-3],)
 
         cogs += ("jishaku",)
-        
+
         for cog in cogs:
             ext = "cogs." if cog != "jishaku" else ""
             if error := call(self.load_extension, f"{ext}{cog}", ret=True):
-                print_exception('Ignoring exception while loading up {}:'.format(cog), error)
+                print_exception(
+                    "Ignoring exception while loading up {}:".format(cog), error
+                )
 
     @to_call.append
     async def fill_blacklist(self):
@@ -85,7 +88,7 @@ class GrootBot(commands.Bot):
         cur = await self.db.execute(query)
         data = await cur.fetchall()
         self.blacklist = {r[0] for r in data} or set()
-    
+
     @to_call.append
     async def fill_premiums(self):
         """Loading up premium users."""
@@ -93,7 +96,7 @@ class GrootBot(commands.Bot):
         cur = await self.db.execute(query)
         data = await cur.fetchall()
         self.premiums = {r[0] for r in data} or set()
-    
+
     @to_call.append
     async def fill_tips_on(self):
         """Loading up users that have tips enabled"""
@@ -102,7 +105,7 @@ class GrootBot(commands.Bot):
         cur = await self.db.execute(query)
         data = await cur.fetchall()
         self.tips_on_cache = {r[0] for r in data} or set()
-    
+
     @to_call.append
     async def fill_disabled_commands(self):
         """Loads up all disabled_commands"""
@@ -111,8 +114,7 @@ class GrootBot(commands.Bot):
         data = await cur.fetchall()
         self.cached_disabled = {
             cmd: [r[1] for r in _group]
-            for cmd, _group in itertools.groupby(data,
-                key=operator.itemgetter(0))
+            for cmd, _group in itertools.groupby(data, key=operator.itemgetter(0))
         }
 
     async def get_prefix(self, message):
@@ -142,11 +144,10 @@ class GrootBot(commands.Bot):
         context = await super().get_context(message, cls=customContext)
         return context
 
-    
     async def close(self):
         """Override close to close bot.session"""
         return await self.session.close()
-    
+
     async def logout(self):
         return await super().close()
 
@@ -154,7 +155,9 @@ class GrootBot(commands.Bot):
         """Starts the bot properly"""
         try:
             loop = asyncio.get_event_loop()
-            db = loop.run_until_complete(aiosqlite.connect(f"{self.cwd}/data/main.sqlite3"))
+            db = loop.run_until_complete(
+                aiosqlite.connect(f"{self.cwd}/data/main.sqlite3")
+            )
 
         except Exception as e:
             print_exception("Could not connect to database:", e)
@@ -165,14 +168,12 @@ class GrootBot(commands.Bot):
             self.loop.run_until_complete(self.after_db())
             self.ipc.start()
             self.run(self.token)
-    
-
 
     # Events
     async def on_ready(self):
         logging.warning(f"Logged in as {self.user}, SQLite3 database initialized.")
         print(f"CHECK: Bot ready 1/2")
-    
+
     async def on_ipc_ready(self):
         logging.warning(f"IPC is ready to go!")
         print("CHECK: IPC ready 2/2")
