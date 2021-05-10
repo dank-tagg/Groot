@@ -1,9 +1,6 @@
-import sys
-
-sys.dont_write_bytecode = True
-
 import logging
 import re
+import sys
 from os import environ
 from os.path import dirname, join
 
@@ -12,6 +9,7 @@ from bot import GrootBot
 from dotenv import load_dotenv
 from utils.useful import wait_ready
 
+sys.dont_write_bytecode = True
 environ["JISHAKU_NO_UNDERSCORE"] = "True"
 environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
 
@@ -26,7 +24,7 @@ mentions = discord.AllowedMentions(
     roles=False, users=True, everyone=False, replied_user=True
 )
 bot_data = {
-    "token": environ.get("dev"),
+    "token": environ.get("main"),
     "intents": intents,
     "case_insensitive": True,
     "help_command": None,

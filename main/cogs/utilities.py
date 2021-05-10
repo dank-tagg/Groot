@@ -15,38 +15,23 @@ class utilities(commands.Cog, description="Handy dandy utils"):
         self.bot = bot
         self.index = 0
         self.snipe_cache = {}
-        self.edit_snipe_cache = {}
+        self.esnipe_cache = {}
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
         if before.author.bot:
             return
-        self.edit_snipe_cache[before.channel.id] = {}
-        self.edit_snipe_cache[before.channel.id]["before"] = [
-            before.content,
-            before.author.name,
-            before.author.avatar_url,
-            before.author.discriminator,
-        ]
-        self.edit_snipe_cache[before.channel.id]["after"] = [
-            after.content,
-            after.author.name,
-            after.author.avatar_url,
-            after.author.discriminator,
-        ]
+        self.esnipe_cache[before.channel.id] = {}
+        self.esnipe_cache[before.channel.id]["before"] = [before.content, before.author]
+        self.esnipe_cache[before.channel.id]["after"] = [after.content, after.author]
         await asyncio.sleep(60)
-        self.edit_snipe_cache.pop(before.channel.id, None)
+        self.esnipe_cache.pop(before.channel.id, None)
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
         if message.author.bot:
             return
-        self.snipe_cache[message.channel.id] = [
-            message.content,
-            message.author.name,
-            message.author.avatar_url,
-            message.author.discriminator,
-        ]
+        self.snipe_cache[message.channel.id] = [message.content, message.author]
         await asyncio.sleep(60)
         self.snipe_cache.pop(message.channel.id, None)
 
@@ -67,12 +52,12 @@ class utilities(commands.Cog, description="Handy dandy utils"):
                 colour=discord.Color.random(),
             )
             em.set_author(
-                name=f"{self.snipe_cache[channel.id][1]}#{self.snipe_cache[channel.id][3]}",
-                icon_url=f"{self.snipe_cache[channel.id][2]}",
+                name=f"{self.snipe_cache[channel.id][1]}",
+                icon_url=f"{self.snipe_cache[channel.id][1].avatar_url}",
             )
             em.set_footer(text=f"Sniped by: {author}")
             return await ctx.send(embed=em)
-        except:
+        except KeyError:
             return await ctx.send("There's nothing to snipe!")
 
     @commands.command(name="editsnipe", brief="Retrieves a recently edited message")
@@ -86,19 +71,20 @@ class utilities(commands.Cog, description="Handy dandy utils"):
         try:
             em = Embed(
                 name=f"Last edited message in #{channel.name}",
-                description=f"**Before:**\n+ {self.edit_snipe_cache[channel.id]['before'][0]}\n"
-                f"\n**After:**\n- {self.edit_snipe_cache[channel.id]['after'][0]}",
+                description="**Before:**\n"
+                f"+ {self.esnipe_cache[channel.id]['before'][0]}\n"
+                f"\n**After:**\n- {self.esnipe_cache[channel.id]['after'][0]}",
                 timestamp=datetime.datetime.utcnow(),
                 colour=discord.Color.random(),
             )
             em.set_author(
-                name=f"{self.edit_snipe_cache[channel.id]['before'][1]}#{self.edit_snipe_cache[channel.id]['before'][3]}",
-                icon_url=f"{self.edit_snipe_cache[channel.id]['before'][2]}",
+                name=f"{self.esnipe_cache[channel.id]['before'][1]}",
+                icon_url=f"{self.esnipe_cache[channel.id]['before'][1].avatar_url}",
             )
 
             em.set_footer(text=f"Sniped by: {author}")
             return await ctx.send(embed=em)
-        except:
+        except KeyError:
             return await ctx.send("There's nothing to snipe!")
 
     @commands.command(name="choose")

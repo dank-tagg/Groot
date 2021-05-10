@@ -389,7 +389,7 @@ class admin(commands.Cog):
             else:
                 em = Embed(color=0xFFCC33)
                 em.add_field(
-                    name="<:idle:817035319165059102> " "**Failed to reload all cogs**",
+                    name="<:idle:817035319165059102> **Failed to reload all cogs**",
                     value=fail,
                 )
                 await ctx.reply(embed=em, mention_author=False)
