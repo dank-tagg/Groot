@@ -1,11 +1,10 @@
 import asyncio
 import random
 
-import aiohttp
 import discord
 from discord.ext import commands
 from discord.ext.commands import BucketType
-from utils.useful import *
+from utils.useful import Embed
 
 
 class fun(commands.Cog, description="Fun commands"):

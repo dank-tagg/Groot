@@ -3,7 +3,7 @@ import typing
 import discord
 from discord.ext import commands
 from discord.ext.commands import guild_only, has_guild_permissions
-from utils.useful import *
+from utils.useful import RoleConvert
 
 
 class configuration(commands.Cog):

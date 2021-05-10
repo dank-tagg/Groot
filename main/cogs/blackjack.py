@@ -4,7 +4,7 @@ import random
 import discord
 from discord.ext import commands
 from utils.chat_formatting import hyperlink as link
-from utils.useful import *
+from utils.useful import Embed, convert_to_int
 
 
 class blackjack(commands.Cog):

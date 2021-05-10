@@ -3,13 +3,14 @@ import sys
 sys.dont_write_bytecode = True
 
 import logging
+import re
 from os import environ
 from os.path import dirname, join
 
 import discord
 from bot import GrootBot
 from dotenv import load_dotenv
-from utils.useful import *
+from utils.useful import wait_ready
 
 environ["JISHAKU_NO_UNDERSCORE"] = "True"
 environ["JISHAKU_NO_DM_TRACEBACK"] = "True"

@@ -1,7 +1,8 @@
+import asyncio
 from datetime import datetime as dt
 
 from discord.ext import commands
-from utils.useful import *
+from utils.useful import Embed
 
 
 class support(commands.Cog):

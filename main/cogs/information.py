@@ -8,7 +8,7 @@ import humanize
 import utils.json_loader
 from discord.ext import commands
 from utils.chat_formatting import hyperlink
-from utils.useful import *
+from utils.useful import Embed, grootCooldown
 
 
 class information(commands.Cog):

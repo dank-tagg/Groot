@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 from humanize.time import precisedelta
 from PIL import Image, ImageDraw, ImageFont
-from utils.useful import *
+from utils.useful import Embed, detect, get_grole
 from wonderwords import RandomSentence, RandomWord
 
 

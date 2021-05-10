@@ -3,7 +3,6 @@ import sqlite3
 import time
 
 from discord.ext import commands
-from utils.useful import *
 
 
 class Tags(commands.Cog):

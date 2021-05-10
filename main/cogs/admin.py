@@ -16,7 +16,7 @@ import utils.json_loader
 from discord.ext import commands
 from jishaku.models import copy_context_with
 from utils.chat_formatting import box, hyperlink
-from utils.useful import *
+from utils.useful import Embed
 
 CommandTask = collections.namedtuple("CommandTask", "index ctx task")
 
