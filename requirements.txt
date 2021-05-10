@@ -10,13 +10,11 @@ requests==2.25.1
 stringcase==1.2.0
 Unidecode==1.2.0
 tabulate==0.8.9
-aiosqlite==0.17.0
 discord==1.0.1
 Pillow==8.2.0
-python-dotenv==0.17.0
 discord.ext.menus
 discord.ext.flags
-mystbin.py
+mystbin.pypi
 Quart_Discord==2.1.4
 Quart==0.14.1
 discord_ext_ipc
