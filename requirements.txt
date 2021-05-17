@@ -1,11 +1,9 @@
 aiohttp
-psutil
 jishaku
 discord.py
 humanize
 wonderwords
 dblpy
-dpymenus
 requests
 stringcase
 Unidecode
@@ -15,8 +13,6 @@ Pillow
 discord.ext.menus
 discord.ext.flags
 mystbin.py
-Quart_Discord
-Quart
 discord_ext_ipc
 python-dotenv
 aiosqlite
