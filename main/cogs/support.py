@@ -13,7 +13,8 @@ class support(commands.Cog):
     async def _report(self, ctx):
         questions = [
             "What do you want to report?",
-            "Write a descriptive overview of what you are reporting.\nNote that your answer must be about 20 characters.",
+            "Write a descriptive overview of what you are reporting.\n"
+            "Note that your answer must be about 20 characters.",
         ]
         answers = []
         for question in questions:
@@ -26,7 +27,8 @@ class support(commands.Cog):
                 )
             except asyncio.TimeoutError:
                 raise commands.BadArgument(
-                    "`60s` are over. I ended your report session, since you didn't answer fast enough. Next time please be quicker."
+                    "`60s` are over. I ended your report session, "
+                    "since you didn't answer fast enough. Please be quicker next time."
                 )
             else:
                 answer = answer.content

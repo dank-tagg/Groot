@@ -13,7 +13,7 @@ class configuration(commands.Cog):
     @commands.command(name="tips", usage="<on|off>", brief="Toggles tips on or off")
     async def _tips(self, ctx, *, mode: str):
         """
-        Toggles tip to on or off, specified by the invoking user.\n
+        Toggles tip to on or off, specified by the invoking user.
         If tips are on, you will see random messages including usefull fact/tip for the bot.
         """
         modus = mode.lower()
@@ -43,7 +43,7 @@ class configuration(commands.Cog):
     @has_guild_permissions(manage_guild=True)
     async def config(self, ctx):
         """
-        Configures settings for your server.\n
+        Configures settings for your server.
         Manage guild permission is needed to run this.
         """
         finder = await self.bot.db.execute(

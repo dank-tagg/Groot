@@ -24,10 +24,6 @@ class TopGG(commands.Cog):
         except Exception as e:
             print(e)
 
-    @commands.Cog.listener()
-    async def on_dbl_vote(self, data):
-        print(data)
-
 
 def setup(bot):
     bot.add_cog(TopGG(bot))

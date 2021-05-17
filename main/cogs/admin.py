@@ -28,7 +28,7 @@ class admin(commands.Cog):
         self.bot = bot
         self._last_result = None
         self.sessions = set()
-        self.task_count: int = 0
+        self.task_count = 0
         self.tasks = collections.deque()
 
     @staticmethod

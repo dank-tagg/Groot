@@ -240,12 +240,18 @@ class information(commands.Cog):
                 aliases = ", ".join(command.aliases)
             else:
                 aliases = "No aliases"
-            default = discord.utils.find(
-                lambda c: isinstance(c, grootCooldown), command.checks
-            ).default_mapping._cooldown.per
-            altered = discord.utils.find(
-                lambda c: isinstance(c, grootCooldown), command.checks
-            ).altered_mapping._cooldown.per
+
+            try:
+                default = discord.utils.find(
+                    lambda c: isinstance(c, grootCooldown), command.checks
+                ).default_mapping._cooldown.per
+                altered = discord.utils.find(
+                    lambda c: isinstance(c, grootCooldown), command.checks
+                ).altered_mapping._cooldown.per
+            except:
+                default = 3
+                altered = 1
+
             if default is not None and altered is not None:
                 em.add_field(
                     name="Cooldowns",
