@@ -11,6 +11,14 @@ class ipc(commands.Cog):
             data.guild_id
         )  # get the guild object using parsed guild_id
         return guild.member_count
+    
+    @ipc.server.route()
+    async def get_stats(self):
+        stats = {
+            "users": len(self.bot.users),
+            "guilds": len(self.bot.guilds)
+        }
+        return stats
 
 
 def setup(bot):
