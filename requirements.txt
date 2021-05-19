@@ -16,3 +16,4 @@ mystbin.py
 discord_ext_ipc
 python-dotenv
 aiosqlite
+dpymenus
