@@ -1,6 +1,9 @@
 import logging
 import re
 import sys
+
+sys.dont_write_bytecode = True
+
 from os import environ
 from os.path import dirname, join
 
@@ -9,7 +12,6 @@ from bot import GrootBot
 from dotenv import load_dotenv
 from utils.useful import wait_ready
 
-sys.dont_write_bytecode = True
 environ["JISHAKU_NO_UNDERSCORE"] = "True"
 environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
 
