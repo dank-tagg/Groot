@@ -1,4 +1,4 @@
-import asyncio #test2
+import asyncio
 import collections
 import datetime
 import io
@@ -472,7 +472,8 @@ class admin(commands.Cog):
     
     @dev.command()
     async def git(self, ctx, *, arguments):
-        await ctx.send(await self.run_shell(f"cd Groot;git {arguments}"))
+        text = await self.run_shell(f"cd Groot;git {arguments}")
+        await ctx.send(str(text.replace("cd Groot;", "")))
     @commands.command(name="delete", aliases=["del", "d"])
     async def delete_bot_message(self, ctx):
         try:
