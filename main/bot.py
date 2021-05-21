@@ -34,7 +34,7 @@ class GrootBot(commands.Bot):
         self.cached_users = {}
         self.cached_disabled = {}
         self.tips_on_cache = set()
-        self.ipc = ipc.Server(self, secret_key="GrootBotAdmin")
+        self.ipc = ipc.Server(self, host="0.0.0.0", port=8060, secret_key="GrootBotAdmin")
 
     async def after_db(self):
         """Runs after the db is connected"""
