@@ -380,6 +380,11 @@ class fun(commands.Cog, description="Fun commands"):
                 result = await r.json()
                 await ctx.send(f'{result["setup"]}\n||{result["punchline"]}||')
 
+    @commands.command(name="challenge")
+    async def challenge(self, ctx):
+        """If you solve the challenge, you get premium forever"""
+        await ctx.send(file=discord.File(f"{self.bot.cwd}/data/extra/challengeHidden.jpg"))
+
 
 def setup(bot):
     bot.add_cog(fun(bot))
