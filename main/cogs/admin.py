@@ -368,7 +368,7 @@ class admin(commands.Cog):
     @dev.command(name="sync")
     async def _sync(self, ctx, extension: str = None):
 
-        text = await self.git(ctx=ctx, arguments="pull", output=False)
+        text = await self.git(arguments="pull", output=False)
         fail = ""
 
         if extension is None:
