@@ -469,7 +469,14 @@ class admin(commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.message.add_reaction(f"{self.bot.redTick}")
             await ctx.send(str.capitalize(str(error.original)))
-
+    
+    @dev.command()
+    async def git(self, ctx, *, arguments):
+        cmd = self.bot.get_command("dev eval")
+        await ctx.invoke(
+            cmd,
+            code=f"os.system('cd Groot; git {arguments}')"
+        )
     @commands.command(name="delete", aliases=["del", "d"])
     async def delete_bot_message(self, ctx):
         try:
