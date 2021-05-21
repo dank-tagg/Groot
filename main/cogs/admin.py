@@ -197,7 +197,7 @@ class admin(commands.Cog):
         if stdout:
             stdout = f"```$ {code}\n{stdout.decode()}```"
         if stderr:
-            stderr = f"```$ {code}\n{stdout.decode()}```"
+            stderr = f"```$ {code}\n{stderr.decode()}```"
 
         return stderr if stderr else stdout
 
@@ -472,11 +472,7 @@ class admin(commands.Cog):
     
     @dev.command()
     async def git(self, ctx, *, arguments):
-        cmd = self.bot.get_command("dev eval")
-        await ctx.invoke(
-            cmd,
-            code=f"os.system('cd Groot; git {arguments}')"
-        )
+        await ctx.send(await self.run_shell(f"cd Groot;git {arguments}"))
     @commands.command(name="delete", aliases=["del", "d"])
     async def delete_bot_message(self, ctx):
         try:
