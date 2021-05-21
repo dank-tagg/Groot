@@ -122,7 +122,7 @@ class core(commands.Cog):
         for item in self.cache_usage:
             query = """
                     INSERT INTO usage (command, counter)
-                    VALUES ((?), ?)
+                    VALUES (?, ?)
                     ON CONFLICT(command) DO UPDATE SET counter = counter+?;
                     """
 
