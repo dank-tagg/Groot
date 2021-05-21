@@ -197,10 +197,16 @@ class admin(commands.Cog):
         if stdout:
             stdout = f"```$ {code}\n{stdout.decode()}```"
         if stderr:
-            stderr = f"```$ {code}\n{stdout.decode()}```"
+            stderr = f"```$ {code}\n{stderr.decode()}```"
 
         return stderr if stderr else stdout
-
+    
+    async def git(self, *, arguments):
+        text = await self.run_shell(f"cd Groot;git {arguments}")
+        if not isinstance(text, str):
+            text = text.decode("ascii").replace("cd Groot;", "")
+        return text
+    
     @dev.command(name="update")
     async def _update(self, ctx, link: str, *, message: str):
         await ctx.send("Are you sure you want update me? `(y/n)`")
@@ -357,6 +363,8 @@ class admin(commands.Cog):
 
     @dev.command(name="sync")
     async def _sync(self, ctx, extension: str = None):
+        
+        text = await self.git(ctx=ctx, arguments="pull", output=False)
         fail = ""
 
         if extension is None:
@@ -392,7 +400,7 @@ class admin(commands.Cog):
                     name="<:idle:817035319165059102> **Failed to reload all cogs**",
                     value=fail,
                 )
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.reply(content=f"```\n{text}```", embed=em, mention_author=False)
 
         else:
             try:
@@ -469,7 +477,12 @@ class admin(commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.message.add_reaction(f"{self.bot.redTick}")
             await ctx.send(str.capitalize(str(error.original)))
-
+    
+    @dev.command(name="git")
+    async def _git(self, ctx, *, arguments):
+        text = await self.git(arguments=arguments)
+        await ctx.send(text or "No output.")
+        
     @commands.command(name="delete", aliases=["del", "d"])
     async def delete_bot_message(self, ctx):
         try:

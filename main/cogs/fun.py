@@ -388,3 +388,4 @@ class fun(commands.Cog, description="Fun commands"):
 
 def setup(bot):
     bot.add_cog(fun(bot))
+
