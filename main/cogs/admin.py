@@ -206,10 +206,11 @@ class admin(commands.Cog):
             f"cd {str(__import__('pathlib').Path(self.bot.cwd).parent)};git {arguments}"
         )
         if not isinstance(text, str):
-            text = text.decode("ascii").replace(
-                f"cd {str(__import__('pathlib').Path(self.bot.cwd).parent)};", ""
+            text = text.decode("ascii")
+        return text.replace(
+                f"cd {str(__import__('pathlib').Path(self.bot.cwd).parent)};", 
+                ""
             )
-        return text
 
     @dev.command(name="update")
     async def _update(self, ctx, link: str, *, message: str):
@@ -368,7 +369,7 @@ class admin(commands.Cog):
     @dev.command(name="sync")
     async def _sync(self, ctx, extension: str = None):
 
-        text = await self.git(arguments="pull", output=False)
+        text = await self.git(arguments="pull")
         fail = ""
 
         if extension is None:
@@ -393,6 +394,11 @@ class admin(commands.Cog):
             if fail == "":
                 em = Embed(color=0x3CA374)
                 em.add_field(
+                    name="Pulling from GitHub",
+                    value=text,
+                    inline=False
+                )
+                em.add_field(
                     name=f"{self.bot.greenTick} Cogs Reloading",
                     value="```diff\n+ All cogs were reloaded successfully```",
                 )
@@ -401,11 +407,16 @@ class admin(commands.Cog):
             else:
                 em = Embed(color=0xFFCC33)
                 em.add_field(
+                    name="Pulling from GitHub",
+                    value=text,
+                    inline=False
+                )
+                em.add_field(
                     name="<:idle:817035319165059102> **Failed to reload all cogs**",
                     value=fail,
                 )
                 await ctx.reply(
-                    content=f"```\n{text}```", embed=em, mention_author=False
+                    embed=em, mention_author=False
                 )
 
         else:
@@ -415,6 +426,11 @@ class admin(commands.Cog):
                     description=f"{self.bot.greenTick} "
                     f"**Reloaded cogs.{extension}**",
                     color=0x3CA374,
+                )
+                em.add_field(
+                    name="Pulling from GitHub",
+                    value=text,
+                    inline=False
                 )
 
                 await ctx.reply(embed=em, mention_author=False)
@@ -427,6 +443,11 @@ class admin(commands.Cog):
                 ).replace("``", "`\u200b`")
 
                 em = Embed(color=0xF04D4B)
+                em.add_field(
+                    name="Pulling from GitHub",
+                    value=text,
+                    inline=False
+                )
                 em.add_field(
                     name=f"{self.bot.redTick} " f"Failed to reload {e.name}",
                     value=f"```py\n{traceback_content}```",
