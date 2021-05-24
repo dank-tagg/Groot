@@ -113,7 +113,11 @@ class core(commands.Cog):
         )
 
         for item in self.cache:
-            query_user_data = "INSERT INTO users_data (user_id, commands_ran) VALUES ((?), ?) ON CONFLICT(user_id) DO UPDATE SET commands_ran = commands_ran+?;"
+            query_user_data = """
+                              INSERT INTO users_data (user_id, commands_ran) 
+                              VALUES (?, ?) 
+                              ON CONFLICT(user_id) DO UPDATE SET commands_ran = commands_ran+?;"
+                              """
             await self.bot.db.execute(
                 query_user_data, (int(item), self.cache[item], self.cache[item])
             )
@@ -121,8 +125,8 @@ class core(commands.Cog):
 
         for item in self.cache_usage:
             query = """
-                    INSERT INTO usage (command, counter)
-                    VALUES (?, ?)
+                    INSERT INTO usage (command, counter) 
+                    VALUES (?, ?) 
                     ON CONFLICT(command) DO UPDATE SET counter = counter+?;
                     """
 
