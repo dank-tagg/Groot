@@ -157,7 +157,7 @@ class Core(commands.Cog):
 
     @tasks.loop(minutes=10)
     async def update_status(self):
-        now = datetime.datetime.utcnow()
+        now = dt.datetime.utcnow()
         groot_status = "<:online:846453832194981898> Online" 
         message = f"**BOT STATUS** \n\n {groot_status} | Groot\n\nRefreshes every 10 minutes"
     
