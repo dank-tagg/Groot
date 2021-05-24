@@ -158,10 +158,10 @@ class Core(commands.Cog):
     @tasks.loop(minutes=10)
     async def update_status(self):
         now = datetime.datetime.utcnow()
-	groot_status = "<:online:846453832194981898> Online" 
-	message = "**BOT STATUS** \n\n"
-                        f"{groot_status} | Groot\n\n"
-                         "Refreshes every 10 minutes"
+        groot_status = "<:online:846453832194981898> Online" 
+        message = "**BOT STATUS** \n\n"
+                 f"{groot_status} | Groot\n\n"
+                  "Refreshes every 10 minutes"
     
         em = Embed(
                 description=message,
@@ -171,7 +171,7 @@ class Core(commands.Cog):
         em.set_author("Bot status")
     
         channel = self.bot.get_channel(846450009721012294)
-	try:
+        try:
             await  channel.last_message.edit(embed=em)
         except:
             await channel.purge(limit=100000)
