@@ -17,7 +17,7 @@ from utils.chat_formatting import box
 from utils.useful import Embed, MemberConvert, RoleConvert, get_frozen
 
 
-class moderation(commands.Cog, description="Moderation commands"):
+class Moderation(commands.Cog, description="Moderation commands"):
     def __init__(self, bot):
         self.bot = bot
 
@@ -533,4 +533,4 @@ class moderation(commands.Cog, description="Moderation commands"):
 
 
 def setup(bot):
-    bot.add_cog(moderation(bot))
+    bot.add_cog(Moderation(bot))

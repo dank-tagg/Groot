@@ -11,7 +11,7 @@ from utils.chat_formatting import hyperlink
 from utils.useful import Embed, grootCooldown
 
 
-class information(commands.Cog):
+class Information(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -221,7 +221,7 @@ class information(commands.Cog):
             if self.bot.get_command(command) == None:
                 f = str(self.bot.get_cog(command))
                 if f != None:
-                    await self.create_menu(ctx, f"{str(command.lower())}")
+                    await self.create_menu(ctx, f"{str.capitalize(command.lower())}")
                     return
                 else:
                     await ctx.reply(
@@ -422,4 +422,4 @@ class information(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(information(bot))
+    bot.add_cog(Information(bot))

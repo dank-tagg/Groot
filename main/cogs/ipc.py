@@ -1,7 +1,7 @@
 from discord.ext import commands, ipc
 
 
-class ipc(commands.Cog):
+class Ipc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -22,4 +22,4 @@ class ipc(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(ipc(bot))
+    bot.add_cog(Ipc(bot))

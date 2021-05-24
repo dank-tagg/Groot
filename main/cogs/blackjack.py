@@ -7,7 +7,7 @@ from utils.chat_formatting import hyperlink as link
 from utils.useful import Embed, convert_to_int
 
 
-class blackjack(commands.Cog):
+class Blackjack(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.data = bot.data
@@ -262,4 +262,4 @@ class blackjack(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(blackjack(bot))
+    bot.add_cog(Blackjack(bot))

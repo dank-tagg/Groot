@@ -10,7 +10,7 @@ from utils.useful import (Embed, convert_to_int, grootCooldown, progress_bar,
                           roman_num)
 
 
-class currency(commands.Cog):
+class Currency(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.data = bot.data
@@ -602,4 +602,4 @@ class currency(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(currency(bot))
+    bot.add_cog(Currency(bot))

@@ -6,7 +6,7 @@ from discord.ext.commands import guild_only, has_guild_permissions
 from utils.useful import RoleConvert
 
 
-class configuration(commands.Cog):
+class Configuration(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -163,4 +163,4 @@ class configuration(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(configuration(bot))
+    bot.add_cog(Configuration(bot))

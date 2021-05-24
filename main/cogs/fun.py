@@ -7,7 +7,7 @@ from discord.ext.commands import BucketType
 from utils.useful import Embed
 
 
-class fun(commands.Cog, description="Fun commands"):
+class Fun(commands.Cog, description="Fun commands"):
     def __init__(self, bot):
         self.bot = bot
 
@@ -387,5 +387,5 @@ class fun(commands.Cog, description="Fun commands"):
 
 
 def setup(bot):
-    bot.add_cog(fun(bot))
+    bot.add_cog(Fun(bot))
 

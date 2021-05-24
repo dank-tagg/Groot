@@ -6,7 +6,7 @@ from discord.ext import commands, tasks
 from utils.useful import Embed, grootCooldown, send_traceback
 
 
-class core(commands.Cog):
+class Core(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.cache = {}
@@ -113,7 +113,7 @@ class core(commands.Cog):
         for item in self.cache:
             query_user_data = """
                               INSERT INTO users_data (user_id, commands_ran) 
-                              VALUES (?, ?)
+                              VALUES ((?), ?)
                               ON CONFLICT(user_id) DO UPDATE SET commands_ran = commands_ran+?;"
                               """
             await self.bot.db.execute(
@@ -124,7 +124,7 @@ class core(commands.Cog):
         for item in self.cache_usage:
             query = """
                     INSERT INTO usage (command, counter) 
-                    VALUES (?, ?) 
+                    VALUES ((?), ?) 
                     ON CONFLICT(command) DO UPDATE SET counter = counter+?;
                     """
 
@@ -156,4 +156,4 @@ class core(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(core(bot))
+    bot.add_cog(Core(bot))

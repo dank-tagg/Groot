@@ -5,7 +5,7 @@ from discord.ext import commands
 from utils.useful import Embed
 
 
-class support(commands.Cog):
+class Support(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -68,4 +68,4 @@ class support(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(support(bot))
+    bot.add_cog(Support(bot))

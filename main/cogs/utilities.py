@@ -10,7 +10,7 @@ from utils.useful import Embed, detect, get_grole
 from wonderwords import RandomSentence, RandomWord
 
 
-class utilities(commands.Cog, description="Handy dandy utils"):
+class Utilities(commands.Cog, description="Handy dandy utils"):
     def __init__(self, bot):
         self.bot = bot
         self.index = 0
@@ -639,4 +639,4 @@ class utilities(commands.Cog, description="Handy dandy utils"):
 
 
 def setup(bot):
-    bot.add_cog(utilities(bot))
+    bot.add_cog(Utilities(bot))
