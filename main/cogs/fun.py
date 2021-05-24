@@ -1,3 +1,4 @@
+from abc import abstractproperty
 import asyncio
 import random
 
@@ -87,20 +88,14 @@ class Fun(commands.Cog, description="Fun commands"):
     @commands.command(name="gayrate", aliases=["howgay"], brief="Rates your gayness")
     async def gayrate(self, ctx, member: discord.Member = None):
         """Rate your gayness or another users gayness. 1-100% is returned"""
-        if member:
-            emb = Embed(
-                title="gay r8 machine",
-                description=f"{member.name} is {random.randrange(0, 100)}% gay 🌈",
-                color=discord.Color.random(),
-            )
-            await ctx.send(embed=emb)
-        else:
-            emb = Embed(
-                title="gay r8 machine",
-                description=f"You are {random.randrange(0, 100)}% gay 🌈",
-                color=discord.Color.random(),
-            )
-            await ctx.send(embed=emb)
+        user = member.name if member else "You"
+
+        emb = Embed(
+            title="gay r8 machine",
+            description=f"{user} is {random.randrange(0, 100)}% gay 🌈",
+            color=discord.Color.random(),
+        )
+        await ctx.send(embed=emb)
 
     @gayrate.error
     async def gayrate_error(self, ctx, error):
@@ -115,9 +110,9 @@ class Fun(commands.Cog, description="Fun commands"):
     @commands.command(aliases=["memes"], brief="Shows a meme from reddit")
     async def meme(self, ctx):
         """Shows a meme from r/memes."""
-        async with self.bot.session as cs:
-            async with cs.get("https://www.reddit.com/r/memes/random/.json") as r:
-                res = await r.json()
+        async with self.bot.session() as cs:
+            async with cs.get("https://www.reddit.com/r/memes/random/.json") as res:
+                res = await res.json()
 
                 image = res[0]["data"]["children"][0]["data"]["url"]
                 permalink = res[0]["data"]["children"][0]["data"]["permalink"]
@@ -127,10 +122,10 @@ class Fun(commands.Cog, description="Fun commands"):
                 downs = res[0]["data"]["children"][0]["data"]["downs"]
                 comments = res[0]["data"]["children"][0]["data"]["num_comments"]
 
-                embed = Embed(colour=discord.Color.blurple(), title=title, url=url)
-                embed.set_image(url=image)
-                embed.set_footer(text=f"👍 {ups} 👎 {downs} 💬 {comments}")
-                await ctx.send(embed=embed, content=None)
+                em = Embed(colour=discord.Color.blurple(), title=title, url=url)
+                em.set_image(url=image)
+                em.set_footer(text=f"👍 {ups} 👎 {downs} 💬 {comments}")
+                await ctx.send(embed=em)
 
     @commands.command(name="8ball", brief="Ask the 8-ball a question!")
     async def eightball(self, ctx, *, question):
@@ -150,13 +145,13 @@ class Fun(commands.Cog, description="Fun commands"):
             "Possibly so!",
             "Yes. Yes. Yes.",
         ]
-        if question:
-            em = Embed(
-                title="Magic 8-ball",
-                description=f"You: {question}\n🎱: {random.choice(answers)}",
-                colour=discord.Color.random(),
-            )
-            await ctx.send(embed=em)
+
+        em = Embed(
+            title="Magic 8-ball",
+            description=f"You: {question}\n🎱: {random.choice(answers)}",
+            colour=discord.Color.random(),
+        )
+        await ctx.send(embed=em)
 
     @commands.group(
         invoke_without_command=True, case_insensitive=True, usage="<encode | decode>"
@@ -170,26 +165,24 @@ class Fun(commands.Cog, description="Fun commands"):
     @binary.command()
     async def encode(self, ctx, *, text):
         """Encodes given text to binary"""
-        binary = self.bot.session
-        async with binary.get(
-            f"https://some-random-api.ml/binary?text={text}"
-        ) as texxt:
-            res = await texxt.json()
-            bintext = res["binary"]
-            await ctx.send(bintext)
-            await binary.close()
+        api = f"https://some-random-api.ml/binary?text={text}"
+        
+        async with self.bot.session() as cs:
+            async with cs.get(api) as res:
+                res = await res.json()
+                bintext = res["binary"]
+                await ctx.send(bintext)
 
     @binary.command()
     async def decode(self, ctx, *, binary):
         """Decodes given text to binary"""
-        decode = self.bot.session
-        async with decode.get(
-            f"https://some-random-api.ml/binary?decode={binary}"
-        ) as s:
-            res = await s.json()
-            decoded = res["text"]
-            await ctx.send(decoded)
-            await decode.close()
+
+        api = f"https://some-random-api.ml/binary?decode={binary}"
+        async with self.bot.session() as cs:
+            async with cs.get(api) as res:
+                res = await res.json()
+                decoded = res["text"]
+                await ctx.send(decoded)
 
     @commands.command(name="fight")
     @commands.max_concurrency(1, BucketType.user, wait=False)
@@ -198,12 +191,12 @@ class Fun(commands.Cog, description="Fun commands"):
         Challenge an user to a duel!
         The user cannot be a bot.
         """
-        if member.bot or member.id == ctx.author.id:
-            await ctx.send("You can't fight yourself or a bot stupid")
-            return
-        userstr = [ctx.author, member]
+        if member.bot or member == ctx.author:
+            return await ctx.send("You can't fight yourself or a bot stupid")
 
-        user1 = random.choice(userstr)
+        users = [ctx.author, member]
+
+        user1 = random.choice(users)
         user2 = ctx.author if user1 == member else member
 
         user1_hp = 100
@@ -375,17 +368,18 @@ class Fun(commands.Cog, description="Fun commands"):
         Returns a random joke from https://official-joke-api.appspot.com/jokes/random.
         """
         api = "https://official-joke-api.appspot.com/jokes/random"
-        async with self.bot.session as cs:
-            async with cs.get(api) as r:
-                result = await r.json()
+        async with self.bot.session() as cs:
+            async with cs.get(api) as res:
+                result = await res.json()
                 await ctx.send(f'{result["setup"]}\n||{result["punchline"]}||')
 
     @commands.command(name="challenge")
     async def challenge(self, ctx):
         """If you solve the challenge, you get premium forever"""
-        await ctx.send(file=discord.File(f"{self.bot.cwd}/data/extra/challengeHidden.jpg"))
+        await ctx.send(
+            file=discord.File(f"{self.bot.cwd}/data/extra/challengeHidden.jpg")
+        )
 
 
 def setup(bot):
     bot.add_cog(Fun(bot))
-

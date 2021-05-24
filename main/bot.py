@@ -29,7 +29,7 @@ class GrootBot(commands.Bot):
         self.data = currencyData(self)
         self.token = kwargs.pop("token", None)
         self.db = None
-        self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession
         self.premiums = set()
         self.blacklist = set()
         self.cached_users = {}
@@ -148,10 +148,6 @@ class GrootBot(commands.Bot):
         """Override get_context to use a custom Context"""
         context = await super().get_context(message, cls=customContext)
         return context
-
-    async def close(self):
-        """Override close to close bot.session"""
-        return await self.session.close()
 
     async def logout(self, restart=False):
         await super().close()
