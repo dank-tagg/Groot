@@ -618,8 +618,9 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             return await ctx.send(embed=em)
     
     @commands.command(name="id")
-    async def id(ctx, any: Union[discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.CategoryChannel, discord.Emoji, discord.User]):
+    async def _get_id(self, ctx, any: Union[discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.CategoryChannel, discord.Emoji, discord.User]):
         return await ctx.send(any.id)
+
     @commands.group(name="tag", invoke_without_command=True, case_insensitive=True)
     async def _tag(self, ctx, *, tag):
         """Get a tag"""
