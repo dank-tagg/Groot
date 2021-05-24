@@ -12,6 +12,7 @@ class Core(commands.Cog):
         self.cache = {}
         self.cache_usage = {}
         self.loops.start()
+        self.update_status.start()
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -154,6 +155,31 @@ class Core(commands.Cog):
     async def before_loops(self):
         await self.bot.wait_until_ready()
 
+    @tasks.loop(minutes=10)
+    async def update_status(self):
+        now = datetime.datetime.utcnow()
+	groot_status = "<:online:846453832194981898> Online" 
+	message = "**BOT STATUS** \n\n"
+                        f"{groot_status} | Groot\n\n"
+                         "Refreshes every 10 minutes"
+    
+        em = Embed(
+                description=message,
+                timestamp=now
+            )
+        em.set_footer(text="Last updated at")
+        em.set_author("Bot status")
+    
+        channel = self.bot.get_channel(846450009721012294)
+	try:
+            await  channel.last_message.edit(embed=em)
+        except:
+            await channel.purge(limit=100000)
+            await channel.send(embed=em)
+
+    @update_status.before_loop
+    async def before_status(self):
+        await self.bot.wait_until_ready()
 
 def setup(bot):
     bot.add_cog(Core(bot))
