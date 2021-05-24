@@ -231,67 +231,8 @@ class admin(commands.Cog):
     async def _eval(self, ctx, *, code: str):
         """Evaluates a code"""
 
-        env = {
-            "bot": self.bot,
-            "ctx": ctx,
-            "channel": ctx.channel,
-            "author": ctx.author,
-            "guild": ctx.guild,
-            "message": ctx.message,
-            "_": self._last_result,
-        }
-
-        env.update(globals())
-
-        code = self.cleanup_code(code)
-        stdout = io.StringIO()
-
-        to_compile = f'async def func():\n{textwrap.indent(code, "  ")}'
-
-        try:
-            exec(to_compile, env)
-        except Exception as e:
-            emb = Embed(title="", description="Evaluated your code", color=0x2F3136)
-            emb.add_field(
-                name="Output:", value=f"```py\n{e.__class__.__name__}: {e}\n```"
-            )
-            return await ctx.send(embed=emb)
-
-        func = env["func"]
-        try:
-            with redirect_stdout(stdout):
-                self.bot.ret = await func()
-        except Exception:
-            self.bot.value = stdout.getvalue()
-            emb = Embed(title="", description="Evaluated your code", color=0x2F3136)
-            emb.add_field(
-                name="Output:",
-                value=f"```py\n{self.bot.value}{traceback.format_exc()}\n```",
-            )
-            return await ctx.send(embed=emb)
-
-        else:
-            self.bot.value = stdout.getvalue()
-            try:
-                await ctx.message.add_reaction("\u2705")
-            except:
-                pass
-
-            if self.bot.ret is None:
-                if self.bot.value:
-                    emb = Embed(
-                        title="", description="Evaluated your code", color=0x2F3136
-                    )
-                    emb.add_field(name="Output:", value=f"```py\n{self.bot.value}\n```")
-                    return await ctx.send(embed=emb)
-
-            else:
-                self._last_result = self.bot.ret
-                emb = Embed(title="", description="Evaluated your code", color=0x2F3136)
-                emb.add_field(
-                    name="Output:", value=f"```py\n{self.bot.value}{self.bot.ret}\n```"
-                )
-                return await ctx.send(embed=emb)
+        cmd = self.bot.get_command("jsk py")
+        return await ctx.invoke(cmd, argument=code)
 
     @_eval.error
     async def _eval_error(self, ctx, error):
