@@ -5,6 +5,7 @@ import logging
 import operator
 import os
 import re
+import sys
 from os import environ
 from pathlib import Path
 
@@ -12,9 +13,9 @@ import aiohttp
 import aiosqlite
 import discord
 from discord.ext import commands, ipc
+
 from utils.subclasses import customContext
-from utils.useful import (ListCall, call, currencyData, grootCooldown,
-                          print_exception)
+from utils.useful import ListCall, call, currencyData, grootCooldown, print_exception
 
 to_call = ListCall()
 
@@ -34,7 +35,9 @@ class GrootBot(commands.Bot):
         self.cached_users = {}
         self.cached_disabled = {}
         self.tips_on_cache = set()
-        self.ipc = ipc.Server(self, host="0.0.0.0", port=8060, secret_key="GrootBotAdmin")
+        self.ipc = ipc.Server(
+            self, host="0.0.0.0", port=8060, secret_key="GrootBotAdmin"
+        )
 
     async def after_db(self):
         """Runs after the db is connected"""
@@ -150,8 +153,10 @@ class GrootBot(commands.Bot):
         """Override close to close bot.session"""
         return await self.session.close()
 
-    async def logout(self):
-        return await super().close()
+    async def logout(self, restart=False):
+        await super().close()
+        if restart:
+            os.system(f"python {self.cwd}/launcher.py")
 
     def starter(self):
         """Starts the bot properly"""
@@ -168,17 +173,16 @@ class GrootBot(commands.Bot):
             self.launch_time = datetime.datetime.utcnow()
             self.db = db
             self.loop.run_until_complete(self.after_db())
-            self.ipc.start()
+            try:
+                self.ipc.start()
+            except Exception as e:
+                logging.warning("Couldn't connect to IPC:", e)
             self.run(self.token)
 
     # Events
     async def on_ready(self):
         logging.warning(f"Logged in as {self.user}, SQLite3 database initialized.")
-        print(f"CHECK: Bot ready 1/2")
-
-    async def on_ipc_ready(self):
-        logging.warning(f"IPC is ready to go!")
-        print("CHECK: IPC ready 2/2")
+        print(f"Logged in as {self.user}")
 
     async def on_ipc_error(self, endpoint, error):
         logging.warning(f"{endpoint} raised {error}")

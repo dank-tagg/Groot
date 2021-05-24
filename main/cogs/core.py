@@ -16,9 +16,7 @@ class core(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         """Error handles everything"""
-        if ctx.command:
-            if ctx.command.has_error_handler():
-                return
+        if ctx.command and ctx.command.has_error_handler(): return
 
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
@@ -115,7 +113,7 @@ class core(commands.Cog):
         for item in self.cache:
             query_user_data = """
                               INSERT INTO users_data (user_id, commands_ran) 
-                              VALUES (?, ?) 
+                              VALUES (?, ?)
                               ON CONFLICT(user_id) DO UPDATE SET commands_ran = commands_ran+?;"
                               """
             await self.bot.db.execute(
