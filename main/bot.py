@@ -65,9 +65,7 @@ class GrootBot(commands.Bot):
     @property
     def error_channel(self):
         """Gets the error channel for the bot to log."""
-        return self.get_guild(int(environ.get("SUPPORT_SERVER"))).get_channel(
-            int(environ.get("ERROR_LOG_CHANNEL"))
-        )
+        return self.owner
 
     @to_call.append
     def loading_cog(self):
