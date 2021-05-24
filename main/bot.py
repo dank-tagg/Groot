@@ -157,6 +157,7 @@ class GrootBot(commands.Bot):
         await super().close()
         if restart:
             os.system(f"python {self.cwd}/launcher.py")
+        exit()
 
     def starter(self):
         """Starts the bot properly"""
