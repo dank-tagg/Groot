@@ -159,9 +159,7 @@ class Core(commands.Cog):
     async def update_status(self):
         now = datetime.datetime.utcnow()
         groot_status = "<:online:846453832194981898> Online" 
-        message = "**BOT STATUS** \n\n"
-                 f"{groot_status} | Groot\n\n"
-                  "Refreshes every 10 minutes"
+        message = f"**BOT STATUS** \n\n {groot_status} | Groot\n\nRefreshes every 10 minutes"
     
         em = Embed(
                 description=message,
