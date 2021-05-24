@@ -76,12 +76,12 @@ class Developer(commands.Cog):
                 data["link"] = link
                 utils.json_loader.write_json(data, "updates")
 
-    @dev.command(name="eval")
+    @dev.command(name="eval", aliases=["run"])
     async def _eval(self, ctx, *, code: codeblock_converter):
         """Evaluates a code"""
 
-        cmd = self.bot.get_command("jsk py")
-        return await ctx.invoke(cmd, argument=code)
+        jsk = self.bot.get_command("jishaku py")
+        return await jsk(ctx, argument=code)
 
     @_eval.error
     async def _eval_error(self, ctx, error):
