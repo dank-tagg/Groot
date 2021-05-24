@@ -158,7 +158,7 @@ class Core(commands.Cog):
     @tasks.loop(minutes=10)
     async def update_status(self):
         now = dt.datetime.utcnow()
-        groot_status = "<:online:846453832194981898> Online" 
+        groot_status = "<:online:808613541774360576> Online" 
         message = f"**BOT STATUS** \n\n {groot_status} | Groot\n\nRefreshes every 10 minutes"
     
         em = Embed(
@@ -166,7 +166,6 @@ class Core(commands.Cog):
                 timestamp=now
             )
         em.set_footer(text="Last updated at")
-        em.set_author(name="Bot status")
     
         channel = self.bot.get_channel(846450009721012294)
         try:
