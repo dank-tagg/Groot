@@ -166,7 +166,7 @@ class Core(commands.Cog):
                 timestamp=now
             )
         em.set_footer(text="Last updated at")
-        em.set_author("Bot status")
+        em.set_author(name="Bot status")
     
         channel = self.bot.get_channel(846450009721012294)
         try:
