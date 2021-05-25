@@ -87,30 +87,6 @@ class Developer(commands.Cog):
         jsk = self.bot.get_command("jishaku py")
         return await jsk(ctx, argument=code)
 
-    @_eval.error
-    async def _eval_error(self, ctx, error):
-        if isinstance(error, commands.CommandInvokeError):
-            error = getattr(error, "original", error)
-            if error.code == 50035:
-                output = (
-                    self.bot.value + self.bot.ret if self.bot.ret else self.bot.value
-                )
-                mystbin_client = mystbin.Client()
-                paste = await mystbin_client.post(f"{output}", syntax="python")
-                await mystbin_client.close()
-                em = Embed(color=0x2F3136)
-                em.add_field(
-                    name="Output:",
-                    value=f"{box(output[0:10] + '... # Truncated', 'py')}",
-                )
-                em.add_field(
-                    name="Your output was too long!\n",
-                    value=f"I pasted your output {hyperlink('here', paste)}",
-                    inline=False,
-                )
-                em.set_author(name="Evaluated your code!")
-                await ctx.send(embed=em)
-
     @dev.command(name="guilds")
     async def _guilds(self, ctx, page: int = 1):
         GUILDSa = self.bot.guilds
@@ -153,7 +129,7 @@ class Developer(commands.Cog):
                 value=f"Members: {guild[3]:,}\nGuild ID: `{guild[1]}`\nOwner: {owner}\n\n",
                 inline=False,
             )
-        msg = await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @dev.command(name="inviteme")
     async def _inviteme(self, ctx, *, guildid: int):
@@ -161,74 +137,49 @@ class Developer(commands.Cog):
         await ctx.author.send(f"{await guild.text_channels[0].create_invite()}")
 
     @dev.command(name="sync")
-    async def _sync(self, ctx, extension: str = None):
+    async def _sync(self, ctx):
 
         text = await self.git(arguments="pull")
         fail = ""
 
-        if extension is None:
-            async with ctx.typing():
-                for file in os.listdir(f"{self.bot.cwd}/cogs"):
-                    if file.endswith(".py"):
-                        try:
-                            self.bot.reload_extension(f"cogs.{file[:-3]}")
-                        except discord.ext.commands.ExtensionNotLoaded as e:
-                            fail += f"```diff\n- {e.name} is not loaded```"
-                        except discord.ext.commands.ExtensionFailed as e:
-                            exc_info = type(e), e.original, e.__traceback__
-                            etype, value, trace = exc_info
-                            traceback_content = "".join(
-                                traceback.format_exception(etype, value, trace, 10)
-                            ).replace("``", "`\u200b`")
-                            fail += (
-                                f"```diff\n- {e.name} failed to reload.```"
-                                + f"```py\n{traceback_content}```"
-                            )
+        async with ctx.typing():
+            for file in os.listdir(f"{self.bot.cwd}/cogs"):
+                if file.endswith(".py"):
+                    try:
+                        self.bot.reload_extension(f"cogs.{file[:-3]}")
+                    except discord.ext.commands.ExtensionNotLoaded as e:
+                        fail += f"```diff\n- {e.name} is not loaded```"
+                    except discord.ext.commands.ExtensionFailed as e:
+                        exc_info = type(e), e.original, e.__traceback__
+                        etype, value, trace = exc_info
+                        traceback_content = "".join(
+                            traceback.format_exception(etype, value, trace, 10)
+                        ).replace("``", "`\u200b`")
+                        fail += (
+                            f"```diff\n- {e.name} failed to reload.```"
+                            + f"```py\n{traceback_content}```"
+                        )
 
-            if fail == "":
-                em = Embed(color=0x3CA374)
-                em.add_field(name="Pulling from GitHub", value=text, inline=False)
-                em.add_field(
-                    name=f"{self.bot.greenTick} Cogs Reloading",
-                    value="```diff\n+ All cogs were reloaded successfully```",
-                )
+        if not fail:
+            em = Embed(color=0x3CA374)
+            em.add_field(name="Pulling from GitHub", value=text, inline=False)
+            em.add_field(
+                name=f"{self.bot.greenTick} Cogs Reloading",
+                value="```diff\n+ All cogs were reloaded successfully```",
+            )
 
-                await ctx.reply(embed=em, mention_author=False)
-            else:
-                em = Embed(color=0xFFCC33)
-                em.add_field(name="Pulling from GitHub", value=text, inline=False)
-                em.add_field(
-                    name="<:idle:817035319165059102> **Failed to reload all cogs**",
-                    value=fail,
-                )
-                await ctx.reply(embed=em, mention_author=False)
-
+            await ctx.reply(embed=em, mention_author=False)
         else:
-            try:
-                self.bot.reload_extension(f"cogs.{extension}")
-                em = Embed(
-                    description=f"{self.bot.greenTick} "
-                    f"**Reloaded cogs.{extension}**",
-                    color=0x3CA374,
-                )
-                em.add_field(name="Pulling from GitHub", value=text, inline=False)
-
-                await ctx.reply(embed=em, mention_author=False)
-
-            except discord.ext.commands.ExtensionFailed as e:
-                exc_info = type(e), e.original, e.__traceback__
-                etype, value, trace = exc_info
-                traceback_content = "".join(
-                    traceback.format_exception(etype, value, trace, 10)
-                ).replace("``", "`\u200b`")
-
-                em = Embed(color=0xF04D4B)
-                em.add_field(name="Pulling from GitHub", value=text, inline=False)
-                em.add_field(
-                    name=f"{self.bot.redTick} " f"Failed to reload {e.name}",
-                    value=f"```py\n{traceback_content}```",
-                )
-                await ctx.reply(embed=em, mention_author=False)
+            mystbin_client = mystbin.Client()
+            paste = await mystbin_client.post(fail, syntax="python")
+            await mystbin_client.close()
+            em = Embed(color=0xFFCC33)
+            em.add_field(name="Pulling from GitHub", value=text, inline=False)
+            em.add_field(
+                name="<:idle:817035319165059102> **Failed to reload all cogs**",
+                value=f"Error was send {hyperlink('here', f'{str(paste)}')}",
+            )
+            await ctx.reply(embed=em, mention_author=False)
 
     @dev.command(name="sudo")
     async def _sudo(self, ctx: commands.Context, *, command_string: str):
@@ -247,9 +198,9 @@ class Developer(commands.Cog):
 
     @dev.command(name="reload")
     async def _reloadmodule(self, ctx, *, module: str):
-        cmd = self.bot.get_command("dev eval")
-        await ctx.invoke(
-            cmd, code="import imp\n" f"import {module}\n" f"print(imp.reload({module}))"
+        jsk = self.bot.get_command("jishaku py")
+        await jsk(
+            code="import imp\n" f"import {module}\n" f"print(imp.reload({module}))"
         )
 
     @dev.command()
