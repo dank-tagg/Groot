@@ -98,7 +98,7 @@ class Core(commands.Cog):
         try:
             self.cache[str(ctx.author.id)] += 1
             self.cache_usage[str(ctx.command.name)] += 1
-        except:
+        except Exception:
             self.cache[str(ctx.author.id)] = 1
             self.cache_usage[str(ctx.command.name)] = 1
 
@@ -177,7 +177,7 @@ class Core(commands.Cog):
         channel = self.bot.get_channel(846450009721012294)
         try:
             await  channel.last_message.edit(embed=em)
-        except:
+        except Exception:
             await channel.purge(limit=100000)
             await channel.send(embed=em)
 

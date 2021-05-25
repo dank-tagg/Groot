@@ -155,7 +155,7 @@ async def convert_to_int(amount, max_amt):
     amount = amount.replace("e", "*10**")
     try:
         return int(eval(amount))
-    except:
+    except Exception:
         raise commands.BadArgument("That is not a valid amount!")
 
 

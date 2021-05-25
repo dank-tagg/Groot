@@ -380,7 +380,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
                     )
                 try:
                     val = int(time[:-1])
-                except:
+                except Exception:
                     return -2
 
                 return val * time_dict[unit]

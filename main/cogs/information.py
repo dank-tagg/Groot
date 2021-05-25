@@ -179,13 +179,13 @@ class Information(commands.Cog):
                 if str(ret[0]) == "\U000023ea":
                     try:
                         await msg.remove_reaction("\U000023ea", ctx.author)
-                    except:
+                    except Exception:
                         pass
                     n = 1
                 elif str(ret[0]) == "\U000025c0":
                     try:
                         await msg.remove_reaction("\U000025c0", ctx.author)
-                    except:
+                    except Exception:
                         pass
                     if n <= 1:
                         pass
@@ -194,7 +194,7 @@ class Information(commands.Cog):
                 elif str(ret[0]) == "\U000025b6":
                     try:
                         await msg.remove_reaction("\U000025b6", ctx.author)
-                    except:
+                    except Exception:
                         pass
                     if n >= pages:
                         pass
@@ -203,7 +203,7 @@ class Information(commands.Cog):
                 elif str(ret[0]) == "\U000023e9":
                     try:
                         await msg.remove_reaction("\U000023e9", ctx.author)
-                    except:
+                    except Exception:
                         pass
                     n = pages
                 elif str(ret[0]) == "<:trashcan:822050746333003776>":
@@ -248,7 +248,7 @@ class Information(commands.Cog):
                 altered = discord.utils.find(
                     lambda c: isinstance(c, grootCooldown), command.checks
                 ).altered_mapping._cooldown.per
-            except:
+            except Exception:
                 default = 3
                 altered = 1
 
@@ -268,7 +268,7 @@ class Information(commands.Cog):
                         if sub.signature
                         else f"`{str(sub).replace(' ', '` `')}` — {sub.brief}\n"
                     )
-            except:
+            except Exception:
                 pass
             if subs != "":
                 em.add_field(name="Subcommands", value=f"{subs}")
@@ -383,7 +383,7 @@ class Information(commands.Cog):
         except asyncio.TimeoutError:
             try:
                 await ctx.message.delete()
-            except:
+            except Exception:
                 pass
             await msg.delete()
             return

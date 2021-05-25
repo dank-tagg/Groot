@@ -96,7 +96,7 @@ class Configuration(commands.Cog):
 
         try:
             command = str(self.bot.get_command(command).name)
-        except:
+        except Exception:
             raise commands.BadArgument("That is not a valid command.")
         if snowflake_id is None:
             snowflake_id = ctx.guild
@@ -108,7 +108,7 @@ class Configuration(commands.Cog):
         )
         try:
             await self.bot.db.execute(query, (snowflake_id.id, command))
-        except:
+        except Exception:
             raise commands.BadArgument(
                 f"{self.bot.redTick} That command is already disabled{txt}!"
             )
@@ -134,7 +134,7 @@ class Configuration(commands.Cog):
         """
         try:
             command = self.bot.get_command(command).name
-        except:
+        except Exception:
             raise commands.BadArgument("That is not a valid command.")
         if snowflake_id is None:
             snowflake_id = ctx.guild

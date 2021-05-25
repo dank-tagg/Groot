@@ -103,7 +103,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             return -1
         try:
             val = int(time[:-1])
-        except:
+        except Exception:
             return -2
 
         return val * time_dict[unit]
@@ -237,7 +237,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
                         )
                         await ctx.author.send(embed=emb1)
 
-                except:
+                except Exception:
                     em = Embed(
                         title=f"{prize}",
                         description=f"Could not determine a winner\nHosted by {ctx.author.mention}",
@@ -283,7 +283,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
 
         try:
             new_msg = await channel.fetch_message(id_)
-        except:
+        except Exception:
             raise commands.BadArgument(
                 "The message with the given ID is not found in the current channel."
             )
@@ -410,7 +410,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             time = time.replace("s", "")
             try:
                 time = int(time)
-            except:
+            except Exception:
                 await ctx.send("Time must be something like `1s`!")
                 return
             if time > 59:
@@ -599,7 +599,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             args1 = "0x" + args1
             try:
                 colour = await commands.ColourConverter().convert(ctx, args1)
-            except:
+            except Exception:
                 raise discord.ext.commands.MissingRequiredArgument(ctx.command)
             em = Embed(description=f"Color `{args}`", colour=colour)
             em.set_author(name="Hex Viewer")

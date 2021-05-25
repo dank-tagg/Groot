@@ -74,7 +74,7 @@ class Fun(commands.Cog, description="Fun commands"):
                     "You got to give me a number... game ended due to inactivity"
                 )
                 return
-            except:
+            except Exception:
                 if 2 - i == 0:
                     await ctx.send(
                         f"Unlucky, you ran out of attempts. The number was **{no}**"
