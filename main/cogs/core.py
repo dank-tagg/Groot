@@ -166,7 +166,7 @@ class Core(commands.Cog):
             }
         
         groot_status = f"{status_emojis[status.get('groot', 'offline')]} {str.title(status.get('groot', 'offline'))}"
-        message = f"**BOT STATUS** \n\n {groot_status} | Groot\n\nRefreshes every 10 minutes"
+        message = f"**BOT STATUS** \n\n {groot_status} | Groot\n\nRefreshes every second"
     
         em = Embed(
                 description=message,
