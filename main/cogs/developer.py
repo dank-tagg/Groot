@@ -4,6 +4,7 @@ import datetime
 import io
 import math
 import os
+import pathlib
 import traceback
 
 import discord
@@ -15,7 +16,6 @@ from jishaku.codeblocks import codeblock_converter
 from jishaku.models import copy_context_with
 from utils.chat_formatting import box, hyperlink
 from utils.useful import Embed
-
 
 
 class Developer(commands.Cog):
@@ -42,17 +42,14 @@ class Developer(commands.Cog):
             stderr = f"```$ {code}\n{stderr.decode()}```"
 
         return stderr if stderr else stdout
-    
+
     async def git(self, *, arguments):
         text = await self.run_shell(
-            f"cd {str(__import__('pathlib').Path(self.bot.cwd).parent)};git {arguments}"
+            f"cd {str(pathlib.Path(self.bot.cwd).parent)};git {arguments}"
         )
         if not isinstance(text, str):
             text = text.decode("ascii")
-        return text.replace(
-                f"cd {str(__import__('pathlib').Path(self.bot.cwd).parent)};", 
-                ""
-            )
+        return text.replace(f"cd {str(pathlib.Path(self.bot.cwd).parent)};", "")
 
     async def cog_check(self, ctx):
         return await self.bot.is_owner(ctx.author)
@@ -75,6 +72,13 @@ class Developer(commands.Cog):
                 data["update"] = message
                 data["link"] = link
                 utils.json_loader.write_json(data, "updates")
+
+    @dev.command(name="status")
+    async def _set_status(self, ctx, *, status):
+        data = utils.json_loader.read_json("status")
+        data["groot"] = status
+        utils.json_loader.write_json(data, "status")
+        await ctx.send(f"Set status to {status}")
 
     @dev.command(name="eval", aliases=["run"])
     async def _eval(self, ctx, *, code: codeblock_converter):
@@ -183,11 +187,7 @@ class Developer(commands.Cog):
 
             if fail == "":
                 em = Embed(color=0x3CA374)
-                em.add_field(
-                    name="Pulling from GitHub",
-                    value=text,
-                    inline=False
-                )
+                em.add_field(name="Pulling from GitHub", value=text, inline=False)
                 em.add_field(
                     name=f"{self.bot.greenTick} Cogs Reloading",
                     value="```diff\n+ All cogs were reloaded successfully```",
@@ -196,18 +196,12 @@ class Developer(commands.Cog):
                 await ctx.reply(embed=em, mention_author=False)
             else:
                 em = Embed(color=0xFFCC33)
-                em.add_field(
-                    name="Pulling from GitHub",
-                    value=text,
-                    inline=False
-                )
+                em.add_field(name="Pulling from GitHub", value=text, inline=False)
                 em.add_field(
                     name="<:idle:817035319165059102> **Failed to reload all cogs**",
                     value=fail,
                 )
-                await ctx.reply(
-                    embed=em, mention_author=False
-                )
+                await ctx.reply(embed=em, mention_author=False)
 
         else:
             try:
@@ -217,11 +211,7 @@ class Developer(commands.Cog):
                     f"**Reloaded cogs.{extension}**",
                     color=0x3CA374,
                 )
-                em.add_field(
-                    name="Pulling from GitHub",
-                    value=text,
-                    inline=False
-                )
+                em.add_field(name="Pulling from GitHub", value=text, inline=False)
 
                 await ctx.reply(embed=em, mention_author=False)
 
@@ -233,11 +223,7 @@ class Developer(commands.Cog):
                 ).replace("``", "`\u200b`")
 
                 em = Embed(color=0xF04D4B)
-                em.add_field(
-                    name="Pulling from GitHub",
-                    value=text,
-                    inline=False
-                )
+                em.add_field(name="Pulling from GitHub", value=text, inline=False)
                 em.add_field(
                     name=f"{self.bot.redTick} " f"Failed to reload {e.name}",
                     value=f"```py\n{traceback_content}```",
