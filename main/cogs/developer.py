@@ -177,7 +177,7 @@ class Developer(commands.Cog):
             em.add_field(name="Pulling from GitHub", value=text, inline=False)
             em.add_field(
                 name="<:idle:817035319165059102> **Failed to reload all cogs**",
-                value=f"Error was send {hyperlink('here', f'{str(paste)}')}",
+                value=f"```\nError was send {hyperlink('here', f'{str(paste)}')}```",
             )
             await ctx.reply(embed=em, mention_author=False)
 
