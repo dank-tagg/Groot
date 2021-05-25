@@ -1,5 +1,6 @@
 import asyncio
 import functools
+from os import stat
 import re
 import sqlite3
 import sys
@@ -113,6 +114,29 @@ class grootCooldown:
             raise commands.CommandOnCooldown(ctx.bucket, retry_after)
         return True
 
+class fuzzy:
+
+    @staticmethod
+    def finder(to_find, collection, *, key=None, lazy=True):
+        suggestions = []
+        text = str(to_find)
+        pat = '.*?'.join(map(re.escape, text))
+        regex = re.compile(pat, flags=re.IGNORECASE)
+        for item in collection:
+            to_search = key(item) if key else item
+            r = regex.search(to_search)
+            if r:
+                suggestions.append((len(r.group()), r.start(), item))
+
+        def sort_key(tup):
+            if key:
+                return tup[0], tup[1], key(tup[2])
+            return tup
+
+        if lazy:
+            return (z for _, _, z in sorted(suggestions, key=sort_key))
+        else:
+            return [z for _, _, z in sorted(suggestions, key=sort_key)]
 
 # ---Useful functions
 def roman_num(num):
