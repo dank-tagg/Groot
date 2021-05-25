@@ -4,6 +4,7 @@ import discord
 import humanize
 from discord.ext import commands, tasks
 from utils.useful import Embed, grootCooldown, send_traceback
+from utils.json_loader import read_json
 
 
 class Core(commands.Cog):
@@ -155,15 +156,21 @@ class Core(commands.Cog):
     async def before_loops(self):
         await self.bot.wait_until_ready()
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(seconds=1)
     async def update_status(self):
-        now = dt.datetime.utcnow()
-        groot_status = "<:online:808613541774360576> Online" 
+        status = read_json('status')
+        status_emojis = {
+            'online': '<:online:808613541774360576>', 
+            'offline': '<:offline:817034738014879845>', 
+            'idle': '<:idle:817035319165059102>'
+            }
+        
+        groot_status = f"{status_emojis[status.get('groot', 'offline')]} {str.title(status.get('groot', 'offline'))}"
         message = f"**BOT STATUS** \n\n {groot_status} | Groot\n\nRefreshes every 10 minutes"
     
         em = Embed(
                 description=message,
-                timestamp=now
+                timestamp=dt.datetime.utcnow()
             )
         em.set_footer(text="Last updated at")
     
