@@ -5,8 +5,6 @@ import logging
 import operator
 import os
 import re
-import sys
-from os import environ
 from pathlib import Path
 
 import aiohttp
