@@ -3,7 +3,3 @@
 *.log
 *.pyc
 .git-credentials
-<<<<<<< HEAD
-beta.py
-=======
->>>>>>> 49d80156d5629766d96cea370b74cb9323e1fdcc
