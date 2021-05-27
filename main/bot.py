@@ -12,8 +12,10 @@ import aiosqlite
 import discord
 from discord.ext import commands, ipc
 
+from utils.cache import CacheManager
 from utils.subclasses import customContext
-from utils.useful import ListCall, call, currencyData, grootCooldown, print_exception
+from utils.useful import (ListCall, call, currencyData, grootCooldown,
+                          print_exception)
 
 to_call = ListCall()
 
@@ -30,6 +32,7 @@ class GrootBot(commands.Bot):
         self.session = aiohttp.ClientSession
         self.premiums = set()
         self.blacklist = set()
+        self.cache = CacheManager(self)
         self.cached_users = {}
         self.cached_disabled = {}
         self.tips_on_cache = set()
