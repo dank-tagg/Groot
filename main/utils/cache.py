@@ -1,26 +1,52 @@
 from discord.ext import commands
-from typing import Union
+from typing import Union, Optional
+from utils.useful import fuzzy
+import numpy as np
 
-class CacheManager:
-
+class CacheManager(dict):
     def __init__(self, bot: Union[commands.Bot, commands.AutoShardedBot]) -> None:
         self.bot = bot
-        self._cache = {}
+        self.log = []
 
-    def key_exists(self, key, value) -> None:
-        self._cache[key] = value
 
-    def __setitem__(self, key, value) -> None:
-        if self._cache.get(key):
-            return self.key_exists(key, value)
+    @property
+    def length(self):
+        return len(self)
+    
+    @staticmethod
+    def iterate_all(iterable, returned="key"):
+        
+        """Returns an iterator that returns all keys or values
+        of a (nested) iterable.
+        
+        Arguments:
+            - iterable: <list> or <dictionary>
+            - returned: <string> "key" or "value"
+            
+        Returns:
+            - <iterator>
+        """
+    
+        if isinstance(iterable, dict):
+            for key, value in iterable.items():
+                if returned == "key":
+                    yield key
+                elif returned == "value":
+                    if not (isinstance(value, dict) or isinstance(value, list)):
+                        yield value
+                else:
+                    raise ValueError("'returned' keyword only accepts 'key' or 'value'.")
+                for ret in iterate_all(value, returned=returned):
+                    yield ret
+        elif isinstance(iterable, list):
+            for el in iterable:
+                for ret in iterate_all(el, returned=returned):
+                    yield ret
 
-        self._cache[key] = value
+    def search(self):
+        whole = self.iterate_all(self)
+        return self
 
-    def __getitem__(self, key):
-        return self._cache[key]
-
-    def __delitem__(self, key) -> None:
-        del self._cache[key]
-
-    def get(self, key):
-        return self._cache.get(key)
+cache = CacheManager(bot)
+cache['hello'] = 1
+cache.search()

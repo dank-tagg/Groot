@@ -37,7 +37,7 @@ class GrootBot(commands.Bot):
         self.cached_disabled = {}
         self.tips_on_cache = set()
         self.ipc = ipc.Server(
-            self, secret_key="GrootBotAdmin"
+            self, host="0.0.0.0", secret_key="GrootBotAdmin"
         )
 
     async def after_db(self):

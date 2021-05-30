@@ -18,7 +18,7 @@ Made by `dank tagg#6017`
 
 ## Usage
 If you anyhow want to _copy_ my code, feel free to. Be sure to read the [license](#licensing-information) though.<br>
-You can find me at the [support server](https://discord.gg/ANbxZmqyK5) for Groot, or just shoot me a DM.<br>
+You can find me at the [support server](https://discord.gg/nUUJPgemFE) for Groot, or just shoot me a DM.<br>
 
 ## Features
 ```css
@@ -73,7 +73,7 @@ I would be more than happy to talk to you.
 
 ## Contact me
 **DISCORD:**<br>
-dank tagg#6017 _or_ [support server](https://discord.gg/ANbxZmqyK5)\
+dank tagg#6017 _or_ [support server](https://discord.gg/nUUJPgemFE)\
 **EMAIL:**<br>
 grootdiscordbot@gmail.com
 
