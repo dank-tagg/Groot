@@ -46,7 +46,3 @@ class CacheManager(dict):
     def search(self):
         whole = self.iterate_all(self)
         return self
-
-cache = CacheManager(bot)
-cache['hello'] = 1
-cache.search()
