@@ -26,7 +26,7 @@ mentions = discord.AllowedMentions(
     roles=False, users=True, everyone=False, replied_user=True
 )
 bot_data = {
-    "token": environ.get("dev"),
+    "token": environ.get("main"),
     "intents": intents,
     "case_insensitive": True,
     "help_command": None,
