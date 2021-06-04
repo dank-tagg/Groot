@@ -11,9 +11,7 @@ class customContext(commands.Context):
         super().__init__(**kwargs)
 
     async def send(self, content=None, **kwargs):
-
-        if self.author.id in self.bot.tips_on_cache:
-            chance = random.randint(1, 10)
+        if self.author.id in self.bot.cache["tips_are_on"]:
             tip = random.choice(
                 [
                     "**TIP:** If you need any support, you can join https://discord.gg/nUUJPgemFE for help!",
@@ -26,7 +24,7 @@ class customContext(commands.Context):
                     f"**TIP:** Looking for a way to contribute? Here is the repository: <https://github.com/dank-tagg/Groot>",
                 ]
             )
-            if chance == 1:
+            if random.randint(1, 10) == 1:
                 content = str(content) if content else ""
                 content += f"\n\n{tip}"
                 return await super().send(content, **kwargs)

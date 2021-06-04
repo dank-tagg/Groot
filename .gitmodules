@@ -1,6 +1,0 @@
-[submodule "Groot-Website"]
-	path = Groot-Website
-	url = https://github.com/dank-tagg/Groot-Website.git
-[submodule "GrootWebsiteFlask"]
-	path = GrootWebsiteFlask
-	url = https://github.com/dank-tagg/GrootWebsiteFlask.git

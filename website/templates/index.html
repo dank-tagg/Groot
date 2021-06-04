@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en-US">
+   <head>
+      <title>Home - Groot</title>
+      {% extends "template.html" %}
+      {% block content %}
+   </head>
+   <body>
+      <section class="page-header">
+         <h1 class="project-name">A simple but yet <br /> feature-rich discord bot</h1>
+         <h2 class="project-tagline">
+            Features moderation, economy and utility commands.
+         </h2>
+         <a href="https://discord.com/oauth2/authorize?client_id=812395879146717214&scope=bot" target="_blank" class="btn"
+            style="background-color:linear-gradient(120deg, var(--theme-links), var(--theme-headers));color:#ffffff">
+         <i class="fas fa-play"></i> Get Started
+         </a>
+         <a href="https://discord.gg/nUUJPgemFE" target="_blank" alt="Groot Support Server" class="btn"
+            style="background-color:linear-gradient(120deg, var(--theme-links), var(--theme-headers));color:#ffffff">
+         <i class="fab fa-discord"></i> Support Server
+         </a>
+         <img class=content-desktop src="{{ url_for('static', filename = 'images/code.png') }}"></img>
+      </section>
+      <section id="main-content" class="main-content">
+         <h1 id="groot">Groot </h1>
+         <p>
+            A multipurpose discord bot, for educational and experimental purposes.<br />
+            Made by <code class=highlight>dank tagg#6017</code>
+         </p>
+         <h2 id="list-of-contents">List of contents</h2>
+         <ul>
+            <li>
+               <a href="#usage">Usage</a>
+            </li>
+            <li>
+               <a href="#features">Features</a>
+            </li>
+            <li>
+               <a href="#how-do-i-contribute">How do I contribute?</a>
+               <ul>
+                  <li>
+                     <a href="#requirements-to-contribute">Requirements</a>
+                  </li>
+               </ul>
+            </li>
+            <li>
+               <a href="#contact-me">Contact me</a>
+            </li>
+            <li>
+               <a href="#links">Links</a>
+            </li>
+            <li>
+               <a href="#licensing-information">Licensing Information</a>
+            </li>
+         </ul>
+         <h2 id="usage">Usage</h2>
+         <p>
+            If you anyhow want to <em>copy</em>
+            my code, feel free to. Be sure to read the <a href="#licensing-information">license</a>
+            though.<br />
+            You can find me at the <a href="https://discord.gg/nUUJPgemFE" target="_blank">support server</a>
+            for Groot, or just shoot me a
+            DM.<br />
+         </p>
+         <h2 id="features">Features</h2>
+         <div>
+            <div class="highlight">
+               <pre class="highlight"><code class=language-css>Fun               -> Funny commands
+Utilities         -> Handy utilities
+Information       -> Information about the bot
+Moderation        -> Powerful moderation commands
+Admin             -> Admin commands and not available for the public</code></pre>
+            </div>
+         </div>
+         <h2 id="how-do-i-contribute">How do I contribute?</h2>
+         <p>
+            If you somehow have interest in contributing, please start an issue.<br />
+            State in it the code and a short description.<br />It should look like the following:
+         </p>
+         <div>
+            <div class="highlight">
+               <pre class="highlight"><code># The code you want to add:
+import discord
+from discord.ext import commands
+
+class aNewCog(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+    
+    @commands.command(name="Thank", aliases=["You"])
+    async def hello(self, ctx):
+        await ctx.send(f"Hello {ctx.author.mention}")
+    
+def setup(bot):
+    bot.add_cog(aNewCog(bot))
+
+# A short description
+'''
+This code adds a new command that sends 'Hello {ctx.author.mention}' when invoked.
+My discord is anUser#6969, you can ask me about it there.
+'''</code></pre>
+            </div>
+         </div>
+         <p>
+            <strong>Note that this is not required. It can also be pseudocode, and a small explanation.</strong>
+         </p>
+         <p>
+            For more information, contact me on discord.<br />
+            If you want to contribute anything big, please DM me.<br />I would be more than happy to talk to you.
+         </p>
+         <h3 id="requirements-to-contribute">Requirements to contribute</h3>
+         <ul class="task-list">
+            <li class="task-list-item">
+               <input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />
+               It must be
+               written in <i class="fab fa-python"></i>
+               Python
+            </li>
+            <li class="task-list-item">
+               <input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />
+               It must be
+               able to run on <code class="language-plaintext highlighter-rouge">python 3.9.4</code>
+               and <code class="language-plaintext highlighter-rouge">discord.py 1.7.2</code>
+            </li>
+         </ul>
+         <h2 id="contact-me">Contact me</h2>
+         <p>
+            <strong>
+            <i class="fab fa-discord"></i>
+            DISCORD:
+            </strong>
+            <br />
+            dank tagg#6017 <em>or</em>
+            <a href="https://discord.gg/nUUJPgemFE" target="_blank">support server</a>
+            <br />
+            <strong>
+            <i class="fas fa-envelope"></i>
+            EMAIL:
+            </strong>
+            <br /><a href="mailto:grootdiscordbot@gmail.com">grootdiscordbot@gmail.com</a>
+         </p>
+         <h2 id="links">Links</h2>
+         <ul>
+            <li>
+               <a href="https://top.gg/bot/812395879146717214/vote" target="_blank">
+               <i class="fas fa-vote-yea"></i>
+               Vote
+               </a>
+            </li>
+            <li>
+               <a href="https://github.com/dank-tagg/Groot" target="_blank">
+               <i class="fas fa-code"></i>
+               Source
+               </a>
+            </li>
+            <li>
+               <a href="https://dank-tagg.github.io/Groot-Website/" target="_blank">
+               <i class="fas fa-globe"></i>
+               Website
+               </a>
+            </li>
+         </ul>
+         <h2 id="licensing-information">Licensing Information</h2>
+         <div class="language-plaintext highlighter-rouge">
+            <div class="highlight">
+               <pre class="highlight"><code class=plaintext>MIT License 
+Copyright (c) 2021 dank tagg
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</code></pre>
+            </div>
+         </div>
+         <footer class="site-footer">
+            <span class="site-footer-owner">
+            <a href="https://github.com/dank-tagg/Groot" target="_blank">Groot</a>
+            is
+            maintained by <a href="https://github.com/dank-tagg" target="_blank">dank-tagg</a>
+            </span>
+            <span class="site-footer-credits">© 2021 Groot </span>
+         </footer>
+      </section>
+      {% endblock %}
+   </body>
+</html>

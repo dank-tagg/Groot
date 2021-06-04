@@ -135,17 +135,17 @@ class Core(commands.Cog):
             )
 
         self.cache_usage = {}
-        for user in self.bot.cached_users:
+        for user in self.bot.cache["users"]:
             query = "UPDATE currency_data SET wallet = ?, bank = ?, max_bank = ?, boost = ?, exp = ?, lvl = ? WHERE user_id = ?"
             await self.bot.db.execute(
                 query,
                 (
-                    self.bot.cached_users[user]["wallet"],
-                    self.bot.cached_users[user]["bank"],
-                    self.bot.cached_users[user]["max_bank"],
-                    round(self.bot.cached_users[user]["boost"], 2),
-                    self.bot.cached_users[user]["exp"],
-                    self.bot.cached_users[user]["lvl"],
+                    self.bot.cache["users"][user]["wallet"],
+                    self.bot.cache["users"][user]["bank"],
+                    self.bot.cache["users"][user]["max_bank"],
+                    round(self.bot.cache["users"][user]["boost"], 2),
+                    self.bot.cache["users"][user]["exp"],
+                    self.bot.cache["users"][user]["lvl"],
                     user,
                 ),
             )

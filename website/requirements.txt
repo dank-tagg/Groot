@@ -1,0 +1,6 @@
+discord_ext_menus==1.0
+Quart_Discord==2.1.4
+Quart_Auth
+Quart==0.14.1
+discord==1.0.1
+discord_ext_ipc

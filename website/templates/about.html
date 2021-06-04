@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <title>About - Groot</title>
+    {% extends "template.html" %}
+    {% block content %}
+</head>
+
+<body>
+    <section class="main-content" style="margin-top: 2em;">
+        <h1>About me</h1>
+        <p>I started my coding journey on 19th February 2021. <br><br>
+            I started with making custom commands for Atlas bot at the
+            start and I really liked that. So I switched over to coding a bot in a real programming language myself:
+            Groot. <br><br>
+            Did you know at first I named it 'Tagg's Utilities'?
+            <br><br>
+            At the beginning everything was
+            soooo hard... a SyntaxError would hold me for hours, could not solve NameErrors and only 10% of the code I
+            wrote was from myself. See a
+            little preview below.
+            That's why I decided to go learn Python first before making a discord bot. After hundred of hours of YouTube
+            tutorials I finally understood most of what I wrote. I agree that it wasn't the best start, but I survived!
+            <br><br>
+            After two months or so, I wrote my own subclasses and started using SQLite3. <br> Never stop trying!
+
+        </p>
+        <pre><code>import discord
+from discord.ext import commands
+
+client = commands.Bot(prefix="!")
+
+@client.command()
+async def command(ctx):
+    await ctx.send("Hello World")
+
+client.run("aDumMyToK.eNaDumMyTOKen.adUmMy.TokeN")
+</code></pre>
+        <p><em>This is how my code looked like at the beginning (and yes I named bot client cause I didn't know)</em>
+        </p>
+    </section>
+    {% endblock %}
+</body>
+
+</html>

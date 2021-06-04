@@ -1,0 +1,16 @@
+.textarea {
+	color: var(--theme-text);
+	padding: 0.4em 0.65em;
+	border-color: transparent;
+	background-color: var(--theme-code);
+	border-radius: 8px;
+	resize: none;
+}
+
+.textarea:focus {
+	outline-width: 0;
+}
+
+.btn:focus {
+	outline-width: 0;
+}

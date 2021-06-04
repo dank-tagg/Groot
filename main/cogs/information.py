@@ -9,7 +9,8 @@ import utils.json_loader
 from discord.ext import commands
 from utils.chat_formatting import hyperlink
 from utils.useful import Embed, grootCooldown
-
+import inspect
+import os
 
 class Information(commands.Cog):
     def __init__(self, bot):
@@ -401,25 +402,31 @@ class Information(commands.Cog):
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
-    @commands.command(name="source")
-    async def _source(self, ctx):
-        em = Embed(title="Be sure to read the licenses.")
-        em.set_thumbnail(url="https://i.imgur.com/AyoXstG.png")
-        em.add_field(
-            name="Source of Groot:", value="https://github.com/dank-tagg/Groot"
-        )
-        em.add_field(
-            name="Source of Groot-Website:",
-            value="https://github.com/dank-tagg/Groot-Website/",
-            inline=False,
-        )
-        em.add_field(
-            name="More links",
-            value="[Website](https://dank-tagg.github.io/Groot-Website) | "
-            "[Advanced website](https://github.com/dank-tagg/GrootWebsiteFlask)",
-        )
-        return await ctx.send(embed=em)
+    @commands.command()
+    async def source(self, ctx, *, command: str = None):
+        """Displays my full source code or for a specific command.
+        To display the source code of a subcommand you can separate it by
+        periods, e.g. tag.create for the create subcommand of the tag command
+        or by spaces.
+        """
+        source_url = 'https://github.com/dank-tagg/Groot'
+        branch = 'main'
+        if command is None:
+            return await ctx.send(source_url)
 
+        obj = self.bot.get_command(command.replace('.', ' '))
+        if obj is None:
+            return await ctx.send('Could not find command.')
+
+        src = obj.callback.__code__
+        module = obj.callback.__module__
+        filename = src.co_filename
+
+        lines, firstlineno = inspect.getsourcelines(src)
+        location = os.path.relpath(filename).replace('\\', '/')
+
+        final_url = f'<{source_url}/tree/{branch}/main/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>'
+        await ctx.send(final_url)
 
 def setup(bot):
     bot.add_cog(Information(bot))

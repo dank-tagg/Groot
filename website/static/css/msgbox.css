@@ -1,0 +1,59 @@
+.msgbox-area {
+	 max-height: 100%;
+	 position: absolute;
+	 bottom: 15px;
+	 left: 20px;
+	 right: 20px;
+     z-index: 100;
+}
+ .msgbox-area .msgbox-box {
+	 font-size: inherit;
+	 color: #fff;
+	 background-color: #F04D4B;
+	 padding: 18px 20px;
+	 margin: 0 0 15px;
+	 display: flex;
+	 align-items: center;
+	 position: relative;
+	 border-radius: 12px;
+	 box-shadow: 0 10px 15px #be3f3d;
+	 transition: opacity 300ms ease-in;
+}
+ .msgbox-area .msgbox-box.msgbox-box-hide {
+	 opacity: 0;
+}
+ .msgbox-area .msgbox-box:last-child {
+	 margin: 0;
+}
+ .msgbox-area .msgbox-content {
+	 flex-shrink: 1;
+}
+ .msgbox-area .msgbox-close {
+	 color: #fff;
+     align-items: right;
+	 font-weight: bold;
+	 text-decoration: none;
+	 margin: 0 0 0 20px;
+	 flex-grow: 0;
+	 flex-shrink: 0;
+	 position: relative;
+	 transition: text-shadow 225ms ease-out;
+}
+ .msgbox-area .msgbox-close:hover {
+	 text-shadow: 0 0 3px #efefef;
+}
+ @media (min-width: 481px) and (max-width: 767px) {
+	 .msgbox-area {
+		 left: 80px;
+		 right: 80px;
+	}
+}
+ @media (min-width: 768px) {
+	 .msgbox-area {
+		 width: 20em;
+		 height: 0;
+		 top: 15px;
+		 left: auto;
+		 right: 15px;
+	}
+}

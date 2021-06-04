@@ -23,9 +23,9 @@ class Configuration(commands.Cog):
         modus = "TRUE" if modus == "on" else "FALSE"
 
         if modus == "TRUE":
-            self.bot.tips_on_cache.add(ctx.author.id)
+            self.bot.cache["tips_are_on"].add(ctx.author.id)
         else:
-            self.bot.tips_on_cache.discard(ctx.author.id)
+            self.bot.cache["tips_are_on"].discard(ctx.author.id)
 
         query = "UPDATE users_data SET tips = ? WHERE user_id = ?"
         await self.bot.db.execute(query, (modus, ctx.author.id))
@@ -76,7 +76,7 @@ class Configuration(commands.Cog):
         query = "INSERT INTO guild_config (guild_id, prefix) VALUES (?, ?) ON CONFLICT (guild_id) DO UPDATE SET prefix = ?"
         await self.bot.db.execute(query, (ctx.guild.id, prefix, prefix))
         await self.bot.db.commit()
-        self.bot.existing_prefix[ctx.guild.id] = prefix
+        self.bot.cache["prefix"][ctx.guild.id] = prefix
         await ctx.send(
             f"The prefix has been set to `{prefix}`. To change the prefix again, use `{prefix}config prefix <prefix>`"
         )
@@ -115,9 +115,9 @@ class Configuration(commands.Cog):
         else:
             await self.bot.db.commit()
             try:
-                self.bot.cached_disabled[command].append(snowflake_id.id)
+                self.bot.cache["disabled_commands"][command].append(snowflake_id.id)
             except KeyError:
-                self.bot.cached_disabled[command] = [ctx.guild.id]
+                self.bot.cache["disabled_commands"][command] = [ctx.guild.id]
             await ctx.send(f"{self.bot.greenTick} Disabled command `{command}`{txt}")
 
     @commands.command(
@@ -156,7 +156,7 @@ class Configuration(commands.Cog):
             )
         else:
             query = "DELETE FROM disabled_commands WHERE snowflake_id = ? AND command_name = ?"
-            self.bot.cached_disabled[command].remove(snowflake_id.id)
+            self.bot.cache["disabled_commands"][command].remove(snowflake_id.id)
             await self.bot.db.execute(query, (snowflake_id.id, command))
             await self.bot.db.commit()
             await ctx.send(f"{self.bot.greenTick} Enabled command `{command}`{txt}")

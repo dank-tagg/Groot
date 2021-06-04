@@ -22,7 +22,7 @@ class Blackjack(commands.Cog):
             raise commands.BadArgument(
                 f"{ctx.author.mention} You are too rich to gamble!"
             )
-        boost = round(self.bot.cached_users[ctx.author.id]["boost"], 2)
+        boost = round(self.bot.cache["users"][ctx.author.id]["boost"], 2)
         if wallet == 0:
             raise commands.BadArgument(
                 f"{ctx.author.mention} You have no coins to gamble with."

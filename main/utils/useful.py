@@ -47,13 +47,13 @@ class currencyData:
         self.bot = bot
 
     async def create_account(self, user_id):
-        if user_id in self.bot.cached_users:
+        if user_id in self.bot.cache["users"]:
             return False
         query = "INSERT INTO currency_data (user_id) VALUES (?)"
         try:
             await self.bot.db.execute(query, (user_id,))
             await self.bot.db.commit()
-            self.bot.cached_users.setdefault(
+            self.bot.cache["users"].setdefault(
                 user_id,
                 {
                     "wallet": 200,
@@ -69,10 +69,10 @@ class currencyData:
             return False
 
     async def get_data(self, user_id, mode="wallet"):
-        return self.bot.cached_users[user_id][mode]
+        return self.bot.cache["users"][user_id][mode]
 
     async def update_data(self, user_id, amount: int, mode="wallet"):
-        self.bot.cached_users[user_id][mode] += amount
+        self.bot.cache["users"][user_id][mode] += amount
         return True
 
     async def has_item(self, user_id, item):
@@ -105,7 +105,7 @@ class grootCooldown:
 
     def __call__(self, ctx: commands.Context):
         key, key1 = (ctx.author.id, ctx.guild.id)
-        if key in ctx.bot.premiums or key1 in ctx.bot.premiums:
+        if key in ctx.bot.cache["premium_users"] or key1 in ctx.bot.cache["premium_users"]:
             ctx.bucket = self.altered_mapping.get_bucket(ctx.message)
         else:
             ctx.bucket = self.default_mapping.get_bucket(ctx.message)

@@ -293,7 +293,7 @@ class Fun(commands.Cog, description="Fun commands"):
                         random.choice(
                             [
                                 f"**{alpha.name}** kicks **{beta.name}** and deals **{damage}** damage\n**{beta.name}** is left over with **{hpover}** HP",
-                                f"**{alpha.name}** lands a dank kick on **{alpha.name}**, dealing **{damage}** damage.\n**{beta.name}** is left over with **{hpover}** HP",
+                                f"**{alpha.name}** lands a dank kick on **{beta.name}**, dealing **{damage}** damage.\n**{beta.name}** is left over with **{hpover}** HP",
                             ]
                         )
                     )

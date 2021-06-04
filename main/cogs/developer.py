@@ -136,6 +136,11 @@ class Developer(commands.Cog):
         guild = self.bot.get_guild(guildid)
         await ctx.author.send(f"{await guild.text_channels[0].create_invite()}")
 
+    @dev.command(name="restart")
+    async def _restart(self, ctx):
+        await self.git(arguments="pull")
+        os._exit(0)
+
     @dev.command(name="sync")
     async def _sync(self, ctx):
 
@@ -170,16 +175,21 @@ class Developer(commands.Cog):
 
             await ctx.reply(embed=em, mention_author=False)
         else:
-            mystbin_client = mystbin.Client()
-            paste = await mystbin_client.post(fail, syntax="python")
-            await mystbin_client.close()
             em = Embed(color=0xFFCC33)
             em.add_field(name="Pulling from GitHub", value=text, inline=False)
             em.add_field(
                 name="<:idle:817035319165059102> **Failed to reload all cogs**",
-                value=f"```\nError was send {hyperlink('here', f'{str(paste)}')}```",
+                value=fail,
             )
-            await ctx.reply(embed=em, mention_author=False)
+            try:
+                await ctx.reply(embed=em, mention_author=False)
+            except Exception:
+                mystbin_client = mystbin.Client()
+                paste = await mystbin_client.post(fail, syntax="python")
+                await mystbin_client.close()
+                await ctx.send(
+                    f"Oops, an exception occured while handling an exception. Error was send here: {str(paste)}"
+                )
 
     @dev.command(name="sudo")
     async def _sudo(self, ctx: commands.Context, *, command_string: str):
@@ -253,17 +263,17 @@ class Developer(commands.Cog):
     @commands.command(name="close")
     async def _close(self, ctx):
         await self.bot.logout()
-        for user in self.bot.cached_users:
+        for user in self.bot.cache["users"]:
             query = "UPDATE currency_data SET wallet = ?, bank = ?, max_bank = ?, boost = ?, exp = ?, lvl = ? WHERE user_id = ?"
             await self.bot.db.execute(
                 query,
                 (
-                    self.bot.cached_users[user]["wallet"],
-                    self.bot.cached_users[user]["bank"],
-                    self.bot.cached_users[user]["max_bank"],
-                    round(self.bot.cached_users[user]["boost"], 2),
-                    self.bot.cached_users[user]["exp"],
-                    self.bot.cached_users[user]["lvl"],
+                    self.bot.cache["users"][user]["wallet"],
+                    self.bot.cache["users"][user]["bank"],
+                    self.bot.cache["users"][user]["max_bank"],
+                    round(self.bot.cache["users"][user]["boost"], 2),
+                    self.bot.cache["users"][user]["exp"],
+                    self.bot.cache["users"][user]["lvl"],
                     user,
                 ),
             )

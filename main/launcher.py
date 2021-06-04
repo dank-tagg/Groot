@@ -26,7 +26,7 @@ mentions = discord.AllowedMentions(
     roles=False, users=True, everyone=False, replied_user=True
 )
 bot_data = {
-    "token": environ.get("main"),
+    "token": environ.get("dev"),
     "intents": intents,
     "case_insensitive": True,
     "help_command": None,
@@ -57,16 +57,16 @@ async def on_message(message):
     if message.author.id == bot.owner.id:
         return await bot.process_commands(message)
     if (
-        message.author.id in bot.blacklist
-        or getattr(message.guild, "id", None) in bot.blacklist
+        message.author.id in bot.cache["blacklisted_users"]
+        or getattr(message.guild, "id", None) in bot.cache["blacklisted_users"]
     ):
         return
-    if ctx.valid and ctx.command.name in bot.cached_disabled.keys():
+    if ctx.valid and ctx.command.name in bot.cache["disabled_commands"].keys():
         if (
             ctx.valid
-            and message.channel.id in bot.cached_disabled[ctx.command.name]
+            and message.channel.id in bot.cache["disabled_commands"][ctx.command.name]
             or ctx.valid
-            and message.guild.id in bot.cached_disabled[ctx.command.name]
+            and message.guild.id in bot.cache["disabled_commands"][ctx.command.name]
         ):
             return
     await bot.process_commands(message)

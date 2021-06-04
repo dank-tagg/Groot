@@ -28,11 +28,11 @@ class Currency(commands.Cog):
             raise commands.BadArgument(
                 "Seems like you are new! I created an account for you."
             )
-        if ctx.author.id not in self.bot.cached_users:
+        if ctx.author.id not in self.bot.cache["users"]:
             query = "SELECT * FROM currency_data WHERE user_id = ?"
             cur = await self.bot.db.execute(query, (ctx.author.id,))
             r = await cur.fetchone()
-            self.bot.cached_users[ctx.author.id] = {
+            self.bot.cache["users"][ctx.author.id] = {
                 "wallet": r[1],
                 "bank": r[2],
                 "max_bank": r[3],
@@ -44,7 +44,7 @@ class Currency(commands.Cog):
 
     async def cog_after_invoke(self, ctx):
         exp = random.randint(0, 3)
-        if ctx.author.id in self.bot.premiums:
+        if ctx.author.id in self.bot.cache["premium_users"]:
             exp += 2
         try:
             self.cache[ctx.author.id] += exp
@@ -58,7 +58,7 @@ class Currency(commands.Cog):
     async def _profile(self, ctx, member: discord.Member = None):
         """Shows your statistics and experience/level total and the commands issued."""
         member = member if member is not None else ctx.author
-        if member.id not in self.bot.cached_users:
+        if member.id not in self.bot.cache["users"]:
             return await ctx.maybe_reply(
                 f"{self.bot.redTick} That user does not have an account yet!"
             )
@@ -123,7 +123,7 @@ class Currency(commands.Cog):
     async def _balance(self, ctx, member: discord.Member = None):
         """Shows your balance (wallet, bank and net worth)"""
         member = member if member is not None else ctx.author
-        if member.id not in self.bot.cached_users:
+        if member.id not in self.bot.cache["users"]:
             return await ctx.maybe_reply(
                 f"{self.bot.redTick} That user does not have an account yet!"
             )
@@ -344,7 +344,7 @@ class Currency(commands.Cog):
             raise commands.BadArgument(
                 f"{self.bot.redTick} You need a `Fishing Rod` to use `fish`!"
             )
-        boost = self.bot.cached_users[ctx.author.id]["boost"]
+        boost = self.bot.cache["users"][ctx.author.id]["boost"]
         times_caught = random.randint(1, 3)
 
         fish_dict = {
@@ -403,7 +403,7 @@ class Currency(commands.Cog):
     @commands.check(grootCooldown(1, 20, 1, 10, commands.BucketType.user))
     async def _hunt(self, ctx, info=None):
         """Hunt for animals that you automatically sell for cash!"""
-        boost = self.bot.cached_users[ctx.author.id]["boost"]
+        boost = self.bot.cache["users"][ctx.author.id]["boost"]
         times_caught = random.randint(1, 3)
         animals_dict = {
             "🦌 Deer": 1200,
@@ -478,7 +478,7 @@ class Currency(commands.Cog):
                 f"{self.bot.redTick} Amount must be a positive number!"
             )
 
-        if member.id not in self.bot.cached_users:
+        if member.id not in self.bot.cache["users"]:
             return await ctx.maybe_reply(
                 f"{self.bot.redTick} That user does not have an account yet!"
             )
@@ -508,7 +508,7 @@ class Currency(commands.Cog):
             raise commands.BadArgument(
                 f"{ctx.author.mention} You are too rich to gamble!"
             )
-        boost = self.bot.cached_users[ctx.author.id]["boost"]
+        boost = self.bot.cache["users"][ctx.author.id]["boost"]
         if wallet == 0:
             raise commands.BadArgument(
                 f"{ctx.author.mention} You have no coins to gamble with."
@@ -591,7 +591,7 @@ class Currency(commands.Cog):
             ):
                 await self.data.update_data(user, 1, mode="lvl")
                 await self.data.update_data(user, 0.01, mode="boost")
-                self.bot.cached_users[user]["boost"] = round(
+                self.bot.cache["users"][user]["boost"] = round(
                     await self.data.get_data(user, mode="boost"), 2
                 )
         self.cache = {}

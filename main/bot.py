@@ -23,19 +23,12 @@ to_call = ListCall()
 class GrootBot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(self.get_prefix, **kwargs)
-        self.existing_prefix = {}
         self.greenTick = "<:greenTick:814504388139155477>"
         self.redTick = "<:redTick:814774960852566026>"
         self.data = currencyData(self)
         self.token = kwargs.pop("token", None)
-        self.db = None
         self.session = aiohttp.ClientSession
-        self.premiums = set()
-        self.blacklist = set()
-        self.cache = CacheManager(self)
-        self.cached_users = {}
-        self.cached_disabled = {}
-        self.tips_on_cache = set()
+        self.cache = CacheManager()
         self.ipc = ipc.Server(
             self, host="0.0.0.0", secret_key="GrootBotAdmin"
         )
@@ -45,6 +38,7 @@ class GrootBot(commands.Bot):
         await to_call.call(self)
 
     def add_command(self, command):
+        """Overwrite add_command to add a default cooldown to every command"""
         super().add_command(command)
         command.cooldown_after_parsing = True
 
@@ -86,20 +80,24 @@ class GrootBot(commands.Bot):
                 )
 
     @to_call.append
-    async def fill_blacklist(self):
+    async def fill_blacklisted_users(self):
         """Loading up the blacklisted users."""
         query = 'SELECT * FROM (SELECT guild_id AS snowflake_id, blacklisted  FROM guild_config  UNION ALL SELECT user_id AS snowflake_id, blacklisted  FROM users_data) WHERE blacklisted="TRUE"'
         cur = await self.db.execute(query)
         data = await cur.fetchall()
-        self.blacklist = {r[0] for r in data} or set()
+        ## BETA
+        self.cache["blacklisted_users"] = {r[0] for r in data} or set()
+        # self.blacklist = {r[0] for r in data} or set()
 
     @to_call.append
-    async def fill_premiums(self):
+    async def fill_premium_users(self):
         """Loading up premium users."""
         query = 'SELECT * FROM (SELECT guild_id AS snowflake_id, premium  FROM guild_config  UNION ALL SELECT user_id AS snowflake_id, premium  FROM users_data) WHERE premium="TRUE"'
         cur = await self.db.execute(query)
         data = await cur.fetchall()
-        self.premiums = {r[0] for r in data} or set()
+        ## BETA
+        self.cache["premium_users"] = {r[0] for r in data} or set()
+        # self.premiums = {r[0] for r in data} or set()
 
     @to_call.append
     async def fill_tips_on(self):
@@ -108,7 +106,9 @@ class GrootBot(commands.Bot):
         query = 'SELECT user_id FROM users_data WHERE tips = "TRUE"'
         cur = await self.db.execute(query)
         data = await cur.fetchall()
-        self.tips_on_cache = {r[0] for r in data} or set()
+        ## BETA
+        self.cache["tips_are_on"] = {r[0] for r in data} or set()
+        # self.tips_on_cache = {r[0] for r in data} or set()
 
     @to_call.append
     async def fill_disabled_commands(self):
@@ -116,22 +116,27 @@ class GrootBot(commands.Bot):
         query = "SELECT command_name, snowflake_id FROM disabled_commands ORDER BY command_name"
         cur = await self.db.execute(query)
         data = await cur.fetchall()
-        self.cached_disabled = {
+        ## BETA
+        self.cache["disabled_commands"] = {
             cmd: [r[1] for r in _group]
             for cmd, _group in itertools.groupby(data, key=operator.itemgetter(0))
         }
+        # self.cached_disabled = {
+        #   cmd: [r[1] for r in _group]
+        #   for cmd, _group in itertools.groupby(data, key=operator.itemgetter(0))
+        #}
 
     async def get_prefix(self, message):
         """Handles custom prefixes, this function is invoked every time process_command method is invoke thus returning
         the appropriate prefixes depending on the guild."""
         query = "SELECT prefix FROM guild_config WHERE guild_id=?"
         snowflake_id = message.guild.id if message.guild else message.author.id
-
-        if not (prefix := self.existing_prefix.get(snowflake_id)):
+        self.cache.setdefault("prefix", {})
+        if not (prefix := self.cache["prefix"].get(snowflake_id)):
             cur = await self.db.execute(query, (snowflake_id,))
             data = await cur.fetchone()
             data = data if data else ["g."]
-            prefix = self.existing_prefix.setdefault(snowflake_id, data[0])
+            prefix = self.cache["prefix"].setdefault(snowflake_id, data[0])
 
         comp = re.compile(f"^({re.escape(prefix)}).*", flags=re.I)
         match = comp.match(message.content)
@@ -148,26 +153,19 @@ class GrootBot(commands.Bot):
         context = await super().get_context(message, cls=customContext)
         return context
 
-    async def logout(self, restart=False):
-        await super().close()
-        if restart:
-            os.system(f"python {self.cwd}/launcher.py")
-        exit()
-
     def starter(self):
         """Starts the bot properly"""
         try:
-            loop = asyncio.get_event_loop()
-            db = loop.run_until_complete(
+            db = self.loop.run_until_complete(
                 aiosqlite.connect(f"{self.cwd}/data/main.sqlite3")
             )
-
         except Exception as e:
             print_exception("Could not connect to database:", e)
 
         else:
             self.launch_time = datetime.datetime.utcnow()
             self.db = db
+            self.cache["users"] = {}
             self.loop.run_until_complete(self.after_db())
             try:
                 self.ipc.start()

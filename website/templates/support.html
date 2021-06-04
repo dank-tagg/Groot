@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>Support - Groot</title>
+    {% extends "template.html" %}
+    {% block content %}
+    <script type="text/javascript">
+      window.onbeforeunload = function () {
+        var input = document.getElementById("textarea").value
+        if (input == '') {
+          return
+        }
+        return 'Are you really want to perform the action?';
+      }
+    </script>
+  </head>
+  <body>
+    <section id="main-content" class="main-content" style="margin-top: 2em;">
+      <div id="msgbox-area" class="msgbox-area"></div>
+      <div id="msgbox-container">
+        <h2 id="groot">Support </h2>
+        <p>If you want a template you can look <a href="https://gist.github.com/dank-tagg/4ce24a641ea095ee3d8e4f98adc40264"
+          target="_blank">here</a></p>
+        <textarea id=supportTitle class=textarea name="supportTitle" rows="1" cols="50" placeholder="Your discord name, ID or email."></textarea>
+        <textarea id=supportMsg class=textarea name="supportMsg" rows="10" cols="100" placeholder="Write your message here..."></textarea>
+        <button id=submitBtn class=btn style="border-radius: 15px;">Submit</button>
+        <select id=type class=btn style="border-radius: 15px;">
+          <option value="" disabled="" selected="">Type of support</option>
+          <option>General support</option>
+          <option>Appeal</option>
+          <option>Bug report</option>
+        </select>
+      </div>
+    </section>
+    {% endblock %}
+  </body>
+</html>

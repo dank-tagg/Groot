@@ -42,11 +42,11 @@ class Moderator(commands.Cog):
         cur = await self.bot.db.execute(query, (blacklist, target.id))
         if mode == "add":
             msg = f"**{target.name}** now got blacklisted! bad bad bad"
-            self.bot.blacklist.add(target.id)
+            self.bot.cache["blacklisted_users"].add(target.id)
         else:
             msg = f"**{target.name}** now got unblacklisted! phew..."
             try:
-                self.bot.blacklist.remove(target.id)
+                self.bot.cache["blacklisted_users"].remove(target.id)
             except KeyError:
                 msg = f"{target.name} is not blacklisted!"
 
@@ -78,11 +78,11 @@ class Moderator(commands.Cog):
         cur = await self.bot.db.execute(query, (premium, target.id))
         if mode == "add":
             msg = f"<:Boosters:814930829461553152> **{target.name}** now got premium perks!"
-            self.bot.premiums.add(target.id)
+            self.bot.cache["premium_users"].add(target.id)
         else:
             msg = f"<:Boosters:814930829461553152> **{target.name}** got their premium removed. oof..."
             try:
-                self.bot.premiums.remove(target.id)
+                self.bot.cache["premium_users"].remove(target.id)
             except KeyError:
                 msg = f"{target.name} is not premium!"
 
@@ -92,7 +92,7 @@ class Moderator(commands.Cog):
     async def _edit_(
         self, ctx, action, user: typing.Union[discord.Member, discord.User], amount: int
     ):
-        self.bot.cached_users[user.id][action] += amount
+        self.bot.cache["users"][user.id][action] += amount
         return await ctx.send(
             f"{self.bot.greenTick} Successfully gave {user.mention} {amount:,} `{action}`."
         )

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en-US">
+   <head>
+      <title>Error - Groot</title>
+      {% extends "template.html" %}
+      {% block content %}
+   </head>
+   <body>
+       <section id="main-content" class="main-content" style="margin-top: 2em;">
+           <h2 style="font-family: monospace;">{{ error_name }}</h1>
+           <p>{{ error_msg }}</p><br />
+       </section>
+       {% endblock %}
+    </body>
+</html>
