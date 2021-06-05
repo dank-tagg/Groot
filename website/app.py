@@ -7,6 +7,10 @@ from quart_auth import login_required as auth_required
 from quart_auth import login_user, logout_user
 from quart_discord import DiscordOAuth2Session
 from werkzeug.exceptions import HTTPException
+from os import environ
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Quart(__name__)
 ipc_client = ipc.Client(secret_key="GrootBotAdmin")
@@ -77,20 +81,18 @@ async def callback():
 
 @app.route("/api/webhook/<source>", methods=["POST"])
 async def webhook(source):
-    data = await request.get_json()
-    if data is None:
-        abort(400)
-    data["source"] == source
+    data = await request.get_json(force=True)
+
+    if request.headers["Authorization"] != environ.get("AUTH"):
+        abort(403)
+
+    data["source"] = source
+
     if source == "dbl":
         data["user"] = data["id"]
+
     res = await ipc_client.request("on_vote", vote_data=data)
     return Response(status=200)
-
-# Handlers
-
-@app.errorhandler(Unauthorized)
-async def handle_unauthorized(error):
-    return await render_template("error.html", error_name="You need to be logged to use this!", error_code = "", error_msg="")
 
 
 @app.errorhandler(Exception)
