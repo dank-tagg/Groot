@@ -156,7 +156,7 @@ class Core(commands.Cog):
     async def before_loops(self):
         await self.bot.wait_until_ready()
 
-    @tasks.loop(seconds=1)
+    @tasks.loop(seconds=10)
     async def update_status(self):
         status = read_json('status')
         status_emojis = {
@@ -177,9 +177,10 @@ class Core(commands.Cog):
         channel = self.bot.get_channel(846450009721012294)
         try:
             await  channel.last_message.edit(embed=em)
-        except Exception:
-            await channel.purge(limit=100000)
-            await channel.send(embed=em)
+        except Exception as error:
+            await send_traceback(
+                        self.bot.error_channel, 10, type(error), error, error.__traceback__
+                    )
 
     @update_status.before_loop
     async def before_status(self):
