@@ -24,9 +24,15 @@ class Ipc(commands.Cog):
     async def on_vote(self, data):
         data = data.vote_data
         user_id = int(data['user'])
+        source = "Discord Bot List" if data['source'] == "dbl" else "Top GG"
         user = self.bot.get_user(user_id)
         channel = self.bot.get_channel(849309529342607360)
-        await channel.send(f"{user.mention} voted for the bot! Thank you for your support :>\n To vote, click here: <https://top.gg/bot/812395879146717214/vote>")
+        await channel.send(
+            f"{user.mention} voted for the bot on **{source}**! Thank you for your support :>\n"
+            "To vote, click here:\n"
+            "<https://top.gg/bot/812395879146717214/vote>"
+            "<https://discordbotlist.com/bots/groot/upvote>"
+        )
 
 def setup(bot):
     bot.add_cog(Ipc(bot))

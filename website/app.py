@@ -1,11 +1,13 @@
 
 from discord.ext import ipc
-from quart import Quart, redirect, render_template, url_for, request, Response
-from werkzeug.exceptions import HTTPException
+from quart import (Quart, Response, abort, redirect, render_template, request,
+                   url_for)
 from quart_auth import AuthManager, AuthUser, Unauthorized
 from quart_auth import login_required as auth_required
 from quart_auth import login_user, logout_user
 from quart_discord import DiscordOAuth2Session
+from werkzeug.exceptions import HTTPException
+
 app = Quart(__name__)
 ipc_client = ipc.Client(secret_key="GrootBotAdmin")
 app.config["SECRET_KEY"] = "Groot"
@@ -73,15 +75,16 @@ async def callback():
     login_user(AuthUser(user.id))
     return await render_template("index.html", user=user)
 
-@app.route("/api/webhook", methods=["POST"])
-async def webhook():
+@app.route("/api/webhook/<source>", methods=["POST"])
+async def webhook(source):
     data = await request.get_json()
     if data is None:
-        return Response(response="You must post something!", status=400)
-    print(data)
+        abort(400)
+    data["source"] == source
+    if source == "dbl":
+        data["user"] = data["id"]
     res = await ipc_client.request("on_vote", vote_data=data)
-    print(res)
-    return Response(response="Received request", status=200)
+    return Response(status=200)
 
 # Handlers
 
