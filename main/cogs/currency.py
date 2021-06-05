@@ -6,7 +6,7 @@ from collections import OrderedDict
 import discord
 from discord.ext import commands, tasks
 from utils.chat_formatting import hyperlink as link
-from utils.useful import (Embed, convert_to_int, grootCooldown, progress_bar,
+from utils.useful import (Embed, convert_to_int, Cooldown, progress_bar,
                           roman_num)
 
 
@@ -54,7 +54,7 @@ class Currency(commands.Cog):
     @commands.command(
         name="profile", aliases=["lvl"], brief="Shows your stats and level"
     )
-    @commands.check(grootCooldown(1, 10, 1, 5, commands.BucketType.user))
+    @commands.check(Cooldown(1, 10, 1, 5, commands.BucketType.user))
     async def _profile(self, ctx, member: discord.Member = None):
         """Shows your statistics and experience/level total and the commands issued."""
         member = member if member is not None else ctx.author
@@ -94,7 +94,7 @@ class Currency(commands.Cog):
 
     @commands.command(name="prestige")
     @commands.check(
-        grootCooldown(
+        Cooldown(
             1, 1 * 60 * 60 * 24, 1, 1 * 60 * 60 * 24, commands.BucketType.user
         )
     )
@@ -119,7 +119,7 @@ class Currency(commands.Cog):
             )
 
     @commands.command(name="balance", aliases=["bal"], brief="Displays your money.")
-    @commands.check(grootCooldown(1, 5, 1, 1, commands.BucketType.user))
+    @commands.check(Cooldown(1, 5, 1, 1, commands.BucketType.user))
     async def _balance(self, ctx, member: discord.Member = None):
         """Shows your balance (wallet, bank and net worth)"""
         member = member if member is not None else ctx.author
@@ -175,7 +175,7 @@ class Currency(commands.Cog):
         return await ctx.send(embed=em)
 
     @commands.command(name="buy", brief="Buy something from the shop")
-    @commands.check(grootCooldown(1, 10, 1, 5, commands.BucketType.user))
+    @commands.check(Cooldown(1, 10, 1, 5, commands.BucketType.user))
     async def _buy(self, ctx, amount: typing.Optional[int] = 1, *, item):
         """
         This command is used to buy something from the shop.
@@ -247,7 +247,7 @@ class Currency(commands.Cog):
             await ctx.send(embed=Embed(title="Shop items", description=items))
 
     @commands.command(name="sell", brief="Sell something you own")
-    @commands.check(grootCooldown(1, 10, 1, 5, commands.BucketType.user))
+    @commands.check(Cooldown(1, 10, 1, 5, commands.BucketType.user))
     async def _sell(self, ctx, amount: typing.Optional[int] = 1, *, item):
         item = item.lower()
         query = """
@@ -281,7 +281,7 @@ class Currency(commands.Cog):
     @commands.command(
         name="deposit", aliases=["dep"], brief="Deposit money from your wallet."
     )
-    @commands.check(grootCooldown(1, 5, 1, 1, commands.BucketType.user))
+    @commands.check(Cooldown(1, 5, 1, 1, commands.BucketType.user))
     async def _deposit(self, ctx, amount: str):
         """
         Deposit money from your wallet into your bank.\n
@@ -313,7 +313,7 @@ class Currency(commands.Cog):
         )
 
     @commands.command(name="withdraw", aliases=["with"], brief="Withdraw money")
-    @commands.check(grootCooldown(1, 5, 1, 1, commands.BucketType.user))
+    @commands.check(Cooldown(1, 5, 1, 1, commands.BucketType.user))
     async def _withdraw(self, ctx, amount: str):
         """
         Withdraw money from your bank.
@@ -337,7 +337,7 @@ class Currency(commands.Cog):
         )
 
     @commands.command(name="fish", brief="Fish for fishes and money.")
-    @commands.check(grootCooldown(1, 20, 1, 10, commands.BucketType.user))
+    @commands.check(Cooldown(1, 20, 1, 10, commands.BucketType.user))
     async def _fish(self, ctx, info=None):
         """Fish for fishes that you automatically sell for cash!"""
         if not await self.bot.data.has_item(ctx.author.id, "fishing rod"):
@@ -400,7 +400,7 @@ class Currency(commands.Cog):
         return await ctx.maybe_reply(content=ctx.author.mention, embed=em)
 
     @commands.command(name="hunt", brief="Hunt for animals and cash.")
-    @commands.check(grootCooldown(1, 20, 1, 10, commands.BucketType.user))
+    @commands.check(Cooldown(1, 20, 1, 10, commands.BucketType.user))
     async def _hunt(self, ctx, info=None):
         """Hunt for animals that you automatically sell for cash!"""
         boost = self.bot.cache["users"][ctx.author.id]["boost"]
@@ -497,7 +497,7 @@ class Currency(commands.Cog):
         )
 
     @commands.command(name="slots", brief="Gamble your money for huuuge winnings!")
-    @commands.check(grootCooldown(1, 5, 1, 3, commands.BucketType.user))
+    @commands.check(Cooldown(1, 5, 1, 3, commands.BucketType.user))
     async def _slots(self, ctx, amount: str):
         """
         Slots some coins and get huge winnings (if you win)\n
@@ -569,7 +569,7 @@ class Currency(commands.Cog):
 
     @commands.command(name="blackjack", aliases=["bj"], brief="Play blackjack!")
     @commands.max_concurrency(1, commands.BucketType.user, wait=False)
-    @commands.check(grootCooldown(1, 5, 1, 3, commands.BucketType.user))
+    @commands.check(Cooldown(1, 5, 1, 3, commands.BucketType.user))
     async def _blackjack(self, ctx, amount: str):
         """
         Play blackjack! READ THE RULES FIRST, before calling it a scam.

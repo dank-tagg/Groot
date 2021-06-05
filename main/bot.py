@@ -14,7 +14,7 @@ from discord.ext import commands, ipc
 
 from utils.cache import CacheManager
 from utils.subclasses import customContext
-from utils.useful import (ListCall, call, currencyData, grootCooldown,
+from utils.useful import (ListCall, call, currencyData, Cooldown,
                           print_exception)
 
 to_call = ListCall()
@@ -43,10 +43,10 @@ class GrootBot(commands.Bot):
         command.cooldown_after_parsing = True
 
         if (
-            discord.utils.find(lambda c: isinstance(c, grootCooldown), command.checks)
+            discord.utils.find(lambda c: isinstance(c, Cooldown), command.checks)
             is None
         ):
-            command.checks.append(grootCooldown(1, 3, 1, 1, commands.BucketType.user))
+            command.checks.append(Cooldown(1, 3, 1, 1, commands.BucketType.user))
 
     @property
     def cwd(self):

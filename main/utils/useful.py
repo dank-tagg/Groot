@@ -89,7 +89,7 @@ class currencyData:
         return bool(data)
 
 
-class grootCooldown:
+class Cooldown:
     def __init__(
         self,
         rate: int,

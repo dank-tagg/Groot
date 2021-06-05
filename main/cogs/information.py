@@ -8,7 +8,7 @@ import humanize
 import utils.json_loader
 from discord.ext import commands
 from utils.chat_formatting import hyperlink
-from utils.useful import Embed, grootCooldown
+from utils.useful import Embed, Cooldown
 import inspect
 import os
 
@@ -244,10 +244,10 @@ class Information(commands.Cog):
 
             try:
                 default = discord.utils.find(
-                    lambda c: isinstance(c, grootCooldown), command.checks
+                    lambda c: isinstance(c, Cooldown), command.checks
                 ).default_mapping._cooldown.per
                 altered = discord.utils.find(
-                    lambda c: isinstance(c, grootCooldown), command.checks
+                    lambda c: isinstance(c, Cooldown), command.checks
                 ).altered_mapping._cooldown.per
             except Exception:
                 default = 3

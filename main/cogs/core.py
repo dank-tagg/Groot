@@ -3,7 +3,7 @@ import datetime as dt
 import discord
 import humanize
 from discord.ext import commands, tasks
-from utils.useful import Embed, grootCooldown, send_traceback
+from utils.useful import Embed, Cooldown, send_traceback
 from utils.json_loader import read_json
 
 
@@ -39,10 +39,10 @@ class Core(commands.Cog):
         elif isinstance(error, commands.CommandOnCooldown):
             command = ctx.command
             default = discord.utils.find(
-                lambda c: isinstance(c, grootCooldown), command.checks
+                lambda c: isinstance(c, Cooldown), command.checks
             ).default_mapping._cooldown.per
             altered = discord.utils.find(
-                lambda c: isinstance(c, grootCooldown), command.checks
+                lambda c: isinstance(c, Cooldown), command.checks
             ).altered_mapping._cooldown.per
             cooldowns = f""
             if default is not None and altered is not None:
