@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import inspect
 import itertools
 import logging
 import operator
@@ -14,7 +15,7 @@ from discord.ext import commands, ipc
 
 from utils.cache import CacheManager
 from utils.subclasses import customContext
-from utils.useful import (ListCall, call, currencyData, Cooldown,
+from utils.useful import (Cooldown, ListCall, call, currencyData,
                           print_exception)
 
 to_call = ListCall()
@@ -141,8 +142,13 @@ class GrootBot(commands.Bot):
     def add_cog(self, cog: commands.Cog, category: str = "Uncategorized"):
         if not category in self.categories:
             self.categories[category] = set()
-        self.categories[category].add(cog)
-        super().add_cog(cog(self))
+            
+        if inspect.isclass(cog):
+            self.categories[category].add(cog)
+            super().add_cog(cog(self))
+        else:
+            self.categories[category].add(cog.__class__)
+            super().add_cog(cog)
         
     def get_message(self, message_id):
         """Gets the message from the cache"""
