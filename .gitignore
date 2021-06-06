@@ -3,3 +3,4 @@
 *.log
 *.pyc
 .git-credentials
+config.json
