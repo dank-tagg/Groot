@@ -163,4 +163,4 @@ class Configuration(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Configuration(bot))
+    bot.add_cog(Configuration, category="Configuration")

@@ -621,27 +621,5 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
     async def _get_id(self, ctx, any: Union[discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.CategoryChannel, discord.Emoji, discord.User]):
         return await ctx.send(any.id)
 
-    @commands.group(name="tag", invoke_without_command=True, case_insensitive=True)
-    async def _tag(self, ctx, *, tag):
-        """Get a tag"""
-        cmd = self.bot.get_command("aaa")
-        await ctx.invoke(cmd, tag=tag)
-
-    @_tag.command(name="create")
-    async def _create(self, ctx, tag, *, content):
-        """Create a tag"""
-        cmd = self.bot.get_command("aaa create")
-        await ctx.invoke(cmd, tag=tag, content=content)
-
-    @_tag.command(name="delete")
-    async def _delete(self, ctx, *, tag):
-        """
-        Deletes a tag.
-        You must own the tag, otherwise it will raise an error.
-        """
-        cmd = self.bot.get_command("aaa delete")
-        await ctx.invoke(cmd, tag=tag)
-
-
 def setup(bot):
-    bot.add_cog(Utilities(bot))
+    bot.add_cog(Utilities, category="Utilities")

@@ -34,4 +34,4 @@ class API(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(API(bot))
+    bot.add_cog(API)

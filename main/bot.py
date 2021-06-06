@@ -144,7 +144,7 @@ class GrootBot(commands.Bot):
         if not category in self.categories:
             self.categories[category] = []
         self.categories[category].append(cog)
-        super().add_cog(cog)
+        super().add_cog(cog(self))
         
     def get_message(self, message_id):
         """Gets the message from the cache"""

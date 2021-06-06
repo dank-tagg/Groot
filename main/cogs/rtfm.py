@@ -43,4 +43,4 @@ class Docs(commands.Cog):
         await ctx.send(embed=em)
 
 def setup(bot):
-    bot.add_cog(Docs(bot))
+    bot.add_cog(Docs, category="Information")

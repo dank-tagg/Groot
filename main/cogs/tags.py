@@ -10,7 +10,7 @@ class Tags(commands.Cog):
         self.bot = bot
 
     @commands.group(invoke_without_command=True, case_insensitive=True)
-    async def aaa(self, ctx, tag):
+    async def tag(self, ctx, tag):
         tag = tag.lower()
 
         query = "SELECT tag_content FROM tags WHERE tag_guild_id = ? AND tag_name = ?"
@@ -104,4 +104,4 @@ class Tags(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Tags(bot))
+    bot.add_cog(Tags, category="Utilities")

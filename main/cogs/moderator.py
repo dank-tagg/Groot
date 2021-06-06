@@ -145,4 +145,4 @@ class Moderator(commands.Cog):
         return await ctx.send(f"{self.bot.greenTick} Deleted item `{item}` from shop.")
 
 def setup(bot):
-    bot.add_cog(Moderator(bot))
+    bot.add_cog(Moderator)
