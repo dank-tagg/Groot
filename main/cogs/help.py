@@ -8,7 +8,7 @@ import contextlib
 class GrootHelp(commands.HelpCommand):
 
     def __init__(self, bot, **options):
-        super().__init__(bot, **options)
+        super().__init__(**options)
         self.categories = bot.categories
     
     @staticmethod
