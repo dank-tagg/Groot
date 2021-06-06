@@ -72,8 +72,9 @@ class GrootBot(commands.Bot):
             if file.endswith(".py"):
                 cogs += (file[:-3],)
 
+        cogs += ("Jishaku", )
         for cog in cogs:
-            ext = "cogs."
+            ext = "cogs." if cog != "Jishaku" else ""
             if error := call(self.load_extension, f"{ext}{cog}", ret=True):
                 print_exception(
                     "Ignoring exception while loading up {}:".format(cog), error
@@ -142,7 +143,7 @@ class GrootBot(commands.Bot):
     def add_cog(self, cog: commands.Cog, category: str = "Uncategorized"):
         if not category in self.categories:
             self.categories[category] = set()
-            
+
         if inspect.isclass(cog):
             self.categories[category].add(cog)
             super().add_cog(cog(self))
