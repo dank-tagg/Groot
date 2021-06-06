@@ -76,7 +76,11 @@ class GrootHelp(commands.HelpCommand):
             icon_url=self.context.author.avatar_url
         )
 
-        em.add_field(name="Category")
+        em.add_field(
+            name="Categories",
+            value=",".join(self.context.bot.categories.keys())
+        )
+        
         channel = self.get_destination()
         await channel.send(embed=em)
 
