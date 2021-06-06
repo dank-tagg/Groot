@@ -174,9 +174,10 @@ class Core(commands.Cog):
             )
         em.set_footer(text="Last updated at")
     
-        channel = self.bot.get_channel(851052521757081630)
+        channel = self.bot.get_channel(846450009721012294)
+        message = await channel.fetch_message(851052521757081630)
         try:
-            await  channel.last_message.edit(embed=em)
+            await message.edit(embed=em)
         except Exception as error:
             await send_traceback(
                         self.bot.error_channel, 10, type(error), error, error.__traceback__
