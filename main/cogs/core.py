@@ -158,14 +158,14 @@ class Core(commands.Cog):
 
     @tasks.loop(seconds=10)
     async def update_status(self):
-        status = read_json('status')
+        status = read_json('config')
         status_emojis = {
             'online': '<:online:808613541774360576>', 
             'offline': '<:offline:817034738014879845>', 
             'idle': '<:idle:817035319165059102>'
             }
         
-        groot_status = f"{status_emojis[status.get('groot', 'offline')]} {str.title(status.get('groot', 'offline'))}"
+        groot_status = f"{status_emojis[status['status'].get('groot', 'offline')]} {str.title(status['status'].get('groot', 'offline'))}"
         message = f"**BOT STATUS** \n\n {groot_status} | Groot\n\nRefreshes every second"
     
         em = Embed(

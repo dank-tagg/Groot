@@ -67,11 +67,12 @@ class Developer(commands.Cog):
         )
         if msg.content.lower() == "y":
             async with ctx.typing():
-                data = utils.json_loader.read_json("updates")
-                data["upDATE"] = str(datetime.datetime.utcnow())
-                data["update"] = message
-                data["link"] = link
-                utils.json_loader.write_json(data, "updates")
+                data = utils.json_loader.read_json("config")
+                data["updates"]["date"] = str(datetime.datetime.utcnow())
+                data["updates"]["message"] = message
+                data["updates"]["link"] = link
+                utils.json_loader.write_json(data, "config")
+            await ctx.send("Done!")
 
     @dev.command(name="status")
     async def _set_status(self, ctx, *, status):
