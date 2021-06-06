@@ -32,6 +32,7 @@ class GrootBot(commands.Bot):
         self.ipc = ipc.Server(
             self, host="0.0.0.0", secret_key="GrootBotAdmin"
         )
+        self.categories = {}
 
     async def after_db(self):
         """Runs after the db is connected"""
@@ -80,7 +81,7 @@ class GrootBot(commands.Bot):
                 )
 
     @to_call.append
-    async def fill_blacklisted_users(self):
+    async def fill_cache(self):
         """Loading up the blacklisted users."""
         query = 'SELECT * FROM (SELECT guild_id AS snowflake_id, blacklisted  FROM guild_config  UNION ALL SELECT user_id AS snowflake_id, blacklisted  FROM users_data) WHERE blacklisted="TRUE"'
         cur = await self.db.execute(query)
@@ -89,8 +90,6 @@ class GrootBot(commands.Bot):
         self.cache["blacklisted_users"] = {r[0] for r in data} or set()
         # self.blacklist = {r[0] for r in data} or set()
 
-    @to_call.append
-    async def fill_premium_users(self):
         """Loading up premium users."""
         query = 'SELECT * FROM (SELECT guild_id AS snowflake_id, premium  FROM guild_config  UNION ALL SELECT user_id AS snowflake_id, premium  FROM users_data) WHERE premium="TRUE"'
         cur = await self.db.execute(query)
@@ -99,8 +98,6 @@ class GrootBot(commands.Bot):
         self.cache["premium_users"] = {r[0] for r in data} or set()
         # self.premiums = {r[0] for r in data} or set()
 
-    @to_call.append
-    async def fill_tips_on(self):
         """Loading up users that have tips enabled"""
 
         query = 'SELECT user_id FROM users_data WHERE tips = "TRUE"'
@@ -110,8 +107,6 @@ class GrootBot(commands.Bot):
         self.cache["tips_are_on"] = {r[0] for r in data} or set()
         # self.tips_on_cache = {r[0] for r in data} or set()
 
-    @to_call.append
-    async def fill_disabled_commands(self):
         """Loads up all disabled_commands"""
         query = "SELECT command_name, snowflake_id FROM disabled_commands ORDER BY command_name"
         cur = await self.db.execute(query)
@@ -125,6 +120,7 @@ class GrootBot(commands.Bot):
         #   cmd: [r[1] for r in _group]
         #   for cmd, _group in itertools.groupby(data, key=operator.itemgetter(0))
         #}
+        self.cache["users"] = {}
 
     async def get_prefix(self, message):
         """Handles custom prefixes, this function is invoked every time process_command method is invoke thus returning
@@ -143,7 +139,13 @@ class GrootBot(commands.Bot):
         if match is not None:
             return match.group(1)
         return prefix
-
+    
+    def add_cog(self, cog: commands.Cog, category: str = "Uncategorized"):
+        if not category in self.categories:
+            self.categories[category] = []
+        self.categories[category].append(cog)
+        super().add_cog(cog)
+        
     def get_message(self, message_id):
         """Gets the message from the cache"""
         return self._connection._get_message(message_id)
@@ -165,7 +167,6 @@ class GrootBot(commands.Bot):
         else:
             self.launch_time = datetime.datetime.utcnow()
             self.db = db
-            self.cache["users"] = {}
             self.loop.run_until_complete(self.after_db())
             try:
                 self.ipc.start()
