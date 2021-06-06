@@ -56,7 +56,7 @@ class Tags(commands.Cog):
                 await commands.clean_content().convert(ctx, content),
             )
 
-    @aaa.command()
+    @tag.command()
     async def create(self, ctx, tag, content):
         """Creates a new tag owned by you.
         This tag is server-specific and cannot be used in other servers.
@@ -77,7 +77,7 @@ class Tags(commands.Cog):
                 f"{self.bot.greenTick} Done! Created tag **{tag}**. `{await self.bot.get_prefix(ctx.message)}tag {tag}`"
             )
 
-    @aaa.command()
+    @tag.command()
     async def delete(self, ctx, tag):
 
         tag = tag.lower()
