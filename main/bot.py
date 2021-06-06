@@ -65,16 +65,14 @@ class GrootBot(commands.Bot):
 
     @to_call.append
     def loading_cog(self):
-        """Loads the cog"""
+        """Loads the cogs"""
         cogs = ()
         for file in os.listdir(f"{self.cwd}/cogs"):
             if file.endswith(".py"):
                 cogs += (file[:-3],)
 
-        cogs += ("jishaku",)
-
         for cog in cogs:
-            ext = "cogs." if cog != "jishaku" else ""
+            ext = "cogs."
             if error := call(self.load_extension, f"{ext}{cog}", ret=True):
                 print_exception(
                     "Ignoring exception while loading up {}:".format(cog), error

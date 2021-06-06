@@ -73,7 +73,7 @@ class GrootHelp(commands.HelpCommand):
 
         em.set_author(
             name=self.context.author, 
-            icon_url=self.context.author.avatar.url
+            icon_url=self.context.author.avatar_url
         )
 
         em.add_field(name="Category")
