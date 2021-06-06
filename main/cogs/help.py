@@ -7,6 +7,10 @@ import contextlib
 
 class GrootHelp(commands.HelpCommand):
 
+    def __init__(self, bot, **options):
+        super().__init__(bot, **options)
+        self.categories = bot.categories
+    
     @staticmethod
     def get_doc(command):
         _help = command.help or "This command has no description"
@@ -75,12 +79,13 @@ class GrootHelp(commands.HelpCommand):
             name=self.context.author, 
             icon_url=self.context.author.avatar_url
         )
-
+        # Categories
+        categories = self.categories.keys()
         em.add_field(
             name="Categories",
-            value=",".join(self.context.bot.categories.keys())
+            value=", \n".join(self.context.bot.categories.keys())
         )
-        
+
         channel = self.get_destination()
         await channel.send(embed=em)
 
@@ -102,7 +107,7 @@ class GrootHelp(commands.HelpCommand):
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        help_command, help_command.cog = GrootHelp(), self
+        help_command, help_command.cog = GrootHelp(bot), self
         bot.help_command = help_command
     
 def setup(bot):
