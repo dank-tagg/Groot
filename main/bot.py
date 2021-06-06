@@ -140,8 +140,8 @@ class GrootBot(commands.Bot):
     
     def add_cog(self, cog: commands.Cog, category: str = "Uncategorized"):
         if not category in self.categories:
-            self.categories[category] = []
-        self.categories[category].append(cog)
+            self.categories[category] = set()
+        self.categories[category].add(cog)
         super().add_cog(cog(self))
         
     def get_message(self, message_id):
