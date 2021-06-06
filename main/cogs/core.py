@@ -174,7 +174,7 @@ class Core(commands.Cog):
             )
         em.set_footer(text="Last updated at")
     
-        channel = self.bot.get_channel(846450009721012294)
+        channel = self.bot.get_channel(851052521757081630)
         try:
             await  channel.last_message.edit(embed=em)
         except Exception as error:
