@@ -7,9 +7,6 @@ import contextlib
 
 class GrootHelp(commands.HelpCommand):
 
-    def __init__(self, bot, **options):
-        super().__init__(**options)
-        self.categories = bot.categories
     
     @staticmethod
     def get_doc(command):
@@ -107,7 +104,7 @@ class GrootHelp(commands.HelpCommand):
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        help_command = GrootHelp(bot)
+        help_command = GrootHelp()
         help_command.cog = self
         bot.help_command = help_command
     
