@@ -6,7 +6,6 @@ import contextlib
 
 
 class GrootHelp(commands.HelpCommand):
-
     
     @staticmethod
     def get_doc(command):
