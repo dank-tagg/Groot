@@ -72,9 +72,9 @@ class GrootBot(commands.Bot):
             if file.endswith(".py"):
                 cogs += (file[:-3],)
 
-        cogs += ("Jishaku", )
+        cogs += ("jishaku", )
         for cog in cogs:
-            ext = "cogs." if cog != "Jishaku" else ""
+            ext = "cogs." if cog != "jishaku" else ""
             if error := call(self.load_extension, f"{ext}{cog}", ret=True):
                 print_exception(
                     "Ignoring exception while loading up {}:".format(cog), error
