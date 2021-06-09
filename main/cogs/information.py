@@ -119,4 +119,4 @@ class Information(commands.Cog):
         await ctx.send(final_url)
 
 def setup(bot):
-    bot.add_cog(Information, category="Information")
+    bot.add_cog(Information(bot), category="Information")

@@ -35,4 +35,4 @@ class Ipc(commands.Cog):
         )
 
 def setup(bot):
-    bot.add_cog(Ipc)
+    bot.add_cog(Ipc(bot))

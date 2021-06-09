@@ -262,4 +262,4 @@ class Blackjack(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Blackjack)
+    bot.add_cog(Blackjack(bot))

@@ -622,4 +622,4 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         return await ctx.send(any.id)
 
 def setup(bot):
-    bot.add_cog(Utilities, category="Utilities")
+    bot.add_cog(Utilities(bot), category="Utilities")

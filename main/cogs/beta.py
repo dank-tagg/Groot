@@ -130,4 +130,4 @@ class TestCog(commands.Cog):
         await ctx.send('Tic Tac Toe: X goes first', view=TicTacToe(ctx.author, member))
 
 def setup(bot):
-    bot.add_cog(TestCog) 
+    bot.add_cog(TestCog(bot)) 

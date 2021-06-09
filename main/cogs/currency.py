@@ -602,4 +602,4 @@ class Currency(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Currency, category="Currency")
+    bot.add_cog(Currency(bot), category="Currency")

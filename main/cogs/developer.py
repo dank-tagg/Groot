@@ -283,4 +283,4 @@ class Developer(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Developer)
+    bot.add_cog(Developer(bot))

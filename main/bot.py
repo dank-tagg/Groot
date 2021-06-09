@@ -139,17 +139,13 @@ class GrootBot(commands.Bot):
         if match is not None:
             return match.group(1)
         return prefix
-    
+
     def add_cog(self, cog: commands.Cog, category: str = "Uncategorized"):
         if not category in self.categories:
             self.categories[category] = set()
 
-        if inspect.isclass(cog):
-            self.categories[category].add(cog)
-            super().add_cog(cog(self))
-        else:
-            self.categories[category].add(cog.__class__)
-            super().add_cog(cog)
+        self.categories[category].add(cog.__cog_name__)
+        super().add_cog(cog)
         
     def get_message(self, message_id):
         """Gets the message from the cache"""

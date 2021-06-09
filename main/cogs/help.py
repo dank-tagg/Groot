@@ -111,4 +111,4 @@ class Help(commands.Cog):
         bot.help_command = help_command
     
 def setup(bot):
-    bot.add_cog(Help, category="Information")
+    bot.add_cog(Help(bot), category="Information")

@@ -188,4 +188,4 @@ class Core(commands.Cog):
         await self.bot.wait_until_ready()
 
 def setup(bot):
-    bot.add_cog(Core)
+    bot.add_cog(Core(bot))
