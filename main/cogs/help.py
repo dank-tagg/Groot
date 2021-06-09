@@ -7,7 +7,9 @@ import contextlib
 
 class GrootHelp(commands.HelpCommand):
 
-    
+    def __init__(self, **options):
+        super().__init__(**options)
+        self.categories = self.context.bot.categories
     @staticmethod
     def get_doc(command):
         _help = command.help or "This command has no description"
