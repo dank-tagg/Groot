@@ -140,7 +140,7 @@ class GrootBot(commands.Bot):
             return match.group(1)
         return prefix
 
-    def add_cog(self, cog: commands.Cog, category: str = "Uncategorized"):
+    def add_cog(self, cog: commands.Cog, category: str = "Unlisted"):
         if not category in self.categories:
             self.categories[category] = set()
 
