@@ -74,10 +74,7 @@ class Core(commands.Cog):
         elif isinstance(error, commands.CommandNotFound):
             return
 
-        await send_traceback(
-            self.bot.error_channel, 10, type(error), error, error.__traceback__
-        )
-        return
+        await send_traceback(self.bot.log_channel, ctx, 0, type(error), error, error.__traceback__)
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
@@ -98,7 +95,7 @@ class Core(commands.Cog):
         try:
             self.cache[str(ctx.author.id)] += 1
             self.cache_usage[str(ctx.command.name)] += 1
-        except Exception:
+        except KeyError:
             self.cache[str(ctx.author.id)] = 1
             self.cache_usage[str(ctx.command.name)] = 1
 
@@ -180,7 +177,7 @@ class Core(commands.Cog):
             await message.edit(embed=em)
         except Exception as error:
             await send_traceback(
-                        self.bot.error_channel, 10, type(error), error, error.__traceback__
+                        self.bot.log_channel, 10, type(error), error, error.__traceback__
                     )
 
     @update_status.before_loop

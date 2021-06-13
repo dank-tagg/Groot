@@ -15,18 +15,17 @@ from discord.ext import commands
 from jishaku.codeblocks import codeblock_converter
 from jishaku.models import copy_context_with
 from utils.chat_formatting import box, hyperlink
-from utils.useful import Embed
+from utils.useful import Embed, BaseMenu, pages, fuzzy
 
+@pages()
+async def show_result(self, menu, entry):
+    return f"```\n{entry}```"
 
 class Developer(commands.Cog):
     """dev-only commands that make the bot dynamic."""
 
     def __init__(self, bot):
         self.bot = bot
-        self._last_result = None
-        self.sessions = set()
-        self.task_count = 0
-        self.tasks = collections.deque()
 
     @staticmethod
     async def run_shell(code: str) -> bytes:
@@ -89,48 +88,35 @@ class Developer(commands.Cog):
         return await jsk(ctx, argument=code)
 
     @dev.command(name="guilds")
-    async def _guilds(self, ctx, page: int = 1):
-        GUILDSa = self.bot.guilds
-        alist = []
-        for GUILDS in GUILDSa:
-            alist.append(self.bot.get_guild(GUILDS.id))
+    async def _guilds(self, ctx, search=None):
+        
+        if not search:
+            paginator = commands.Paginator(prefix=None, suffix=None, max_size=500)
+            for guild in sorted(self.bot.guilds, key=lambda guild: len(guild.members), reverse=True):
+                summary = f"GUILD: {guild.name} [{guild.id}]\nOWNER: {guild.owner} [{guild.owner_id}]\nMEMBERS: {len(guild.members)}\n"
+                paginator.add_line(summary)
 
-        alist = [
-            (guild.name, guild.id, guild.owner_id, len(guild.members))
-            for i, guild in enumerate(alist)
-        ]
-        alist = sorted(alist, key=lambda guild: guild[3], reverse=True)
+            menu = BaseMenu(source=show_result(paginator.pages))
+            await menu.start(ctx)
+        else:
+            collection = {guild.name: guild.id for guild in self.bot.guilds}
+            found = fuzzy.finder(search, collection, lazy=False)[:5]
+            
+            if len(found) == 1:
+                guild = self.bot.get_guild(collection[found[0]])
+                em = Embed(
+                    description=f"ID: {guild.id}\nTotal members: {len(guild.members)}"
+                )
+                em.set_author(name=found[0])
+                await ctx.send(embed=em)
+            elif len(found) > 1:
+                newline = "\n"
+                await ctx.send(
+                    f"{len(found)} guilds found:\n{newline.join(found)}"
+                )
+            else:
+                await ctx.send(f"No guild was found named **{search}**")
 
-        page = page
-
-        items_per_page = 5
-        pages = math.ceil(len(alist) / items_per_page)
-
-        start = (page - 1) * items_per_page
-        end = start + items_per_page
-
-        queue = ""
-        embed = (
-            Embed(
-                description="**Servers [{}]**\n\n{}".format(len(GUILDSa), queue),
-                color=0x2F3136,
-            )
-            .set_footer(
-                text="Viewing page {}/{}".format(page, pages),
-                icon_url=self.bot.user.avatar_url,
-            )
-            .set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
-        )
-
-        for i, guild in enumerate(alist[start:end], start=start):
-            owner = await self.bot.fetch_user(int(guild[2]))
-            owner = owner.mention
-            embed.add_field(
-                name=f"{guild[0]}\n",
-                value=f"Members: {guild[3]:,}\nGuild ID: `{guild[1]}`\nOwner: {owner}\n\n",
-                inline=False,
-            )
-        await ctx.send(embed=embed)
 
     @dev.command(name="inviteme")
     async def _inviteme(self, ctx, *, guildid: int):
@@ -159,7 +145,7 @@ class Developer(commands.Cog):
                         exc_info = type(e), e.original, e.__traceback__
                         etype, value, trace = exc_info
                         traceback_content = "".join(
-                            traceback.format_exception(etype, value, trace, 10)
+                            traceback.format_exception(etype, value, trace, 0)
                         ).replace("``", "`\u200b`")
                         fail += (
                             f"```diff\n- {e.name} failed to reload.```"
@@ -168,7 +154,7 @@ class Developer(commands.Cog):
 
         if not fail:
             em = Embed(color=0x3CA374)
-            em.add_field(name="Pulling from GitHub", value=text, inline=False)
+            em.add_field(name="<:online:808613541774360576> Pulling from GitHub", value=text, inline=False)
             em.add_field(
                 name=f"{self.bot.greenTick} Cogs Reloading",
                 value="```diff\n+ All cogs were reloaded successfully```",
@@ -208,11 +194,10 @@ class Developer(commands.Cog):
         return await alt_ctx.command.reinvoke(alt_ctx)
 
     @dev.command(name="reload")
-    async def _reloadmodule(self, ctx, *, module: str):
-        jsk = self.bot.get_command("jishaku py")
-        await jsk(
-            code="import imp\n" f"import {module}\n" f"print(imp.reload({module}))"
-        )
+    async def _reloadmodule(self, ctx):
+        import imp, utils
+        imp.reload(utils)
+        await ctx.send("Done")
 
     @dev.command()
     async def tables(self, ctx):

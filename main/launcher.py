@@ -19,7 +19,7 @@ dotenv_path = join(dirname(__file__), "bot_config/secrets.env")
 load_dotenv(dotenv_path)
 
 intent_data = {
-    x: True for x in ("guilds", "members", "emojis", "messages", "reactions", "presences")
+    x: True for x in ("guilds", "members", "emojis", "messages", "reactions", "presences", "voice_states")
 }
 intents = discord.Intents(**intent_data)
 mentions = discord.AllowedMentions(

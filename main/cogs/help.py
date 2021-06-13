@@ -124,7 +124,7 @@ class GrootHelp(commands.HelpCommand):
     
     async def send_category_help(self, category):
         to_find = category.lower().title()
-        categories = self.context.bot.categories
+        categories = self.context.bot.categories.copy()
 
         if self.context.author != self.context.bot.owner:
             categories.pop("Unlisted")

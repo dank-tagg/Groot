@@ -3,6 +3,7 @@ import datetime
 import random
 
 import discord
+import json
 from discord.ext import commands
 from humanize.time import precisedelta
 from PIL import Image, ImageDraw, ImageFont
@@ -620,6 +621,11 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
     @commands.command(name="id")
     async def _get_id(self, ctx, any: Union[discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.CategoryChannel, discord.Emoji, discord.User]):
         return await ctx.send(any.id)
+    
+    @commands.command(name="embed")
+    async def _send_embed(self, ctx, embed):
+        embed = json.loads(embed)
+        await ctx.send(type(embed))
 
 def setup(bot):
     bot.add_cog(Utilities(bot), category="Utilities")

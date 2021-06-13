@@ -53,7 +53,13 @@ async def support():
 @app.route("/stats")
 async def stats():
     stats = await ipc_client.request("get_stats")
-    return await render_template("stats.html", users=f"{stats['users']:,}", guilds=f"{stats['guilds']:,}")
+    return await render_template(
+        "stats.html", 
+        users=f"{stats['users']:,}", 
+        guilds=f"{stats['guilds']:,}", 
+        commands=f"{stats['commands']:,}",
+        uptime=f"{stats['uptime']}"
+    )
 
 
 # API (discord etc)
@@ -61,7 +67,7 @@ async def stats():
 
 @app.route("/api/login")
 async def login():
-    return await discord.create_session()
+    return await discord.create_session(scopes=["identify", "guilds"])
 
 @app.route("/api/logout")
 async def logout():

@@ -60,7 +60,7 @@ class GrootBot(commands.Bot):
         return self.get_user(396805720353275924)
 
     @property
-    def error_channel(self):
+    def log_channel(self):
         """Gets the error channel for the bot to log."""
         return self.owner
 
@@ -182,3 +182,4 @@ class GrootBot(commands.Bot):
 
     async def on_ipc_error(self, endpoint, error):
         logging.warning(f"{endpoint} raised {error}")
+        
