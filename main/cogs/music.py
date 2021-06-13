@@ -4,15 +4,15 @@ import wavelink
 
 class Music(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
         if not hasattr(bot, 'wavelink'):
-            self.bot.wavelink = wavelink.Client(bot=self.bot)
+            bot.wavelink = wavelink.Client(bot=bot)
 
-        self.bot.loop.create_task(self.start_nodes())
+        bot.loop.create_task(self.start_nodes())
 
-    async def start_nodes(self):
+    async def start_nodes(self) -> None:
         """Connect and intiate nodes."""
         await self.bot.wait_until_ready()
 
@@ -32,6 +32,7 @@ class Music(commands.Cog):
 
         for n in nodes.values():
             await self.bot.wavelink.initiate_node(**n)
+
 
     @commands.command(name='connect')
     async def connect_(self, ctx, *, channel: discord.VoiceChannel=None):
