@@ -311,13 +311,12 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     async def start_nodes(self):
         await self.bot.wait_until_ready()
-        identifier = "Node"
-        node = await self.bot.wavelink.initiate_node(
+        await self.bot.wavelink.initiate_node(
                         host="127.0.0.1",
                         port=2333,
                         rest_uri="http://127.0.0.1:2333",
                         password="HMZEdison07",
-                        identifier=identifier,
+                        identifier="Node",
                         region="europe",
                         heartbeat=60,
                     )
