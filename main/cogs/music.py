@@ -320,7 +320,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
                         identifier=identifier,
                         region="europe",
                         heartbeat=60,
-                    )=
+                    )
 
     @wavelink.WavelinkMixin.listener()
     async def on_node_ready(self, node: wavelink.Node):
