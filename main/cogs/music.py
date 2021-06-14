@@ -302,7 +302,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         bot.loop.create_task(self.start_nodes())
 
-    async def cog_unload(self):=
+    async def cog_unload(self):
         self.bot.loop.create_task(self.destroy_players())
 
     async def destroy_players(self):
