@@ -231,6 +231,11 @@ def roman_num(num):
                 num -= i
     return roman
 
+def get_title(track, length=35):
+    title = track.title
+    if len(title) > length:
+        title = f"{title[:length]}..."
+    return title
 
 def progress_bar(progress):
     progress = round(progress / 10)
@@ -321,7 +326,7 @@ async def get_frozen(self, guild: discord.Guild, member: discord.Member):
 
 
 async def send_traceback(
-    destination: discord.abc.Messageable, ctx: commands.Context, verbosity: int, *exc_info
+    destination: discord.abc.Messageable, ctx: commands.Context, edit, verbosity: int, *exc_info
 ):
     """
     Sends a traceback of an exception to a destination.
@@ -333,7 +338,7 @@ async def send_traceback(
     :return: The last message sent
     """
 
-    base = f"An error occured while **{ctx.author}** [{ctx.author.id} ran the command `{ctx.command.name}` at {datetime.utcnow().strftime('%H:%M:%S')} UTC\n"
+    base = f"An error occured while **{ctx.author}** [`{ctx.author.id}`] ran the command `{ctx.command.name}` at {datetime.utcnow().strftime('%H:%M:%S')} UTC\n"
     
     etype, value, trace = exc_info
 
@@ -342,8 +347,11 @@ async def send_traceback(
     ).replace("``", "`\u200b`")
 
     final = base + f"```py\n{traceback_content}```"
-    await destination.send(final)
-    return final
+    if not edit[0]:
+        msg = await destination.send(final)
+    else:
+        msg = await edit[1].edit(content=final)
+    return msg
 
 
 # ---Converters

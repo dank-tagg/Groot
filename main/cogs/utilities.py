@@ -308,9 +308,8 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         It drops a given or random sentence and the user that types it the fastest, gets the prize.\n
         To use the subcommands, the author must have the giveaway role set for the server.
         """
-        cmd = self.bot.get_command("help")
-        await ctx.invoke(cmd, command="drop")
-
+        await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
+    
     @drop.command(brief="Drops a prize with a custom sentence")
     @commands.max_concurrency(1, commands.BucketType.channel, wait=False)
     async def custom(self, ctx, *, prize):

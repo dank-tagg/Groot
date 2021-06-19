@@ -15,6 +15,22 @@ class Core(commands.Cog):
         self.loops.start()
         self.update_status.start()
 
+    async def expand_tb(self, ctx, error, msg):
+        await msg.add_reaction(self.bot.plus)
+        await msg.add_reaction(self.bot.minus)
+        await msg.add_reaction("<:save:854038370735882260>")
+
+        while True:
+            reaction, user = await self.bot.wait_for('reaction_add', check=lambda reaction, m: m == self.bot.owner and reaction.message == msg)
+            if str(reaction) == self.bot.plus:
+                await send_traceback(self.bot.log_channel, ctx, (True, msg), 3, type(error), error, error.__traceback__)
+            elif str(reaction) == self.bot.minus:
+                await send_traceback(self.bot.log_channel, ctx, (True, msg), 0, type(error), error, error.__traceback__)
+            elif str(reaction) == "<:save:854038370735882260>":
+                log = self.bot.get_channel(850439592352022528)
+                await send_traceback(log, ctx, (False, None), 3, type(error), error, error.__traceback__)
+                await msg.channel.send(f"Saved traceback to {log.mention}")
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         """Error handles everything"""
@@ -55,8 +71,8 @@ class Core(commands.Cog):
             )
             return await ctx.send(embed=em)
         elif isinstance(error, commands.MissingRequiredArgument):
-            cmd = self.bot.get_command("help")
-            return await ctx.invoke(cmd, command=f"{ctx.command}")
+            await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
+            return
         elif isinstance(error, commands.BadArgument):
             return await ctx.send(str(error))
         elif isinstance(error, commands.MissingPermissions):
@@ -73,8 +89,13 @@ class Core(commands.Cog):
             )
         elif isinstance(error, commands.CommandNotFound):
             return
-
-        await send_traceback(self.bot.log_channel, ctx, 0, type(error), error, error.__traceback__)
+        
+        elif isinstance(error, commands.CheckFailure):
+            await ctx.send("You do not have permissions to use this command!")
+            return
+        msg = await send_traceback(self.bot.log_channel, ctx, (False, None), 0, type(error), error, error.__traceback__)
+        await self.expand_tb(ctx, error, msg)
+        
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):

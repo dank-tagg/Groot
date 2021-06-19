@@ -1,5 +1,3 @@
-from os import environ
-
 import topgg
 from discord.ext import commands, tasks
 from utils import discordbotlist
@@ -12,14 +10,14 @@ class API(commands.Cog):
         self.bot = bot
 
         # Top GG
-        self.topgg = topgg.DBLClient(self.bot, environ.get("topgg"))
+        self.topgg = topgg.DBLClient(self.bot, self.bot.config.get("topgg"))
         self.webhook = topgg.WebhookManager(self.bot)
         self.webhook.dbl_webhook(
             "https://grootdiscordbot.xyz/api/webhook", auth_key="realwebhook"
         )
 
         # Discord Bot List
-        self.dbl = discordbotlist.Client(self.bot, environ.get("dbl"))
+        self.dbl = discordbotlist.Client(self.bot, self.bot.config.get("dbl"))
 
         self.update_stats.start()
 

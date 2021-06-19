@@ -2,6 +2,10 @@ from discord.ext import commands, ipc
 import logging
 import humanize
 import datetime
+import textwrap
+import io
+from contextlib import redirect_stdout
+import traceback
 
 class Ipc(commands.Cog):
     def __init__(self, bot):
@@ -34,7 +38,7 @@ class Ipc(commands.Cog):
         await channel.send(
             f"{user.mention} voted for the bot on **{source}**! Thank you for your support :>\n"
             "To vote, click here:\n"
-            "<https://top.gg/bot/812395879146717214/vote>"
+            "<https://top.gg/bot/812395879146717214/vote>\n"
             "<https://discordbotlist.com/bots/groot/upvote>"
         )
 

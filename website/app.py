@@ -61,6 +61,18 @@ async def stats():
         uptime=f"{stats['uptime']}"
     )
 
+# Shortcuts
+@app.route("/invite")
+async def invite():
+    return redirect("https://discord.com/oauth2/authorize?client_id=812395879146717214&scope=bot")
+
+@app.route("/vote")
+async def vote():
+    return redirect("https://top.gg/bot/812395879146717214/vote")
+
+@app.route("/server")
+async def server():
+    return redirect("https://discord.gg/nUUJPgemFE")
 
 # API (discord etc)
 

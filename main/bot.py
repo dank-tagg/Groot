@@ -26,6 +26,8 @@ class GrootBot(commands.Bot):
         super().__init__(self.get_prefix, **kwargs)
         self.greenTick = "<:greenTick:814504388139155477>"
         self.redTick = "<:redTick:814774960852566026>"
+        self.plus = "<:plus:854044237556351006>"
+        self.minus = "<:minus:854046724497604649>"
         self.data = currencyData(self)
         self.token = kwargs.pop("token", None)
         self.session = aiohttp.ClientSession
@@ -34,6 +36,7 @@ class GrootBot(commands.Bot):
             self, host="0.0.0.0", secret_key="GrootBotAdmin"
         )
         self.categories = {}
+        self.config = dict(os.environ)
 
     async def after_db(self):
         """Runs after the db is connected"""
@@ -125,8 +128,10 @@ class GrootBot(commands.Bot):
     async def get_prefix(self, message):
         """Handles custom prefixes, this function is invoked every time process_command method is invoke thus returning
         the appropriate prefixes depending on the guild."""
+        if message.author == self.owner:
+            return ["g.", "", self.cache["prefix"].get(getattr(message.guild, "id", message.author.id))]
         query = "SELECT prefix FROM guild_config WHERE guild_id=?"
-        snowflake_id = message.guild.id if message.guild else message.author.id
+        snowflake_id = getattr(message.guild, "id", message.author.id)
         self.cache.setdefault("prefix", {})
         if not (prefix := self.cache["prefix"].get(snowflake_id)):
             cur = await self.db.execute(query, (snowflake_id,))
