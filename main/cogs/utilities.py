@@ -622,7 +622,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         return await ctx.send(any.id)
     
     @commands.command(name="embed")
-    async def _send_embed(self, ctx, embed):
+    async def _send_embed(self, ctx, *, embed: str):
         await ctx.send(type(embed))
         embed = json.loads(embed)
         await ctx.send(type(embed))
