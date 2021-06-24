@@ -6,6 +6,7 @@ import logging
 import operator
 import os
 import re
+import time
 from pathlib import Path
 
 import aiohttp
@@ -37,6 +38,7 @@ class GrootBot(commands.Bot):
         )
         self.categories = {}
         self.config = dict(os.environ)
+        self.testers = [396805720353275924]
 
     async def after_db(self):
         """Runs after the db is connected"""
@@ -70,6 +72,7 @@ class GrootBot(commands.Bot):
     @to_call.append
     def loading_cog(self):
         """Loads the cogs"""
+        time.sleep(10) # To let lavalink run properly first.
         cogs = ()
         for file in os.listdir(f"{self.cwd}/cogs"):
             if file.endswith(".py"):

@@ -5,8 +5,10 @@ import re
 import wavelink
 import math
 import datetime
+import typing
+import random
 from discord.ext import commands
-from utils.useful import Embed, get_title
+from utils.useful import Embed, get_title, is_beta
 
 
 URL_REG = re.compile(r'https?://(?:www\.)?.+')
@@ -32,7 +34,9 @@ class Player(wavelink.Player):
 
         self.waiting = False
         self.updating = False
+        self.looping = False
 
+        self.previous = None
         self.queue = asyncio.Queue()
 
         self.skip_votes = set()
@@ -47,6 +51,12 @@ class Player(wavelink.Player):
         self.stop_votes.clear()
         self.shuffle_votes.clear()
 
+        if self.looping and (track := self.previous):
+            self.waiting = True
+            await self.play(track)
+            self.waiting = False
+            return
+        
         try:
             self.waiting = True
             with async_timeout.timeout(300):
@@ -55,9 +65,17 @@ class Player(wavelink.Player):
             return await self.teardown()
         
         await self.play(track)
-        self.waiting = False
         await self.send_embed()
+        
+        self.previous = track
+        self.waiting = False
+        self.looping = False
     
+    async def stop(self):
+        """Custom stop method"""
+        self.looping = False
+        await super().stop()
+
     async def send_embed(self):
         if self.updating: return
 
@@ -76,7 +94,7 @@ class Player(wavelink.Player):
         fields = {
             "Author": (track.author, True), 
             "Duration": (str(datetime.timedelta(milliseconds=int(track.length))), True),
-            "\u200b": ("\u200b", True),
+            "Looping": (f"{self.ctx.bot.greenTick if self.looping else self.ctx.bot.redTick}", True),
             "Requested by": (track.requester.mention, True),
             "DJ": (self.dj.mention, True),
             "Volume": (f"{self.volume}%", True)
@@ -109,7 +127,13 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     
     async def start_nodes(self):
         await self.bot.wait_until_ready()
+        
+        if self.bot.wavelink.nodes:
+            previous = self.bot.wavelink.nodes.copy()
 
+            for node in previous.values():
+                await node.destroy()
+        
         created = False
         node_num = 1
 
@@ -125,7 +149,6 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
                 )
             except wavelink.errors.NodeOccupied:
                 node_num += 1
-            else:
                 created = True
     
     def required(self, ctx: commands.Context):
@@ -147,7 +170,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     
     def is_privileged(self, ctx):
         player = self.get_player(ctx)
-        return ctx.author in [player.dj, player.current.requester] or ctx.author.guild_permissions.kick_members
+        return ctx.author in [player.dj, getattr(player.current, "requester", None)] or ctx.author.guild_permissions.kick_members
 
     @wavelink.WavelinkMixin.listener('on_track_stuck')
     @wavelink.WavelinkMixin.listener('on_track_end')
@@ -225,6 +248,20 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if not player.is_playing:
             await player.play_next()
     
+    @commands.command(name="loop")
+    async def _loop(self, ctx):
+        """Loops the current song or turns the loop off"""
+        player = self.get_player(ctx)
+
+        if player.looping:
+            player.looping = False
+            message = f"Stopped looping **{player.current.title}**"
+        else:
+            player.looping = True
+            message = f"Looping **{player.current.title}**..."
+        
+        return await ctx.reply(f"{self.bot.greenTick} | {message}")
+        
     @commands.command(name="skip", aliases=["next"])
     async def _skip(self, ctx):
         """Skips the current song"""
@@ -270,15 +307,19 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         else:
             await ctx.reply(f'{ctx.author.mention} has voted to stop the player. (`{votes}/{required}`)')
 
-    @commands.command(aliases=['q', 'que'])
-    async def queue(self, ctx: commands.Context):
+    @commands.group(case_insensitive=True,invoke_without_command=True, aliases=['q', 'que'])
+    async def queue(self, ctx):
         """Display the players queued songs."""
         player = self.get_player(ctx)
 
         if not player.is_connected:
             return
 
-        entries = [f"{i+1}. {get_title(track)} - {player.current.requester.mention}" for i, track in enumerate(player.queue._queue)][:8]
+        if player.queue.qsize() == 0:
+            await ctx.reply(f"{self.bot.redTick} | No more songs in the queue. Add some songs to the queue and try again.")
+            return
+        
+        entries = [f"{i+1}. [{datetime.timedelta(milliseconds=int(track.length))}] {get_title(track, 35)} - {player.current.requester.mention}" for i, track in enumerate(player.queue._queue)]
         entries.insert(0, f"NOW: **{get_title(player.current, 20)}** - {player.current.requester.mention}\n")
         em = Embed(
             description="\n".join(entries)
@@ -286,13 +327,25 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         em.set_author(name=f"🎶 Current queue [{len(entries)}]")
         await ctx.reply(embed=em)
     
+    @queue.command(name="remove")
+    async def _remove(self, ctx, position: int):
+        player = self.get_player(ctx)
+
+        if not player.is_connected:
+            return
+
+        track = player.queue._queue[position-1]
+        del player.queue._queue[position-1]
+        await ctx.reply(f"{self.bot.minus} | Removed **{position}. {track.title}** from the queue.")
+
+    
     @commands.command(name="volume")
     async def _volume(self, ctx, volume: int):
         """Changes the volume"""
         player = self.get_player(ctx)
 
         if not player.is_connected:
-            return
+            raise commands.BadArgument(f"{self.bot.redTick} | No song is playing.")
 
         if not self.is_privileged(ctx):
             return await ctx.reply(f"{self.bot.redTick} | Only the requester or the DJ can change volume value.")
@@ -305,11 +358,11 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="shuffle")
     async def _shuffle(self, ctx):
-        """Shuffles the playlist"""
+        """Shuffles the queue"""
         player = self.get_player(ctx)
 
         if not player.is_connected:
-            return
+            raise commands.BadArgument(f"{self.bot.redTick} | No song is playing.")
         
         if player.queue.qsize() < 3:
             return await ctx.reply(f"{self.bot.redTick} | Add more songs to the queue first before shuffling.")
@@ -334,7 +387,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player = self.get_player(ctx)
 
         if not player.is_connected:
-            return
+            raise commands.BadArgument(f"{self.bot.redTick} | No song is playing.")
         
         await player.send_embed()
 
@@ -344,7 +397,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player = self.get_player(ctx)
 
         if not player.is_connected:
-            return
+            raise commands.BadArgument(f"{self.bot.redTick} | No song is playing.")
         
         if not self.is_privileged(ctx):
             return await ctx.reply(f"{self.bot.redTick} | Only privileged members (DJ/requester) can change the equalizer.")
@@ -386,7 +439,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             return await ctx.reply(f'{self.bot.redTick} | Cannot swap DJ to the current DJ...')
 
         if len(members) <= 2:
-            return await ctx.reply(f'{self.bot.redTick} | No more members to swap to.', delete_after=15)
+            return await ctx.reply(f'{self.bot.redTick} | No more members to swap to.')
 
         if member:
             player.dj = member
@@ -400,4 +453,4 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
                 return await ctx.send(f'{self.bot.greenTick} | {member.mention} is now the DJ.')
 
 def setup(bot):
-    bot.add_cog(Music(bot))
+    bot.add_cog(Music(bot), category="Music")

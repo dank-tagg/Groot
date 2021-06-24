@@ -12,6 +12,9 @@ from discord.ext import commands, menus
 from discord.ext.menus import First, Last
 from discord.utils import maybe_coroutine
 from utils.checks import can_execute_action
+import wavelink
+import typing
+import textwrap
 
 PAGE_REGEX = r'(Page)?(\s)?((\[)?((?P<current>\d+)/(?P<last>\d+))(\])?)'
 
@@ -92,6 +95,17 @@ class Embed(discord.Embed):
         for n, v in fields:
             self.add_field(name=n, value=v, inline=field_inline)
 
+class PlaylistInfo(menus.ListPageSource):
+    def __init__(self, data, playlist, **kwargs):
+        super().__init__(data, per_page=kwargs.get("per_page", 5))
+        self.playlist = playlist
+
+    async def format_page(self, menu, item):
+        em = Embed(
+            description=f"\🎶 Playlist `{self.playlist.name}` with `{self.playlist.length}` songs\n"+item
+        )
+
+        return em
 
 class currencyData:
     def __init__(self, bot):
@@ -206,6 +220,11 @@ def pages(per_page=1, show_page=True):
         return type(coro.__name__, (menus.ListPageSource,), kwargs)
     return page_source
 
+def WrapText(text : str, length : int):
+    wrapper = textwrap.TextWrapper(width=length)
+    words = wrapper.wrap(text=text)
+    return words
+
 def roman_num(num):
     num_map = [
         (1000, "M"),
@@ -232,10 +251,11 @@ def roman_num(num):
     return roman
 
 def get_title(track, length=35):
-    title = track.title
-    if len(title) > length:
-        title = f"{title[:length]}..."
-    return title
+    if isinstance(track, wavelink.Track):
+        track = track.title
+    if len(track) > length:
+        track = f"{track[:length]}..."
+    return track
 
 def progress_bar(progress):
     progress = round(progress / 10)
@@ -270,6 +290,16 @@ def event_check(func):
 
     return check
 
+def run_in_executor(func: typing.Callable):
+    
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        """Asynchrous function that wraps a sync function with an executor"""
+        loop = asyncio.get_event_loop()
+        to_run = functools.partial(func, *args, **kwargs)
+        return await loop.run_in_executor(None, to_run)
+    
+    return wrapper
 
 def call(func, *args, exception=Exception, ret=False, **kwargs):
     """one liner method that handles all errors in a single line which returns None, or Error instance depending on ret
@@ -290,6 +320,10 @@ def print_exception(text, error):
     lines = traceback.format_exception(etype, error, trace)
     return "".join(lines)
 
+def is_beta():
+    def predicate(ctx):
+        return ctx.author.id in ctx.bot.testers
+    return commands.check(predicate)
 
 def wait_ready(bot=None):
     async def predicate(*args, **_):

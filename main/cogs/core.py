@@ -1,11 +1,11 @@
 import datetime as dt
-
+import traceback
 import discord
 import humanize
+import wavelink
 from discord.ext import commands, tasks
 from utils.useful import Embed, Cooldown, send_traceback
 from utils.json_loader import read_json
-
 
 class Core(commands.Cog):
     def __init__(self, bot):
@@ -31,11 +31,18 @@ class Core(commands.Cog):
                 await send_traceback(log, ctx, (False, None), 3, type(error), error, error.__traceback__)
                 await msg.channel.send(f"Saved traceback to {log.mention}")
 
+    async def send_error(self, ctx, exc_info: dict):
+        em = Embed(
+            title=f"{self.bot.redTick} Error while running command {exc_info['command']}",
+            description=f"```py\n{exc_info['error']}```[Report error](https://discord.gg/nUUJPgemFE)"
+        )
+        em.set_footer(text="Please report this error in our support server if it persists.")
+        await ctx.send(embed=em)
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         """Error handles everything"""
         if ctx.command and ctx.command.has_error_handler(): return
-
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
             if isinstance(error, discord.errors.Forbidden):
@@ -52,6 +59,8 @@ class Core(commands.Cog):
             return await ctx.send(
                 f"{self.bot.redTick} The maximum concurrency is already reached for `{ctx.command}` ({error.number}). Try again later."
             )
+        elif isinstance(error, wavelink.errors.ZeroConnectedNodes):
+            await self.bot.reload_extension("Music")
         elif isinstance(error, commands.CommandOnCooldown):
             command = ctx.command
             default = discord.utils.find(
@@ -93,6 +102,12 @@ class Core(commands.Cog):
         elif isinstance(error, commands.CheckFailure):
             await ctx.send("You do not have permissions to use this command!")
             return
+        
+        exc_info = {
+            "command": ctx.command,
+            "error": "".join(traceback.format_exception(type(error), error, error.__traceback__, 0)).replace("``", "`\u200b`")
+        }
+        await self.send_error(ctx, exc_info)
         msg = await send_traceback(self.bot.log_channel, ctx, (False, None), 0, type(error), error, error.__traceback__)
         await self.expand_tb(ctx, error, msg)
         
