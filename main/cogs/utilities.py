@@ -623,9 +623,8 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
     
     @commands.command(name="embed")
     async def _send_embed(self, ctx, *, embed: str):
-        await ctx.send(type(embed))
-        embed = json.loads(embed)
-        await ctx.send(type(embed))
+        em = discord.Embed.from_dict(json.loads(embed))
+        await ctx.send(embed=em)
 
 def setup(bot):
     bot.add_cog(Utilities(bot), category="Utilities")
