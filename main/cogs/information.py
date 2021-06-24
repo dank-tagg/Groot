@@ -39,7 +39,7 @@ class Information(commands.Cog):
 
         sql_ping = (end - start) * 1000
         await msg.edit(
-            content=f"**Typing**: {round(typing_ping, 1)} ms\n**Websocket**: {round(self.bot.latency*1000)} ms\n**Database**: {round(sql_ping, 1)} ms"
+            content=f"<a:typing:826939777290076230> ** | Typing**: {round(typing_ping, 1)} ms\n<:Groot:829361863807860756> ** | Websocket**: {round(self.bot.latency*1000)} ms\n<:database:857553072909189191>** | Database**: {round(sql_ping, 1)} ms"
         )
 
     @commands.command(name="vote", brief="The links where you can vote for the bot.")
