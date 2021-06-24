@@ -74,7 +74,7 @@ class Support(commands.Cog):
         await msg.add_reaction("👍")
         await msg.add_reaction("👎")
     
-    @commands.command(name="support")
+    @commands.command(name="supportserver")
     async def _support_server_invite(self, ctx):
         await ctx.send("https://discord.gg/nUUJPgemFE")
 
