@@ -73,6 +73,7 @@ class Support(commands.Cog):
         msg = await channel.send(f"{ctx.author}: {suggestion}")
         await msg.add_reaction("👍")
         await msg.add_reaction("👎")
+        await ctx.send(f"Submitted your suggestion in {channel.mention}. Join the support server to see the status of your suggestion.")
     
     @commands.command(name="supportserver")
     async def _support_server_invite(self, ctx):
