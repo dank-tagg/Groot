@@ -14,6 +14,15 @@ from utils import paginations
 
 URL_REG = re.compile(r'https?://(?:www\.)?.+')
 
+def convert(ms):
+    seconds, milliseconds = divmod(ms, 1000)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+
+    result = [hours, minutes, seconds]
+    format_result = [f"0{i}" if len(str(i)) == 1 else str(i) for i in result]
+    return ":".join(format_result).removeprefix("00:").removesuffix(":")
+
 class Track(wavelink.Track):
     """Wavelink Track object with a requester attribute."""
 
@@ -95,7 +104,7 @@ class Player(wavelink.Player):
 
         fields = {
             "Author": (track.author, True), 
-            "Duration": (str(datetime.timedelta(milliseconds=int(track.length))), True),
+            "Duration": (convert(int(track.length)), True),
             "Looping": (f"{self.ctx.bot.greenTick if self.looping else self.ctx.bot.redTick}", True),
             "Requested by": (track.requester.mention, True),
             "DJ": (self.dj.mention, True),
@@ -342,14 +351,6 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await ctx.reply(f"{self.bot.redTick} | No more songs in the queue. Add some songs to the queue and try again.")
             return
         
-        def convert(ms):
-            seconds, milliseconds = divmod(ms, 1000)
-            minutes, seconds = divmod(seconds, 60)
-            hours, minutes = divmod(minutes, 60)
-            
-            base = f"{hours}:{minutes}:{seconds}"
-            
-            return base
 
         entries = [f"**{i+1}**. [{get_title(track, 20)}]({track.uri}) | `{convert(int(track.length))}`" for i, track in enumerate(player.queue._queue, start=1)]
         menu = menus.MenuPages(paginations.QueueSource(entries, player))
