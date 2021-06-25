@@ -352,7 +352,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             return
         
 
-        entries = [f"**{i+1}**. [{get_title(track, 20)}]({track.uri}) | `{convert(int(track.length))}`" for i, track in enumerate(player.queue._queue, start=1)]
+        entries = [f"**{i+1}**. [{track.title}]({track.uri}) | `{convert(int(track.length))}`" for i, track in enumerate(player.queue._queue, start=1)]
         menu = menus.MenuPages(paginations.QueueSource(entries, player))
         await menu.start(ctx)
     
