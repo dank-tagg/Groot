@@ -32,6 +32,7 @@ class GrootBot(commands.Bot):
         self.data = currencyData(self)
         self.token = kwargs.pop("token", None)
         self.session = aiohttp.ClientSession
+        self.maintenance = False
         self.cache = CacheManager()
         self.ipc = ipc.Server(
             self, host="0.0.0.0", secret_key="GrootBotAdmin"
@@ -72,7 +73,6 @@ class GrootBot(commands.Bot):
     @to_call.append
     def loading_cog(self):
         """Loads the cogs"""
-        time.sleep(10) # To let lavalink run properly first.
         cogs = ()
         for file in os.listdir(f"{self.cwd}/cogs"):
             if file.endswith(".py"):

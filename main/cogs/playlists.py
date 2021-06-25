@@ -6,8 +6,9 @@ import math
 import datetime
 import typing
 import random
-from discord.ext import commands
+from discord.ext import commands, menus
 from utils.useful import Embed, get_title, is_beta
+from utils import paginations
 from cogs.music import Track
 
 
@@ -31,8 +32,8 @@ class Playlist:
             tracks = await wavelink.get_tracks(song[1])
             try:
                 track = Track(tracks[0].id, tracks[0].info, requester=requester)
-            except:
-                await ctx.send(f"{song} couldn't be loaded...")
+            except Exception as e:
+                await ctx.send(f"{song[0]} couldn't be loaded...")
             else:
                 await player.queue.put(track)
             loaded_songs += 1
@@ -132,23 +133,15 @@ class Playlists(commands.Cog):
         await ctx.reply(embed=em)
     
     @playlist.command(name="info", usage="<id> [page]")
-    async def _playlist_info(self, ctx, playlist_id: int, page: int = 1):
+    async def _playlist_info(self, ctx, playlist_id: int):
         playlist = await get_playlist(self.bot.db, playlist_id)
 
         if not playlist:
             return await ctx.reply(f"{self.bot.redTick} | No playlist data was found with `ID {playlist_id}` (Empty or does not exist)")
 
-        per_page = 10
-
-        start = (page-1) * per_page
-        end = start + per_page
-
         entries = [f"`ID {tup[2]}`. [{get_title(tup[0])}]({tup[1]})" for tup in playlist.songs]
-        em = Embed(
-            description=f"\🎶 Playlist `{playlist.name}` with `{playlist.length}` songs\n"+"\n".join(entries[start:end])
-        )
-        em.set_footer(text=f"Viewing page {page}/{math.ceil(len(entries) / per_page)}")
-        await ctx.reply(embed=em)
+        menu = menus.MenuPages(paginations.PlaylistSource(entries, playlist))
+        await menu.start(ctx)
     
     @playlist.command(name="create", usage="<name>")
     async def _playlist_create(self, ctx, *, name):

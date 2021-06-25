@@ -95,18 +95,6 @@ class Embed(discord.Embed):
         for n, v in fields:
             self.add_field(name=n, value=v, inline=field_inline)
 
-class PlaylistInfo(menus.ListPageSource):
-    def __init__(self, data, playlist, **kwargs):
-        super().__init__(data, per_page=kwargs.get("per_page", 5))
-        self.playlist = playlist
-
-    async def format_page(self, menu, item):
-        em = Embed(
-            description=f"\🎶 Playlist `{self.playlist.name}` with `{self.playlist.length}` songs\n"+item
-        )
-
-        return em
-
 class currencyData:
     def __init__(self, bot):
         self.bot = bot

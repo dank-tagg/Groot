@@ -56,6 +56,11 @@ async def on_message(message):
     ctx = await bot.get_context(message)
     if message.author.id == bot.owner.id:
         return await bot.process_commands(message)
+    
+    if bot.maintenance and ctx.valid:
+        await message.channel.send("Bot is in maintenance. Please try again later.")
+        return
+
     if (
         message.author.id in bot.cache["blacklisted_users"]
         or getattr(message.guild, "id", None) in bot.cache["blacklisted_users"]

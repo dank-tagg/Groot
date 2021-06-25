@@ -7,8 +7,9 @@ import math
 import datetime
 import typing
 import random
-from discord.ext import commands
+from discord.ext import commands, menus
 from utils.useful import Embed, get_title, is_beta
+from utils import paginations
 
 
 URL_REG = re.compile(r'https?://(?:www\.)?.+')
@@ -62,6 +63,7 @@ class Player(wavelink.Player):
             with async_timeout.timeout(300):
                 track = await self.queue.get()
         except asyncio.TimeoutError:
+            self.waiting = False
             return await self.teardown()
         
         await self.play(track)
@@ -177,6 +179,27 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @wavelink.WavelinkMixin.listener('on_track_exception')
     async def on_player_stop(self, node: wavelink.Node, payload):
         await payload.player.play_next()
+
+    @wavelink.WavelinkMixin.listener("on_track_exception") #ty to cryptex for helping because jadon is stupid omegalul
+    async def on_node_event_(self, node, event):
+        if "YouTube (429)" in event.error:
+            player = event.player
+            if URL_REG.fullmatch(player.query):
+                new_track = await self.bot.wavelink.get_tracks(f"scsearch:{player.track.title}")
+            else:
+                new_track = await self.bot.wavelink.get_tracks(f"scsearch:{player.query}")
+            if new_track:
+                track = Track(
+                    new_track[0].id,
+                    new_track[0].info,
+                    requester=player.ctx.author,
+                )
+                await player.play(track)
+                await player.send_embed()
+            else:
+                raise commands.BadArgument(f"{self.bot.redTick} | No song was found with the given query. Try again.")
+        else:
+            await event.player.ctx.send(event.error)
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
@@ -319,13 +342,18 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await ctx.reply(f"{self.bot.redTick} | No more songs in the queue. Add some songs to the queue and try again.")
             return
         
-        entries = [f"{i+1}. [{datetime.timedelta(milliseconds=int(track.length))}] {get_title(track, 35)} - {player.current.requester.mention}" for i, track in enumerate(player.queue._queue)]
-        entries.insert(0, f"NOW: **{get_title(player.current, 20)}** - {player.current.requester.mention}\n")
-        em = Embed(
-            description="\n".join(entries)
-        )
-        em.set_author(name=f"🎶 Current queue [{len(entries)}]")
-        await ctx.reply(embed=em)
+        def convert(ms):
+            seconds, milliseconds = divmod(ms, 1000)
+            minutes, seconds = divmod(seconds, 60)
+            hours, minutes = divmod(minutes, 60)
+            
+            base = f"{hours}:{minutes}:{seconds}"
+            
+            return base
+
+        entries = [f"**{i+1}**. [{get_title(track, 20)}]({track.uri}) | `{convert(int(track.length))}`" for i, track in enumerate(player.queue._queue, start=1)]
+        menu = menus.MenuPages(paginations.QueueSource(entries, player))
+        await menu.start(ctx)
     
     @queue.command(name="remove")
     async def _remove(self, ctx, position: int):
