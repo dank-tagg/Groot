@@ -1,5 +1,5 @@
 from discord.ext import menus
-from utils.useful import Embed, get_title
+from utils.useful import Embed
 
 class PlaylistSource(menus.ListPageSource):
     def __init__(self, data, playlist):
@@ -20,7 +20,7 @@ class QueueSource(menus.ListPageSource):
     
     async def format_page(self, menu, entries):
         em = Embed(
-            description=f"**Currently playing:**\n **1.** [{get_title(self.player.current, 35)}]({self.player.current.uri})\nRequested by {self.player.current.requester.mention}\n\n"+
+            description=f"**Currently playing:**\n **1.** [{self.player.current.title}]({self.player.current.uri})\nRequested by {self.player.current.requester.mention}\n\n"+
                         f"**Next up [{self.player.queue.qsize()}]: **\n" + 
                          "\n".join(entries)
         )
