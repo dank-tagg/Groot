@@ -126,6 +126,7 @@ class Developer(commands.Cog):
     @dev.command(name="restart")
     async def _restart(self, ctx):
         await self.git(arguments="pull")
+        await ctx.send(f"{self.bot.emojis['loading']} Restarting bot...")
         os._exit(0)
 
     @dev.command(name="sync")
