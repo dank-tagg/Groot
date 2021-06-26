@@ -20,7 +20,7 @@ class customContext(commands.Context):
                     f"**TIP:** You can earn rewards by voting for the bot! `{self.prefix}vote`",
                     f"**TIP:** We've partnered with a bot called Stop Sign! Check them out: https://discordbotlist.com/bots/stop-sign/upvote",
                     f"**TIP:** If you find any bugs, report it in the support server! `{self.prefix}invite`",
-                    f"**TIP:** Have you seen our website yet? <https://dank-tagg.github.io/Groot-Website> :smile:",
+                    f"**TIP:** Have you seen our website yet? <https://grootdiscordbot.xyz> :smile:",
                     f"**TIP:** Looking for a way to contribute? Here is the repository: <https://github.com/dank-tagg/Groot>",
                 ]
             )

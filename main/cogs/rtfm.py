@@ -1,14 +1,13 @@
 import discord
 from discord.ext import commands
 import aiodevision
-from os import environ
 from utils.useful import fuzzy, Embed
 from utils.chat_formatting import hyperlink as link
 
 class Docs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.token = environ.get('idevision')
+        self.token = self.bot.config.get('idevision')
         self.cache = {}
     
     @commands.group(name="rtfm", aliases=["docs"])

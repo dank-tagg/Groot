@@ -5,15 +5,69 @@ import re
 import sqlite3
 import sys
 import traceback
-
+from datetime import datetime
 import aiohttp
 import discord
-from discord.ext import commands
+from discord.ext import commands, menus
+from discord.ext.menus import First, Last
 from discord.utils import maybe_coroutine
 from utils.checks import can_execute_action
+import wavelink
+import typing
+import textwrap
+
+PAGE_REGEX = r'(Page)?(\s)?((\[)?((?P<current>\d+)/(?P<last>\d+))(\])?)'
 
 # ---Useful classes
+class BaseMenu(menus.MenuPages):
+    def __init__(self, source, *, generate_page=True, **kwargs):
+        super().__init__(source, delete_message_after=kwargs.pop('delete_message_after', True), **kwargs)
+        self.info = False
+        self._generate_page = generate_page
+    
+    @menus.button('◀️', position=First(1))
+    async def _go_before(self, payload):
+        await self.show_checked_page(self.current_page - 1)
+    @menus.button('▶️', position=Last(0))
+    async def _go_next(self, payload):
+        await self.show_checked_page(self.current_page + 1)
+    @menus.button('⏹️', position=First(2))
+    async def _stop(self, payload):
+        self.stop()
 
+    async def _get_kwargs_format_page(self, page):
+        value = await discord.utils.maybe_coroutine(self._source.format_page, self, page)
+        if self._generate_page:
+            value = self.generate_page(value, self._source.get_max_pages())
+        if isinstance(value, dict):
+            return value
+        elif isinstance(value, str):
+            return { 'content': value, 'embed': None }
+        elif isinstance(value, discord.Embed):
+            return { 'embed': value, 'content': None }
+
+    async def _get_kwargs_from_page(self, page):
+        dicts = await self._get_kwargs_format_page(page)
+        dicts.update({'allowed_mentions': discord.AllowedMentions(replied_user=False)})
+        return dicts
+
+    def generate_page(self, content, maximum):
+        if maximum > 0:
+            page = f"Page {self.current_page + 1}/{maximum}"
+            if isinstance(content, discord.Embed):
+                if embed_dict := getattr(content, "_author", None):
+                    if not re.match(PAGE_REGEX, embed_dict["name"]):
+                        embed_dict["name"] += f"[{page.replace('Page ', '')}]"
+                    return content
+                return content.set_author(name=page)
+            elif isinstance(content, str) and not re.match(PAGE_REGEX, content):
+                return f"{page}\n{content}"
+        return content
+
+    async def send_initial_message(self, ctx, channel):
+        page = await self._source.get_page(0)
+        kwargs = await self._get_kwargs_from_page(page)
+        return await ctx.reply(**kwargs)
 
 class detect(aiohttp.ClientSession):
     async def find(self, url):
@@ -40,7 +94,6 @@ class Embed(discord.Embed):
         super().__init__(color=color, **kwargs)
         for n, v in fields:
             self.add_field(name=n, value=v, inline=field_inline)
-
 
 class currencyData:
     def __init__(self, bot):
@@ -104,7 +157,7 @@ class Cooldown:
         )
 
     def __call__(self, ctx: commands.Context):
-        key, key1 = (ctx.author.id, ctx.guild.id)
+        key, key1 = (ctx.author.id, getattr(ctx.guild, "id", None))
         if key in ctx.bot.cache["premium_users"] or key1 in ctx.bot.cache["premium_users"]:
             ctx.bucket = self.altered_mapping.get_bucket(ctx.message)
         else:
@@ -139,6 +192,27 @@ class fuzzy:
             return [z for _, _, z in sorted(suggestions, key=sort_key)]
 
 # ---Useful functions
+def pages(per_page=1, show_page=True):
+    """Compact ListPageSource that was originally made teru but was modified"""
+    def page_source(coro):
+        async def create_page_header(self, menu, entry):
+            result = await discord.utils.maybe_coroutine(coro, self, menu, entry)
+            return menu.generate_page(result, self._max_pages)
+
+        def __init__(self, list_pages):
+            super(self.__class__, self).__init__(list_pages, per_page=per_page)
+        kwargs = {
+            '__init__': __init__,
+            'format_page': (coro, create_page_header)[show_page]
+        }
+        return type(coro.__name__, (menus.ListPageSource,), kwargs)
+    return page_source
+
+def WrapText(text : str, length : int):
+    wrapper = textwrap.TextWrapper(width=length)
+    words = wrapper.wrap(text=text)
+    return words
+
 def roman_num(num):
     num_map = [
         (1000, "M"),
@@ -164,6 +238,12 @@ def roman_num(num):
                 num -= i
     return roman
 
+def get_title(track, length=35):
+    if isinstance(track, wavelink.Track):
+        track = track.title
+    if len(track) > length:
+        track = f"{track[:length]}..."
+    return track
 
 def progress_bar(progress):
     progress = round(progress / 10)
@@ -198,6 +278,16 @@ def event_check(func):
 
     return check
 
+def run_in_executor(func: typing.Callable):
+    
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        """Asynchrous function that wraps a sync function with an executor"""
+        loop = asyncio.get_event_loop()
+        to_run = functools.partial(func, *args, **kwargs)
+        return await loop.run_in_executor(None, to_run)
+    
+    return wrapper
 
 def call(func, *args, exception=Exception, ret=False, **kwargs):
     """one liner method that handles all errors in a single line which returns None, or Error instance depending on ret
@@ -218,6 +308,10 @@ def print_exception(text, error):
     lines = traceback.format_exception(etype, error, trace)
     return "".join(lines)
 
+def is_beta():
+    def predicate(ctx):
+        return ctx.author.id in ctx.bot.testers
+    return commands.check(predicate)
 
 def wait_ready(bot=None):
     async def predicate(*args, **_):
@@ -254,7 +348,7 @@ async def get_frozen(self, guild: discord.Guild, member: discord.Member):
 
 
 async def send_traceback(
-    destination: discord.abc.Messageable, verbosity: int, *exc_info
+    destination: discord.abc.Messageable, ctx: commands.Context, edit, verbosity: int, *exc_info
 ):
     """
     Sends a traceback of an exception to a destination.
@@ -266,22 +360,20 @@ async def send_traceback(
     :return: The last message sent
     """
 
+    base = f"An error occured while **{ctx.author}** [`{ctx.author.id}`] ran the command `{ctx.command.name}` at {datetime.utcnow().strftime('%H:%M:%S')} UTC\n"
+    
     etype, value, trace = exc_info
 
     traceback_content = "".join(
         traceback.format_exception(etype, value, trace, verbosity)
     ).replace("``", "`\u200b`")
 
-    paginator = commands.Paginator(prefix="```py")
-    for line in traceback_content.split("\n"):
-        paginator.add_line(line)
-
-    message = None
-
-    for page in paginator.pages:
-        message = await destination.send(page)
-
-    return message
+    final = base + f"```py\n{traceback_content}```"
+    if not edit[0]:
+        msg = await destination.send(final)
+    else:
+        msg = await edit[1].edit(content=final)
+    return msg
 
 
 # ---Converters

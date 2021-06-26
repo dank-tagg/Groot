@@ -13,8 +13,7 @@ class Moderator(commands.Cog):
     @commands.group(name="mod", invoke_without_command=True, case_insensitive=True)
     @commands.is_owner()
     async def mod(self, ctx):
-        cmd = self.bot.get_command("help")
-        await ctx.invoke(cmd, command="mod")
+        await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
 
     @mod.command(name="blacklist", hidden=True, aliases=["bl", "poo"])
     async def _blacklist(

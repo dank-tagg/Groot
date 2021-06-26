@@ -53,15 +53,33 @@ async def support():
 @app.route("/stats")
 async def stats():
     stats = await ipc_client.request("get_stats")
-    return await render_template("stats.html", users=f"{stats['users']:,}", guilds=f"{stats['guilds']:,}")
+    return await render_template(
+        "stats.html", 
+        users=f"{stats['users']:,}", 
+        guilds=f"{stats['guilds']:,}", 
+        commands=f"{stats['commands']:,}",
+        uptime=f"{stats['uptime']}"
+    )
 
+# Shortcuts
+@app.route("/invite")
+async def invite():
+    return redirect("https://discord.com/oauth2/authorize?client_id=812395879146717214&scope=bot")
+
+@app.route("/vote")
+async def vote():
+    return redirect("https://top.gg/bot/812395879146717214/vote")
+
+@app.route("/server")
+async def server():
+    return redirect("https://discord.gg/nUUJPgemFE")
 
 # API (discord etc)
 
 
 @app.route("/api/login")
 async def login():
-    return await discord.create_session()
+    return await discord.create_session(scopes=["identify", "guilds"])
 
 @app.route("/api/logout")
 async def logout():

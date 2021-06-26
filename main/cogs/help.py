@@ -124,7 +124,7 @@ class GrootHelp(commands.HelpCommand):
     
     async def send_category_help(self, category):
         to_find = category.lower().title()
-        categories = self.context.bot.categories
+        categories = self.context.bot.categories.copy()
 
         if self.context.author != self.context.bot.owner:
             categories.pop("Unlisted")
@@ -134,7 +134,7 @@ class GrootHelp(commands.HelpCommand):
         category = categories[to_find]
         cogs = [self.context.bot.get_cog(cog) for cog in category]
         commands = [cog.get_commands() for cog in cogs]
-        commands = [f"`{command.name}`" for command in await self.filter_commands(chain(*commands))]
+        commands = [f"`{command.name}`" for command in chain(*commands)]
         
         em = Embed(description=' '.join(commands))
         em.set_author(name=f"{to_find} [{len(commands)}]")

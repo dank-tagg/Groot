@@ -1,8 +1,8 @@
 {
     "updates": {
-        "date": "2021-06-10 17:47:46.424289",
-        "message": "\\\ud83d\udcf0New `help` command!\n- Sorted commands inside categories instead of cogs.\n- Commands you can't run won't show up in help command.\n- Help command doesn't show details anymore but just the whole list of commands inside the category.",
-        "link": "https://discord.com/channels/707869808129081364/823585904248487957/852264467681116170"
+        "date": "2021-06-20 14:06:17.413375",
+        "message": "\ud83c\udfb5  NEW CATEGORY: **Music** is back!\n- To play music, use `play`\n- Multiple `play` commands will form a queue. `queue`\n- Don't like the song? `skip`\n- Volume too low? `volume 100`\n- Shuffle the playlist with `shuffle`\n- Tired of listening to awesome music? `stop`",
+        "link": "https://discord.com/channels/707869808129081364/823585905167433729/856172858496516107"
     },
     "status": {
         "groot": "online"

@@ -63,6 +63,19 @@ class Support(commands.Cog):
                 raise commands.BadArgument(
                     "`60s` are over. I ended your report session, since you didn't answer fast enough. Next time please be quicker."
                 )
+    
+    
+    @commands.command(name="suggest")
+    async def _suggest_feature(self, ctx, *, suggestion):
+        channel = self.bot.get_channel(857544734338449448)
+        msg = await channel.send(f"{ctx.author}: {suggestion}")
+        await msg.add_reaction("👍")
+        await msg.add_reaction("👎")
+        await ctx.send(f"Submitted your suggestion in {channel.mention}. Join the support server to see the status of your suggestion.")
+    
+    @commands.command(name="supportserver")
+    async def _support_server_invite(self, ctx):
+        await ctx.send("https://discord.gg/nUUJPgemFE")
 
 
 def setup(bot):

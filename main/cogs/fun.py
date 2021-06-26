@@ -87,11 +87,11 @@ class Fun(commands.Cog, description="Fun commands"):
     @commands.command(name="gayrate", aliases=["howgay"], brief="Rates your gayness")
     async def gayrate(self, ctx, member: discord.Member = None):
         """Rate your gayness or another users gayness. 1-100% is returned"""
-        user = member.name if member else "You"
+        user = member.name + " is" if member else "You are"
 
         emb = Embed(
             title="gay r8 machine",
-            description=f"{user} is {random.randrange(0, 100)}% gay 🌈",
+            description=f"{user} {random.randrange(0, 100)}% gay 🌈",
             color=discord.Color.random(),
         )
         await ctx.send(embed=emb)
@@ -157,8 +157,7 @@ class Fun(commands.Cog, description="Fun commands"):
     )
     async def binary(self, ctx):
         """Encode or decode something to binary!"""
-        cmd = self.bot.get_command("help")
-        await ctx.invoke(cmd, command="binary")
+        await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
         return
 
     @binary.command()

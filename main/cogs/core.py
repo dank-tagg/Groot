@@ -1,11 +1,11 @@
 import datetime as dt
-
+import traceback
 import discord
 import humanize
+import wavelink
 from discord.ext import commands, tasks
 from utils.useful import Embed, Cooldown, send_traceback
 from utils.json_loader import read_json
-
 
 class Core(commands.Cog):
     def __init__(self, bot):
@@ -15,11 +15,34 @@ class Core(commands.Cog):
         self.loops.start()
         self.update_status.start()
 
+    async def expand_tb(self, ctx, error, msg):
+        await msg.add_reaction(self.bot.plus)
+        await msg.add_reaction(self.bot.minus)
+        await msg.add_reaction("<:save:854038370735882260>")
+
+        while True:
+            reaction, user = await self.bot.wait_for('reaction_add', check=lambda reaction, m: m == self.bot.owner and reaction.message == msg)
+            if str(reaction) == self.bot.plus:
+                await send_traceback(self.bot.log_channel, ctx, (True, msg), 3, type(error), error, error.__traceback__)
+            elif str(reaction) == self.bot.minus:
+                await send_traceback(self.bot.log_channel, ctx, (True, msg), 0, type(error), error, error.__traceback__)
+            elif str(reaction) == "<:save:854038370735882260>":
+                log = self.bot.get_channel(850439592352022528)
+                await send_traceback(log, ctx, (False, None), 3, type(error), error, error.__traceback__)
+                await msg.channel.send(f"Saved traceback to {log.mention}")
+
+    async def send_error(self, ctx, exc_info: dict):
+        em = Embed(
+            title=f"{self.bot.redTick} Error while running command {exc_info['command']}",
+            description=f"```py\n{exc_info['error']}```[Report error](https://discord.gg/nUUJPgemFE)"
+        )
+        em.set_footer(text="Please report this error in our support server if it persists.")
+        await ctx.send(embed=em)
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         """Error handles everything"""
         if ctx.command and ctx.command.has_error_handler(): return
-
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
             if isinstance(error, discord.errors.Forbidden):
@@ -36,6 +59,8 @@ class Core(commands.Cog):
             return await ctx.send(
                 f"{self.bot.redTick} The maximum concurrency is already reached for `{ctx.command}` ({error.number}). Try again later."
             )
+        elif isinstance(error, wavelink.errors.ZeroConnectedNodes):
+            await self.bot.reload_extension("Music")
         elif isinstance(error, commands.CommandOnCooldown):
             command = ctx.command
             default = discord.utils.find(
@@ -55,8 +80,8 @@ class Core(commands.Cog):
             )
             return await ctx.send(embed=em)
         elif isinstance(error, commands.MissingRequiredArgument):
-            cmd = self.bot.get_command("help")
-            return await ctx.invoke(cmd, command=f"{ctx.command}")
+            await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
+            return
         elif isinstance(error, commands.BadArgument):
             return await ctx.send(str(error))
         elif isinstance(error, commands.MissingPermissions):
@@ -73,11 +98,19 @@ class Core(commands.Cog):
             )
         elif isinstance(error, commands.CommandNotFound):
             return
-
-        await send_traceback(
-            self.bot.error_channel, 10, type(error), error, error.__traceback__
-        )
-        return
+        
+        elif isinstance(error, commands.CheckFailure):
+            await ctx.send("You do not have permissions to use this command!")
+            return
+        
+        exc_info = {
+            "command": ctx.command,
+            "error": "".join(traceback.format_exception(type(error), error, error.__traceback__, 0)).replace("``", "`\u200b`")
+        }
+        await self.send_error(ctx, exc_info)
+        msg = await send_traceback(self.bot.log_channel, ctx, (False, None), 0, type(error), error, error.__traceback__)
+        await self.expand_tb(ctx, error, msg)
+        
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
@@ -98,7 +131,7 @@ class Core(commands.Cog):
         try:
             self.cache[str(ctx.author.id)] += 1
             self.cache_usage[str(ctx.command.name)] += 1
-        except Exception:
+        except KeyError:
             self.cache[str(ctx.author.id)] = 1
             self.cache_usage[str(ctx.command.name)] = 1
 
@@ -180,7 +213,7 @@ class Core(commands.Cog):
             await message.edit(embed=em)
         except Exception as error:
             await send_traceback(
-                        self.bot.error_channel, 10, type(error), error, error.__traceback__
+                        self.bot.log_channel, 10, type(error), error, error.__traceback__
                     )
 
     @update_status.before_loop

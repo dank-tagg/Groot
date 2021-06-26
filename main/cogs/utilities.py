@@ -3,6 +3,7 @@ import datetime
 import random
 
 import discord
+import json
 from discord.ext import commands
 from humanize.time import precisedelta
 from PIL import Image, ImageDraw, ImageFont
@@ -307,9 +308,8 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         It drops a given or random sentence and the user that types it the fastest, gets the prize.\n
         To use the subcommands, the author must have the giveaway role set for the server.
         """
-        cmd = self.bot.get_command("help")
-        await ctx.invoke(cmd, command="drop")
-
+        await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
+    
     @drop.command(brief="Drops a prize with a custom sentence")
     @commands.max_concurrency(1, commands.BucketType.channel, wait=False)
     async def custom(self, ctx, *, prize):
@@ -620,6 +620,11 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
     @commands.command(name="id")
     async def _get_id(self, ctx, any: Union[discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.CategoryChannel, discord.Emoji, discord.User]):
         return await ctx.send(any.id)
+    
+    @commands.command(name="embed")
+    async def _send_embed(self, ctx, *, embed: str):
+        em = discord.Embed.from_dict(json.loads(embed))
+        await ctx.send(embed=em)
 
 def setup(bot):
     bot.add_cog(Utilities(bot), category="Utilities")
