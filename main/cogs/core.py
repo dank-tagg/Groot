@@ -18,7 +18,7 @@ class Core(commands.Cog):
     async def expand_tb(self, ctx, error, msg):
         await msg.add_reaction(self.bot.plus)
         await msg.add_reaction(self.bot.minus)
-        await msg.add_reaction("<:save:854038370735882260>")
+        await msg.add_reaction(self.bot.emojis['save'])
 
         while True:
             reaction, user = await self.bot.wait_for('reaction_add', check=lambda reaction, m: m == self.bot.owner and reaction.message == msg)
@@ -26,7 +26,7 @@ class Core(commands.Cog):
                 await send_traceback(self.bot.log_channel, ctx, (True, msg), 3, type(error), error, error.__traceback__)
             elif str(reaction) == self.bot.minus:
                 await send_traceback(self.bot.log_channel, ctx, (True, msg), 0, type(error), error, error.__traceback__)
-            elif str(reaction) == "<:save:854038370735882260>":
+            elif str(reaction) == self.bot.emojis['save']:
                 log = self.bot.get_channel(850439592352022528)
                 await send_traceback(log, ctx, (False, None), 3, type(error), error, error.__traceback__)
                 await msg.channel.send(f"Saved traceback to {log.mention}")
@@ -192,13 +192,8 @@ class Core(commands.Cog):
     @tasks.loop(seconds=10)
     async def update_status(self):
         status = read_json('config')
-        status_emojis = {
-            'online': '<:online:808613541774360576>', 
-            'offline': '<:offline:817034738014879845>', 
-            'idle': '<:idle:817035319165059102>'
-            }
         
-        groot_status = f"{status_emojis[status['status'].get('groot', 'offline')]} {str.title(status['status'].get('groot', 'offline'))}"
+        groot_status = f"{self.bot.emojis[status['status'].get('groot', 'offline')]} {str.title(status['status'].get('groot', 'offline'))}"
         message = f"**BOT STATUS** \n\n {groot_status} | Groot\n\nRefreshes every second"
     
         em = Embed(

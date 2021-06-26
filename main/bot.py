@@ -25,10 +25,7 @@ to_call = ListCall()
 class GrootBot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(self.get_prefix, **kwargs)
-        self.greenTick = "<:greenTick:814504388139155477>"
-        self.redTick = "<:redTick:814774960852566026>"
-        self.plus = "<:plus:854044237556351006>"
-        self.minus = "<:minus:854046724497604649>"
+        self.emojis = dict()
         self.data = currencyData(self)
         self.token = kwargs.pop("token", None)
         self.session = aiohttp.ClientSession
@@ -71,7 +68,28 @@ class GrootBot(commands.Bot):
         return self.owner
 
     @to_call.append
-    def loading_cog(self):
+    def loading_emojis(self):
+        emojis = {
+            "greenTick": "<:greenTick:814504388139155477>",
+            "redTick": "<:redTick:814774960852566026>",
+            "plus": "<:plus:854044237556351006>",
+            "minus": "<:minus:854046724497604649>",
+            "save": "<:save:854038370735882260>",
+            'online': '<:online:808613541774360576>', 
+            'offline': '<:offline:817034738014879845>', 
+            'idle': '<:idle:817035319165059102>',
+            'boosters': '<:Boosters:814930829461553152>',
+            'typing': '<a:typing:826939777290076230>',
+            'database': '<:database:857553072909189191>',
+            'groot': '<:Groot:829361863807860756>',
+            'loading': '<a:loading:856978168476205066>'
+        }
+
+        self.emojis = emojis
+        return self.emojis
+
+    @to_call.append
+    def loading_cogs(self):
         """Loads the cogs"""
         cogs = ()
         for file in os.listdir(f"{self.cwd}/cogs"):
@@ -163,6 +181,16 @@ class GrootBot(commands.Bot):
         """Override get_context to use a custom Context"""
         context = await super().get_context(message, cls=customContext)
         return context
+
+    async def process_commands(self, message):
+        """Override process_commands to call typing every invoke"""
+        if message.author.bot:
+            return
+
+        ctx = await self.get_context(message)
+        if ctx.valid and getattr(ctx.cog, "qualified_name", None) != "Jishaku":
+            await ctx.trigger_typing()
+        await self.invoke(ctx)
 
     def starter(self):
         """Starts the bot properly"""

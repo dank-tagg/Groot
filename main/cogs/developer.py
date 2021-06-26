@@ -154,7 +154,7 @@ class Developer(commands.Cog):
 
         if not fail:
             em = Embed(color=0x3CA374)
-            em.add_field(name="<:online:808613541774360576> Pulling from GitHub", value=text, inline=False)
+            em.add_field(name=f"{self.bot.emojis['online']} Pulling from GitHub", value=text, inline=False)
             em.add_field(
                 name=f"{self.bot.greenTick} Cogs Reloading",
                 value="```diff\n+ All cogs were reloaded successfully```",
@@ -163,9 +163,9 @@ class Developer(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         else:
             em = Embed(color=0xFFCC33)
-            em.add_field(name="<:online:808613541774360576> Pulling from GitHub", value=text, inline=False)
+            em.add_field(name=f"{self.bot.emojis['online']} Pulling from GitHub", value=text, inline=False)
             em.add_field(
-                name="<:idle:817035319165059102> **Failed to reload all cogs**",
+                name=f"{self.bot.emojis['idle']} **Failed to reload all cogs**",
                 value=fail,
             )
             try:

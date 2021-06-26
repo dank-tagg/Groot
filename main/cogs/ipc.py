@@ -1,11 +1,6 @@
 from discord.ext import commands, ipc
-import logging
 import humanize
 import datetime
-import textwrap
-import io
-from contextlib import redirect_stdout
-import traceback
 
 class Ipc(commands.Cog):
     def __init__(self, bot):

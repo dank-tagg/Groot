@@ -86,7 +86,7 @@ class Configuration(commands.Cog):
         usage="[channel] <command>",
     )
     async def _disable(
-        self, ctx, snowflake_id: typing.Optional[discord.TextChannel], *, command
+        self, ctx, command, snowflake_id: discord.TextChannel = None
     ):
         """
         You can use this command to disable a command for the server or channel.\n
@@ -125,7 +125,7 @@ class Configuration(commands.Cog):
         usage="[channel] <command>",
     )
     async def _enable(
-        self, ctx, snowflake_id: typing.Optional[discord.TextChannel], *, command
+        self, ctx, command, snowflake_id: discord.TextChannel = None
     ):
         """
         You can use this command to enable a disabled command for the server or channel.\n

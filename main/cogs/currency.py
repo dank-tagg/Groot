@@ -359,7 +359,7 @@ class Currency(commands.Cog):
             k: fish_dict[k] for k in random.sample(fish_dict.keys(), times_caught)
         }
         if info is not None and info == "info":
-            fish_dict["<:Groot:829361863807860756> Groot"] = 100000
+            fish_dict[f"{self.bot.emojis['groot']}  Groot"] = 100000
             fish_list = [
                 f"{k} | **⛻{v:,}**"
                 for k, v in sorted(fish_dict.items(), key=lambda item: item[1])
@@ -369,7 +369,7 @@ class Currency(commands.Cog):
             ctx.bucket.reset()
             return await ctx.maybe_reply(embed=em)
         if random.randint(0, 100) < 1:
-            randomized["<:Groot:829361863807860756> Groot"] = 100000
+            randomized[f"{self.bot.emojis['groot']}  Groot"] = 100000
         fish_caught_alpha = [
             random.choice(list(randomized.keys())) for _ in range(times_caught)
         ]
@@ -417,7 +417,7 @@ class Currency(commands.Cog):
         if info is not None and info == "info":
             animals_dict["🦄 Unicorn"] = 25000
             animals_dict["🐲 Dragon"] = 50000
-            animals_dict["<:Groot:829361863807860756> Groot"] = 100000
+            animals_dict[f"{self.bot.emojis['groot']}  Groot"] = 100000
             animals_list = [
                 f"{k} | **⛻{v:,}**"
                 for k, v in sorted(animals_dict.items(), key=lambda item: item[1])
@@ -427,7 +427,7 @@ class Currency(commands.Cog):
             ctx.bucket.reset()
             return await ctx.maybe_reply(embed=em)
         if random.randint(0, 100) < 1:
-            randomized["<:Groot:829361863807860756> Groot"] = 100000
+            randomized[f"{self.bot.emojis['groot']}  Groot"] = 100000
         if random.randint(0, 100) < 10:
             randomized["🐲 Dragon"] = 25000
         if random.randint(0, 100) < 25:

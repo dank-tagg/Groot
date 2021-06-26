@@ -537,14 +537,8 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
                 inline=False,
             )
 
-        status_dict = {
-            "Offline": "<:offline:817034738014879845> Offline",
-            "Online": "<:online:808613541774360576> Online",
-            "Idle": "<:idle:817035319165059102> Idle",
-            "Dnd": "<:dnd:817035352925536307> Do Not Disturb",
-        }
 
-        em.add_field(name=f"Status:", value=status_dict[status])
+        em.add_field(name=f"Status:", value=self.bot.emojis[status])
         if member.activity:
             em.add_field(name="Activity:", value=member.activity, inline=False)
         else:
