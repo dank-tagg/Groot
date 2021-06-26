@@ -1,13 +1,17 @@
+from __future__ import annotations
+
 import asyncio
 import typing
 
 import discord
 from discord.ext import commands
 
+from bot import GrootBot
+
 
 class Moderator(commands.Cog):
     
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
     
     @commands.group(name="mod", invoke_without_command=True, case_insensitive=True)

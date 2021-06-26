@@ -178,10 +178,9 @@ class Developer(commands.Cog):
                     f"Oops, an exception occured while handling an exception. Error was send here: {str(paste)}"
                 )
 
-    @commands.command()
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @dev.command()
     async def commits(self, ctx):
-        res = await self.bot.session().get(f"https://api.github.com/repos/dank-tagg/Groot/commits")
+        res = await self.bot.session.get(f"https://api.github.com/repos/dank-tagg/Groot/commits")
         res = await res.json()
         em = Embed(title=f"Commits", description="\n".join(f"[`{commit['sha'][:6]}`]({commit['html_url']}) {commit['commit']['message']}" for commit in res[:5]), url=f"https://api.github.com/repos/dank-tagg/Groot/commits")
         em.set_thumbnail(url="https://image.flaticon.com/icons/png/512%2F25%2F25231.png")
@@ -204,8 +203,8 @@ class Developer(commands.Cog):
 
     @dev.command(name="reload")
     async def _reloadmodule(self, ctx):
-        import imp, utils
-        imp.reload(utils)
+        import importlib, utils
+        importlib.reload(utils)
         await ctx.send("Done")
 
     @dev.command()

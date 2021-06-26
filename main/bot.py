@@ -1,12 +1,9 @@
-import asyncio
 import datetime
-import inspect
 import itertools
 import logging
 import operator
 import os
 import re
-import time
 from pathlib import Path
 
 import aiohttp
@@ -28,7 +25,7 @@ class GrootBot(commands.Bot):
         self.emojis = dict()
         self.data = currencyData(self)
         self.token = kwargs.pop("token", None)
-        self.session = aiohttp.ClientSession
+        self.session = aiohttp.ClientSession()
         self.maintenance = False
         self.cache = CacheManager()
         self.ipc = ipc.Server(

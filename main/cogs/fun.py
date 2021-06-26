@@ -109,22 +109,22 @@ class Fun(commands.Cog, description="Fun commands"):
     @commands.command(aliases=["memes"], brief="Shows a meme from reddit")
     async def meme(self, ctx):
         """Shows a meme from r/memes."""
-        async with self.bot.session() as cs:
-            async with cs.get("https://www.reddit.com/r/memes/random/.json") as res:
-                res = await res.json()
+        res = await self.bot.session.get("https://www.reddit.com/r/memes/random/.json")
+        data = await res.json()
 
-                image = res[0]["data"]["children"][0]["data"]["url"]
-                permalink = res[0]["data"]["children"][0]["data"]["permalink"]
-                url = f"https://reddit.com{permalink}"
-                title = res[0]["data"]["children"][0]["data"]["title"]
-                ups = res[0]["data"]["children"][0]["data"]["ups"]
-                downs = res[0]["data"]["children"][0]["data"]["downs"]
-                comments = res[0]["data"]["children"][0]["data"]["num_comments"]
+        image = data[0]["data"]["children"][0]["data"]["url"]
+        permalink = data[0]["data"]["children"][0]["data"]["permalink"]
+        url = f"https://reddit.com{permalink}"
+        title = data[0]["data"]["children"][0]["data"]["title"]
+        ups = data[0]["data"]["children"][0]["data"]["ups"]
+        downs = data[0]["data"]["children"][0]["data"]["downs"]
+        comments = data[0]["data"]["children"][0]["data"]["num_comments"]
 
-                em = Embed(colour=discord.Color.blurple(), title=title, url=url)
-                em.set_image(url=image)
-                em.set_footer(text=f"👍 {ups} 👎 {downs} 💬 {comments}")
-                await ctx.send(embed=em)
+        em = Embed(colour=discord.Color.blurple(), title=title, url=url)
+        em.set_image(url=image)
+        em.set_footer(text=f"👍 {ups} 👎 {downs} 💬 {comments}")
+
+        await ctx.send(embed=em)
 
     @commands.command(name="8ball", brief="Ask the 8-ball a question!")
     async def eightball(self, ctx, *, question):
@@ -163,24 +163,16 @@ class Fun(commands.Cog, description="Fun commands"):
     @binary.command()
     async def encode(self, ctx, *, text):
         """Encodes given text to binary"""
-        api = f"https://some-random-api.ml/binary?text={text}"
-        
-        async with self.bot.session() as cs:
-            async with cs.get(api) as res:
-                res = await res.json()
-                bintext = res["binary"]
-                await ctx.send(bintext)
+        res = await self.bot.session.get(f"https://some-random-api.ml/binary?text={text}")
+        data = await res.json()
+        await ctx.send(data["binary"])
 
     @binary.command()
     async def decode(self, ctx, *, binary):
         """Decodes given text to binary"""
-
-        api = f"https://some-random-api.ml/binary?decode={binary}"
-        async with self.bot.session() as cs:
-            async with cs.get(api) as res:
-                res = await res.json()
-                decoded = res["text"]
-                await ctx.send(decoded)
+        res = await self.bot.session.get(f"https://some-random-api.ml/binary?decode={binary}")
+        data = await res.json()
+        await ctx.send(data["text"])
 
     @commands.command(name="fight")
     @commands.max_concurrency(1, BucketType.user, wait=False)
@@ -365,11 +357,9 @@ class Fun(commands.Cog, description="Fun commands"):
         """
         Returns a random joke from https://official-joke-api.appspot.com/jokes/random.
         """
-        api = "https://official-joke-api.appspot.com/jokes/random"
-        async with self.bot.session() as cs:
-            async with cs.get(api) as res:
-                result = await res.json()
-                await ctx.send(f'{result["setup"]}\n||{result["punchline"]}||')
+        res = await self.bot.session.get("https://official-joke-api.appspot.com/jokes/random")
+        data = await res.json()
+        await ctx.send(f'{data["setup"]}\n||{data["punchline"]}||')
 
     @commands.command(name="challenge")
     async def challenge(self, ctx):
