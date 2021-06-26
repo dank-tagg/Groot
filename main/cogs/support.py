@@ -43,9 +43,7 @@ class Support(commands.Cog):
             msg = await ctx.send(
                 content="Are you sure you want to submit your report?", embed=em
             )
-            emojis = [f"{self.bot.greenTick}", f"{self.bot.redTick}"]
-            for emoji in emojis:
-                await msg.add_reaction(emoji)
+            for emoji in (emojis := [self.bot.greenTick, {self.bot.redTick}]): await msg.add_reaction(emoji)
             try:
                 reaction, m = await self.bot.wait_for(
                     "reaction_add",

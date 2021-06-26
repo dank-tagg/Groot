@@ -261,26 +261,6 @@ class Developer(commands.Cog):
         except discord.Forbidden:
             await ctx.message.add_reaction("❌")
 
-    @commands.command(name="close")
-    async def _close(self, ctx):
-        await self.bot.logout()
-        for user in self.bot.cache["users"]:
-            query = "UPDATE currency_data SET wallet = ?, bank = ?, max_bank = ?, boost = ?, exp = ?, lvl = ? WHERE user_id = ?"
-            await self.bot.db.execute(
-                query,
-                (
-                    self.bot.cache["users"][user]["wallet"],
-                    self.bot.cache["users"][user]["bank"],
-                    self.bot.cache["users"][user]["max_bank"],
-                    round(self.bot.cache["users"][user]["boost"], 2),
-                    self.bot.cache["users"][user]["exp"],
-                    self.bot.cache["users"][user]["lvl"],
-                    user,
-                ),
-            )
-
-        await self.bot.db.commit()
-
 
 def setup(bot):
     bot.add_cog(Developer(bot))

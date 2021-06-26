@@ -6,6 +6,6 @@ def can_execute_action(ctx, user, target):
     )
 
 
-async def is_premium(ctx, user):
+def is_premium(ctx, user):
 
     return user.id in ctx.bot.premium_users
