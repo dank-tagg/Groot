@@ -206,7 +206,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
                 await player.play(track)
                 await player.send_embed()
             else:
-                raise commands.BadArgument(f"{self.bot.emojis_dict('redTick')} | No song was found with the given query. Try again.")
+                raise commands.BadArgument(f"{self.bot.emoji_dict['redTick']} | No song was found with the given query. Try again.")
         else:
             await event.player.ctx.send(event.error)
 
@@ -241,13 +241,13 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         channel = getattr(ctx.author.voice, "channel", channel)
         if not channel:
-            raise commands.BadArgument(f"{self.bot.emojis_dict('redTick')} | No channel to join. Either join one, or specify a valid channel to join.")
+            raise commands.BadArgument(f"{self.bot.emoji_dict['redTick']} | No channel to join. Either join one, or specify a valid channel to join.")
         
         if channel == getattr(ctx.guild.me.voice, "channel", False):
-            raise commands.BadArgument(f"{self.bot.emojis_dict('redTick')} | Already connected to {channel.mention} !")
+            raise commands.BadArgument(f"{self.bot.emoji_dict['redTick']} | Already connected to {channel.mention} !")
 
         if not invoked_from:
-            await ctx.reply(f"{self.bot.emojis_dict('greenTick')} | Connected to {channel.mention}")
+            await ctx.reply(f"{self.bot.emoji_dict['greenTick']} | Connected to {channel.mention}")
         await player.connect(channel.id)
     
     @commands.command(name='play')
@@ -264,7 +264,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         
         tracks = await self.bot.wavelink.get_tracks(query)
         if not tracks:
-            raise commands.BadArgument(f"{self.bot.emojis_dict('redTick')} | No song was found with the given query. Try again.")
+            raise commands.BadArgument(f"{self.bot.emoji_dict['redTick']} | No song was found with the given query. Try again.")
         
         if isinstance(tracks, wavelink.TrackPlaylist):
             for track in tracks.tracks:
@@ -292,7 +292,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             player.looping = True
             message = f"Looping **{player.current.title}**..."
         
-        return await ctx.reply(f"{self.bot.emojis_dict('greenTick')} | {message}")
+        return await ctx.reply(f"{self.bot.emoji_dict['greenTick']} | {message}")
         
     @commands.command(name="skip", aliases=["next"])
     async def _skip(self, ctx):
@@ -301,17 +301,17 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         
 
         if not player.is_connected:
-            raise commands.BadArgument(f"{self.bot.emojis_dict('redTick')} | No song is playing.")
+            raise commands.BadArgument(f"{self.bot.emoji_dict['redTick']} | No song is playing.")
         
         if self.is_privileged(ctx):
-            await ctx.reply(f"{self.bot.emojis_dict('greenTick')} | The song requester/DJ ({ctx.author.mention}) has skipped the song.")
+            await ctx.reply(f"{self.bot.emoji_dict['greenTick']} | The song requester/DJ ({ctx.author.mention}) has skipped the song.")
             player.skip_votes.clear()
             return await player.stop()
         
         required = self.required(ctx)
         player.skip_votes.add(ctx.author)
         if (votes := len(player.skip_votes)) >= required:
-            await ctx.reply(f"{self.bot.emojis_dict('greenTick')} | {votes} people voted to skip this song. Skipping...")
+            await ctx.reply(f"{self.bot.emoji_dict['greenTick']} | {votes} people voted to skip this song. Skipping...")
             player.skip_votes.clear()
             await player.stop()
         else:
@@ -326,7 +326,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             return
         
         if self.is_privileged(ctx):
-            await ctx.reply(f"{self.bot.emojis_dict('greenTick')} | The song requester/DJ ({ctx.author.mention}) has stopped the player.")
+            await ctx.reply(f"{self.bot.emoji_dict['greenTick']} | The song requester/DJ ({ctx.author.mention}) has stopped the player.")
             player.stop_votes.clear()
             return await player.teardown()
         
@@ -334,7 +334,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player.stop_votes.add(ctx.author)
 
         if (votes := len(player.stop_votes)) >= required:
-            await ctx.reply(f"{self.bot.emojis_dict('greenTick')} | {votes} people voted to stop the player. Stopping...")
+            await ctx.reply(f"{self.bot.emoji_dict['greenTick']} | {votes} people voted to stop the player. Stopping...")
             await player.teardown()
         else:
             await ctx.reply(f'{ctx.author.mention} has voted to stop the player. (`{votes}/{required}`)')
@@ -348,7 +348,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             return
 
         if player.queue.qsize() == 0:
-            await ctx.reply(f"{self.bot.emojis_dict('redTick')} | No more songs in the queue. Add some songs to the queue and try again.")
+            await ctx.reply(f"{self.bot.emoji_dict['redTick']} | No more songs in the queue. Add some songs to the queue and try again.")
             return
         
 
@@ -374,16 +374,16 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player = self.get_player(ctx)
 
         if not player.is_connected:
-            raise commands.BadArgument(f"{self.bot.emojis_dict('redTick')} | No song is playing.")
+            raise commands.BadArgument(f"{self.bot.emoji_dict['redTick']} | No song is playing.")
 
         if not self.is_privileged(ctx):
-            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | Only the requester or the DJ can change volume value.")
+            return await ctx.reply(f"{self.bot.emoji_dict['redTick']} | Only the requester or the DJ can change volume value.")
         
         if not 0 < volume < 101:
-            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | The volume value must be in between 0 and 100")
+            return await ctx.reply(f"{self.bot.emoji_dict['redTick']} | The volume value must be in between 0 and 100")
         
         await player.set_volume(volume)
-        await ctx.reply(f"{self.bot.emojis_dict('greenTick')} | Changed volume to {volume}%")
+        await ctx.reply(f"{self.bot.emoji_dict['greenTick']} | Changed volume to {volume}%")
 
     @commands.command(name="shuffle")
     async def _shuffle(self, ctx):
@@ -391,14 +391,14 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player = self.get_player(ctx)
 
         if not player.is_connected:
-            raise commands.BadArgument(f"{self.bot.emojis_dict('redTick')} | No song is playing.")
+            raise commands.BadArgument(f"{self.bot.emoji_dict['redTick']} | No song is playing.")
         
         if player.queue.qsize() < 3:
-            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | Add more songs to the queue first before shuffling.")
+            return await ctx.reply(f"{self.bot.emoji_dict['redTick']} | Add more songs to the queue first before shuffling.")
 
         if self.is_privileged(ctx):
             random.shuffle(player.queue._queue)
-            return await ctx.reply(f"{self.bot.emojis_dict('greenTick')} | {ctx.author.mention} shuffled the playlist.")
+            return await ctx.reply(f"{self.bot.emoji_dict['greenTick']} | {ctx.author.mention} shuffled the playlist.")
 
         required = self.required(ctx)
         player.skip_votes.add(ctx.author)
@@ -406,7 +406,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if (votes := len(player.skip_votes)) >= required:
             player.skip_votes.clear()
             random.shuffle(player.queue._queue)
-            await ctx.reply(f"{self.bot.emojis_dict('greenTick')} | Shuffled playlist.")
+            await ctx.reply(f"{self.bot.emoji_dict['greenTick']} | Shuffled playlist.")
         else:
             await ctx.reply(f'{ctx.author.mention} has voted to shuffle the playlist. (`{votes}/{required}`)')
     
@@ -416,7 +416,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player = self.get_player(ctx)
 
         if not player.is_connected:
-            raise commands.BadArgument(f"{self.bot.emojis_dict('redTick')} | No song is playing.")
+            raise commands.BadArgument(f"{self.bot.emoji_dict['redTick']} | No song is playing.")
         
         await player.send_embed()
 
@@ -426,10 +426,10 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player = self.get_player(ctx)
 
         if not player.is_connected:
-            raise commands.BadArgument(f"{self.bot.emojis_dict('redTick')} | No song is playing.")
+            raise commands.BadArgument(f"{self.bot.emoji_dict['redTick']} | No song is playing.")
         
         if not self.is_privileged(ctx):
-            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | Only privileged members (DJ/requester) can change the equalizer.")
+            return await ctx.reply(f"{self.bot.emoji_dict['redTick']} | Only privileged members (DJ/requester) can change the equalizer.")
 
         eqs = {
             'flat': wavelink.Equalizer.flat(),
@@ -442,9 +442,9 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not eq:
             joined = "\n".join(eqs.keys())
-            return await ctx.reply(f'{self.bot.emojis_dict('redTick')} | Invalid EQ provided. Choose from `flat` `boost` `metal` `piano`.')
+            return await ctx.reply(f"{self.bot.emoji_dict['redTick']} | Invalid EQ provided. Choose from `flat` `boost` `metal` `piano`.")
 
-        await ctx.reply(f'{self.bot.emojis_dict('greenTick')} | Successfully changed equalizer to {equalizer}')
+        await ctx.reply(f"{self.bot.emoji_dict['greenTick']} | Successfully changed equalizer to {equalizer}")
         await player.set_eq(eq)
 
     @commands.command(aliases=['dj', 'swap'])
@@ -456,30 +456,30 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             return
 
         if not self.is_privileged(ctx):
-            return await ctx.reply(f'{self.bot.emojis_dict('redTick')} | Only admins and the DJ may use this command.')
+            return await ctx.reply(f"{self.bot.emoji_dict['redTick']} | Only admins and the DJ may use this command.")
         
         channel = self.bot.get_channel(int(player.channel_id))
         members = channel.members
 
         if member and member not in members:
-            return await ctx.reply(f'{self.bot.emojis_dict('redTick')} | **{member.name}** is not currently in {channel.mention}, so can not be a DJ.')
+            return await ctx.reply(f"{self.bot.emoji_dict['redTick']} | **{member.name}** is not currently in {channel.mention}, so can not be a DJ.")
 
         if member and member == player.dj:
-            return await ctx.reply(f'{self.bot.emojis_dict('redTick')} | Cannot swap DJ to the current DJ...')
+            return await ctx.reply(f"{self.bot.emoji_dict['redTick']} | Cannot swap DJ to the current DJ...")
 
         if len(members) <= 2:
-            return await ctx.reply(f'{self.bot.emojis_dict('redTick')} | No more members to swap to.')
+            return await ctx.reply(f"{self.bot.emoji_dict['redTick']} | No more members to swap to.")
 
         if member:
             player.dj = member
-            return await ctx.send(f'{member.mention} is now the DJ.')
+            return await ctx.send(f"{member.mention} is now the DJ.")
 
         for m in members:
             if m == player.dj or m.bot:
                 continue
             else:
                 player.dj = m
-                return await ctx.send(f'{self.bot.emojis_dict('greenTick')} | {member.mention} is now the DJ.')
+                return await ctx.send(f"{self.bot.emoji_dict['greenTick']} | {member.mention} is now the DJ.")
 
 def setup(bot):
     bot.add_cog(Music(bot), category="Music")

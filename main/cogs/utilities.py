@@ -125,14 +125,14 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             )
         if grole not in ctx.author.roles:
             return await ctx.send(
-                f"{self.bot.emojis_dict('redTick')} You do not have the role `{grole.name}` that is required to start a giveaway!"
+                f"{self.bot.emoji_dict['redTick']} You do not have the role `{grole.name}` that is required to start a giveaway!"
             )
 
         authorURL = ctx.author.avatar_url
         winners = int(winners.replace("w", ""))
         if winners > 30 or winners < 1:
             raise commands.BadArgument(
-                f"{self.bot.emojis_dict('redTick')} Max. winners is 30, min. is 1"
+                f"{self.bot.emoji_dict['redTick']} Max. winners is 30, min. is 1"
             )
 
         if "s" in time:
@@ -279,7 +279,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
 
         if grole not in ctx.author.roles:
             return await ctx.send(
-                f"{self.bot.emojis_dict('redTick')} You do not have the role `{grole.name}` that is required to reroll a giveaway!"
+                f"{self.bot.emoji_dict['redTick']} You do not have the role `{grole.name}` that is required to reroll a giveaway!"
             )
 
         try:
@@ -322,7 +322,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
 
         if grole not in ctx.author.roles:
             return await ctx.send(
-                f"{self.bot.emojis_dict('redTick')} You do not have the role `{grole.name}` that is required to start a drop!"
+                f"{self.bot.emoji_dict['redTick']} You do not have the role `{grole.name}` that is required to start a drop!"
             )
         rarity = random.choice(
             [
@@ -393,7 +393,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
 
         if grole not in ctx.author.roles:
             return await ctx.send(
-                f"{self.bot.emojis_dict('redTick')} You do not have the role `{grole.name}` that is required to start a drop!"
+                f"{self.bot.emoji_dict['redTick']} You do not have the role `{grole.name}` that is required to start a drop!"
             )
         rarity = random.choice(
             [

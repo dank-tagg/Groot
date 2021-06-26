@@ -43,7 +43,7 @@ class Support(commands.Cog):
             msg = await ctx.send(
                 content="Are you sure you want to submit your report?", embed=em
             )
-            for emoji in (emojis := [self.bot.emojis_dict('greenTick'), {self.bot.emojis_dict('redTick')}]): await msg.add_reaction(emoji)
+            for emoji in (emojis := [self.bot.emoji_dict['greenTick'], {self.bot.emoji_dict['redTick']}]): await msg.add_reaction(emoji)
             try:
                 reaction, m = await self.bot.wait_for(
                     "reaction_add",
@@ -51,7 +51,7 @@ class Support(commands.Cog):
                     check=lambda reaction, m: m == ctx.author
                     and str(reaction.emoji) in emojis,
                 )
-                if str(reaction) == self.bot.emojis_dict('greenTick'):
+                if str(reaction) == self.bot.emoji_dict['greenTick']:
                     channel = self.bot.get_channel(823585906044174416)
                     await channel.send(embed=em)
                     return await ctx.send(

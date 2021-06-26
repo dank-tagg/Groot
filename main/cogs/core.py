@@ -33,7 +33,7 @@ class Core(commands.Cog):
 
     async def send_error(self, ctx, exc_info: dict):
         em = Embed(
-            title=f"{self.bot.emojis_dict('redTick')} Error while running command {exc_info['command']}",
+            title=f"{self.bot.emoji_dict['redTick']} Error while running command {exc_info['command']}",
             description=f"```py\n{exc_info['error']}```[Report error](https://discord.gg/nUUJPgemFE)"
         )
         em.set_footer(text="Please report this error in our support server if it persists.")
@@ -48,16 +48,16 @@ class Core(commands.Cog):
             if isinstance(error, discord.errors.Forbidden):
                 try:
                     return await ctx.reply(
-                        f"{self.bot.emojis_dict('redTick')} I am missing permissions to do that!"
+                        f"{self.bot.emoji_dict['redTick']} I am missing permissions to do that!"
                     )
                 except discord.Forbidden:
                     return await ctx.author.send(
-                        f"{self.bot.emojis_dict('redTick')} I am missing permissions to do that!"
+                        f"{self.bot.emoji_dict['redTick']} I am missing permissions to do that!"
                     )
 
         elif isinstance(error, commands.MaxConcurrencyReached):
             return await ctx.send(
-                f"{self.bot.emojis_dict('redTick')} The maximum concurrency is already reached for `{ctx.command}` ({error.number}). Try again later."
+                f"{self.bot.emoji_dict['redTick']} The maximum concurrency is already reached for `{ctx.command}` ({error.number}). Try again later."
             )
         elif isinstance(error, wavelink.errors.ZeroConnectedNodes):
             await self.bot.reload_extension("Music")
@@ -86,15 +86,15 @@ class Core(commands.Cog):
             return await ctx.send(str(error))
         elif isinstance(error, commands.MissingPermissions):
             return await ctx.send(
-                f"{self.bot.emojis_dict('redTick')} You are missing the `{error.missing_perms[0]}` permission to do that!"
+                f"{self.bot.emoji_dict['redTick']} You are missing the `{error.missing_perms[0]}` permission to do that!"
             )
         elif isinstance(error, commands.MemberNotFound):
             return await ctx.send(
-                f"{self.bot.emojis_dict('redTick')} I couldn't find `{error.argument}`. Have you spelled their name correctly? Try mentioning them."
+                f"{self.bot.emoji_dict['redTick']} I couldn't find `{error.argument}`. Have you spelled their name correctly? Try mentioning them."
             )
         elif isinstance(error, commands.RoleNotFound):
             return await ctx.send(
-                f"{self.bot.emojis_dict('redTick')} I couldn't find the role `{error.argument}`. Did you spell it correctly? Capitalization matters!"
+                f"{self.bot.emoji_dict['redTick']} I couldn't find the role `{error.argument}`. Did you spell it correctly? Capitalization matters!"
             )
         elif isinstance(error, commands.CommandNotFound):
             return

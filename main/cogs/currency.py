@@ -60,7 +60,7 @@ class Currency(commands.Cog):
         member = member if member is not None else ctx.author
         if member.id not in self.bot.cache["users"]:
             return await ctx.maybe_reply(
-                f"{self.bot.emojis_dict('redTick')} That user does not have an account yet!"
+                f"{self.bot.emoji_dict['redTick']} That user does not have an account yet!"
             )
         lvl = await self.data.get_data(member.id, mode="lvl")
         exp = await self.data.get_data(member.id, mode="exp")
@@ -125,7 +125,7 @@ class Currency(commands.Cog):
         member = member if member is not None else ctx.author
         if member.id not in self.bot.cache["users"]:
             return await ctx.maybe_reply(
-                f"{self.bot.emojis_dict('redTick')} That user does not have an account yet!"
+                f"{self.bot.emoji_dict['redTick']} That user does not have an account yet!"
             )
         bank_amount = await self.data.get_data(member.id, mode="bank")
         wallet_amount = await self.data.get_data(member.id)
@@ -342,7 +342,7 @@ class Currency(commands.Cog):
         """Fish for fishes that you automatically sell for cash!"""
         if not await self.bot.data.has_item(ctx.author.id, "fishing rod"):
             raise commands.BadArgument(
-                f"{self.bot.emojis_dict('redTick')} You need a `Fishing Rod` to use `fish`!"
+                f"{self.bot.emoji_dict['redTick']} You need a `Fishing Rod` to use `fish`!"
             )
         boost = self.bot.cache["users"][ctx.author.id]["boost"]
         times_caught = random.randint(1, 3)
@@ -469,18 +469,18 @@ class Currency(commands.Cog):
         """
         if member == ctx.author or member.bot:
             raise commands.BadArgument(
-                f"{self.bot.emojis_dict('redTick')} You cannot share coins to yourself or a bot."
+                f"{self.bot.emoji_dict['redTick']} You cannot share coins to yourself or a bot."
             )
 
         amount = await convert_to_int(amount, await self.data.get_data(ctx.author.id))
         if amount < 1:
             raise commands.BadArgument(
-                f"{self.bot.emojis_dict('redTick')} Amount must be a positive number!"
+                f"{self.bot.emoji_dict['redTick']} Amount must be a positive number!"
             )
 
         if member.id not in self.bot.cache["users"]:
             return await ctx.maybe_reply(
-                f"{self.bot.emojis_dict('redTick')} That user does not have an account yet!"
+                f"{self.bot.emoji_dict['redTick']} That user does not have an account yet!"
             )
 
         tax_rate = 0.05 if amount < 100000 else 0.10

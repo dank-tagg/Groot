@@ -126,7 +126,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
         overwrite = channel.overwrites_for(ctx.guild.default_role)
         overwrite.send_messages = False
         await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
-        await ctx.send(f"{self.bot.emojis_dict('greenTick')} Locked down **{channel}**.")
+        await ctx.send(f"{self.bot.emoji_dict['greenTick']} Locked down **{channel}**.")
 
     @commands.command(name="unlock", brief="Unlocks a channel")
     @commands.has_permissions(manage_channels=True)
@@ -139,7 +139,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
         overwrite = channel.overwrites_for(ctx.guild.default_role)
         overwrite.send_messages = True
         await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
-        await ctx.send(f"{self.bot.emojis_dict('greenTick')} Unlocked **{channel}**.")
+        await ctx.send(f"{self.bot.emoji_dict['greenTick']} Unlocked **{channel}**.")
 
     def strip_accs(self, text):
         try:
@@ -303,7 +303,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
 
         valid_nick_check = None if len(nickname) > 32 else True
         if not valid_nick_check:
-            await ctx.message.add_reaction(f"{self.bot.emojis_dict('redTick')}")
+            await ctx.message.add_reaction(f"{self.bot.emoji_dict['redTick']}")
             return await ctx.send(
                 "That nickname is too long. Keep it under 32 characters, please"
             )
@@ -314,7 +314,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
                 "INSERT INTO frozen_names VALUES (?,?,?)",
                 (ctx.guild.id, member.id, nickname),
             )
-            await ctx.message.add_reaction(f"{self.bot.emojis_dict('greenTick')}")
+            await ctx.message.add_reaction(f"{self.bot.emoji_dict['greenTick']}")
 
         except discord.errors.Forbidden:
             await ctx.send("Missing permissions.")
@@ -376,7 +376,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
 
                 if unit not in pos:
                     raise commands.BadArgument(
-                        f"{self.bot.emojis_dict('redTick')} Number must end on a `s, m, h`"
+                        f"{self.bot.emoji_dict['redTick']} Number must end on a `s, m, h`"
                     )
                 try:
                     val = int(time[:-1])
@@ -388,7 +388,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
             interval1 = convert(interval)
             if interval1 < 1:
                 raise commands.BadArgument(
-                    f"{self.bot.emojis_dict('redTick')} The interval should be a positive number."
+                    f"{self.bot.emoji_dict['redTick']} The interval should be a positive number."
                 )
             if interval1 < 21601:
                 await ctx.channel.edit(slowmode_delay=interval1)

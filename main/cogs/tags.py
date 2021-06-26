@@ -36,18 +36,18 @@ class Tags(commands.Cog):
         tag = tag.lower()
         if re.match(r"<[#@](!?&)(\d+)>", tag):
             raise commands.BadArgument(
-                f"{self.bot.emojis_dict('redTick')} The tag name cannot be a mention!"
+                f"{self.bot.emoji_dict['redTick']} The tag name cannot be a mention!"
             )
         first_word = tag.partition(" ")[0]
         root = self.bot.get_command("tag")
         if first_word in root.all_commands:
             raise commands.BadArgument(
-                f"{self.bot.emojis_dict('redTick')} This tag name starts with a reserved word."
+                f"{self.bot.emoji_dict['redTick']} This tag name starts with a reserved word."
             )
 
         elif len(tag) > 32 or len(content) > 2000:
             raise commands.BadArgument(
-                f"{self.bot.emojis_dict('redTick')} There are limits for tag name `(32 letters)` and content `(2000 letters)`!"
+                f"{self.bot.emoji_dict['redTick']} There are limits for tag name `(32 letters)` and content `(2000 letters)`!"
             )
 
         else:
@@ -70,11 +70,11 @@ class Tags(commands.Cog):
                 query, (ctx.guild.id, tag, content, ctx.author.id, 0, time.time())
             )
         except sqlite3.IntegrityError:
-            await ctx.send(f"{self.bot.emojis_dict('redTick')} That tag already exists!")
+            await ctx.send(f"{self.bot.emoji_dict['redTick']} That tag already exists!")
         else:
             await self.bot.db.commit()
             return await ctx.send(
-                f"{self.bot.emojis_dict('greenTick')} Done! Created tag **{tag}**. `{await self.bot.get_prefix(ctx.message)}tag {tag}`"
+                f"{self.bot.emoji_dict['greenTick']} Done! Created tag **{tag}**. `{await self.bot.get_prefix(ctx.message)}tag {tag}`"
             )
 
     @tag.command()
@@ -85,7 +85,7 @@ class Tags(commands.Cog):
         cur = await self.bot.db.execute(query, (tag, ctx.guild.id))
         data = await cur.fetchone()
         if data is None:
-            return await ctx.send(f"{self.bot.emojis_dict('redTick')} No tag is found called `{tag}`.")
+            return await ctx.send(f"{self.bot.emoji_dict['redTick']} No tag is found called `{tag}`.")
 
         bypass_owner_check = (
             ctx.author.id == self.bot.owner_id
@@ -94,13 +94,13 @@ class Tags(commands.Cog):
 
         if not bypass_owner_check and ctx.author.id != data[0]:
             return await ctx.send(
-                f"{self.bot.emojis_dict('redTick')} You are not the owner of tag `{tag}`."
+                f"{self.bot.emoji_dict['redTick']} You are not the owner of tag `{tag}`."
             )
 
         query = "DELETE FROM tags WHERE tag_name = ? AND tag_guild_id = ?"
         cur = await self.bot.db.execute(query, (tag, ctx.guild.id))
         await self.bot.db.commit()
-        return await ctx.send(f"{self.bot.emojis_dict('greenTick')} Deleted tag `{tag}`.")
+        return await ctx.send(f"{self.bot.emoji_dict['greenTick']} Deleted tag `{tag}`.")
 
 
 def setup(bot):

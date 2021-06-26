@@ -157,7 +157,7 @@ class Developer(commands.Cog):
             em = Embed(color=0x3CA374)
             em.add_field(name=f"{self.bot.emoji_dict['online']} Pulling from GitHub", value=text, inline=False)
             em.add_field(
-                name=f"{self.bot.emojis_dict('greenTick')} Cogs Reloading",
+                name=f"{self.bot.emoji_dict['greenTick']} Cogs Reloading",
                 value="```diff\n+ All cogs were reloaded successfully```",
             )
 
@@ -226,7 +226,7 @@ class Developer(commands.Cog):
                 columns = "keys"
             thing = await cur.fetchall()
             if len(thing) == 0:
-                return await ctx.message.add_reaction(f"{self.bot.emojis_dict('greenTick')}")
+                return await ctx.message.add_reaction(f"{self.bot.emoji_dict['greenTick']}")
             thing = tabulate.tabulate(thing, headers=columns, tablefmt="psql")
             byte = io.BytesIO(str(thing).encode("utf-8"))
             return await ctx.send(file=discord.File(fp=byte, filename="table.txt"))
@@ -234,7 +234,7 @@ class Developer(commands.Cog):
     @sql.error
     async def sql_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
-            await ctx.message.add_reaction(f"{self.bot.emojis_dict('redTick')}")
+            await ctx.message.add_reaction(f"{self.bot.emoji_dict['redTick']}")
             await ctx.send(str.capitalize(str(error.original)))
 
     @dev.command(name="git")
