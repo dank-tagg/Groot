@@ -60,7 +60,7 @@ class Currency(commands.Cog):
         member = member if member is not None else ctx.author
         if member.id not in self.bot.cache["users"]:
             return await ctx.maybe_reply(
-                f"{self.bot.redTick} That user does not have an account yet!"
+                f"{self.bot.emojis_dict('redTick')} That user does not have an account yet!"
             )
         lvl = await self.data.get_data(member.id, mode="lvl")
         exp = await self.data.get_data(member.id, mode="exp")
@@ -125,7 +125,7 @@ class Currency(commands.Cog):
         member = member if member is not None else ctx.author
         if member.id not in self.bot.cache["users"]:
             return await ctx.maybe_reply(
-                f"{self.bot.redTick} That user does not have an account yet!"
+                f"{self.bot.emojis_dict('redTick')} That user does not have an account yet!"
             )
         bank_amount = await self.data.get_data(member.id, mode="bank")
         wallet_amount = await self.data.get_data(member.id)
@@ -342,7 +342,7 @@ class Currency(commands.Cog):
         """Fish for fishes that you automatically sell for cash!"""
         if not await self.bot.data.has_item(ctx.author.id, "fishing rod"):
             raise commands.BadArgument(
-                f"{self.bot.redTick} You need a `Fishing Rod` to use `fish`!"
+                f"{self.bot.emojis_dict('redTick')} You need a `Fishing Rod` to use `fish`!"
             )
         boost = self.bot.cache["users"][ctx.author.id]["boost"]
         times_caught = random.randint(1, 3)
@@ -359,7 +359,7 @@ class Currency(commands.Cog):
             k: fish_dict[k] for k in random.sample(fish_dict.keys(), times_caught)
         }
         if info is not None and info == "info":
-            fish_dict[f"{self.bot.emojis['groot']}  Groot"] = 100000
+            fish_dict[f"{self.bot.emoji_dict['groot']}  Groot"] = 100000
             fish_list = [
                 f"{k} | **⛻{v:,}**"
                 for k, v in sorted(fish_dict.items(), key=lambda item: item[1])
@@ -369,7 +369,7 @@ class Currency(commands.Cog):
             ctx.bucket.reset()
             return await ctx.maybe_reply(embed=em)
         if random.randint(0, 100) < 1:
-            randomized[f"{self.bot.emojis['groot']}  Groot"] = 100000
+            randomized[f"{self.bot.emoji_dict['groot']}  Groot"] = 100000
         fish_caught_alpha = [
             random.choice(list(randomized.keys())) for _ in range(times_caught)
         ]
@@ -417,7 +417,7 @@ class Currency(commands.Cog):
         if info is not None and info == "info":
             animals_dict["🦄 Unicorn"] = 25000
             animals_dict["🐲 Dragon"] = 50000
-            animals_dict[f"{self.bot.emojis['groot']}  Groot"] = 100000
+            animals_dict[f"{self.bot.emoji_dict['groot']}  Groot"] = 100000
             animals_list = [
                 f"{k} | **⛻{v:,}**"
                 for k, v in sorted(animals_dict.items(), key=lambda item: item[1])
@@ -427,7 +427,7 @@ class Currency(commands.Cog):
             ctx.bucket.reset()
             return await ctx.maybe_reply(embed=em)
         if random.randint(0, 100) < 1:
-            randomized[f"{self.bot.emojis['groot']}  Groot"] = 100000
+            randomized[f"{self.bot.emoji_dict['groot']}  Groot"] = 100000
         if random.randint(0, 100) < 10:
             randomized["🐲 Dragon"] = 25000
         if random.randint(0, 100) < 25:
@@ -469,18 +469,18 @@ class Currency(commands.Cog):
         """
         if member == ctx.author or member.bot:
             raise commands.BadArgument(
-                f"{self.bot.redTick} You cannot share coins to yourself or a bot."
+                f"{self.bot.emojis_dict('redTick')} You cannot share coins to yourself or a bot."
             )
 
         amount = await convert_to_int(amount, await self.data.get_data(ctx.author.id))
         if amount < 1:
             raise commands.BadArgument(
-                f"{self.bot.redTick} Amount must be a positive number!"
+                f"{self.bot.emojis_dict('redTick')} Amount must be a positive number!"
             )
 
         if member.id not in self.bot.cache["users"]:
             return await ctx.maybe_reply(
-                f"{self.bot.redTick} That user does not have an account yet!"
+                f"{self.bot.emojis_dict('redTick')} That user does not have an account yet!"
             )
 
         tax_rate = 0.05 if amount < 100000 else 0.10

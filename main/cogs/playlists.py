@@ -137,7 +137,7 @@ class Playlists(commands.Cog):
         playlist = await get_playlist(self.bot.db, playlist_id)
 
         if not playlist:
-            return await ctx.reply(f"{self.bot.redTick} | No playlist data was found with `ID {playlist_id}` (Empty or does not exist)")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | No playlist data was found with `ID {playlist_id}` (Empty or does not exist)")
 
         entries = [f"`ID {tup[2]}`. [{get_title(tup[0])}]({tup[1]})" for tup in playlist.songs]
         menu = menus.MenuPages(paginations.PlaylistSource(entries, playlist))
@@ -150,32 +150,32 @@ class Playlists(commands.Cog):
         number_of_playlists = await cur.fetchone()
 
         if number_of_playlists[0] == 5:
-            return await ctx.reply(f"{self.bot.redTick} | You only can have up to 5 playlists")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | You only can have up to 5 playlists")
         
         query = "INSERT INTO playlists VALUES (?, ?, ?)"
         _id = await self.new_id()
         cur = await self.bot.db.execute(query, (ctx.author.id, name, _id))
         
-        await ctx.reply(f"{self.bot.greenTick} | Created playlist **{name}** with `ID {_id}`")
+        await ctx.reply(f"{self.bot.emojis_dict('greenTick')} | Created playlist **{name}** with `ID {_id}`")
 
     @playlist.command(name="delete", aliases=["del"], usage="<id>")
     async def _playlist_delete(self, ctx, playlist_id: int):
         if check := await self.is_playlistOwner(ctx.author.id, playlist_id) is False:
-            return await ctx.reply(f"{self.bot.redTick} | You do not own this playlist.")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | You do not own this playlist.")
         elif check is None:
-            return await ctx.reply(f"{self.bot.redTick} | This playlist doesn't seem to exist.")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | This playlist doesn't seem to exist.")
 
         queries = ["DELETE FROM playlist_songs WHERE playlist_id = ?", "DELETE FROM playlists WHERE playlist_id = ?"]
         for query in queries:
             await self.bot.db.execute(query, (playlist_id, ))
-        await ctx.reply(f"{self.bot.greenTick} | Deleted playlist with `ID {playlist_id}`")
+        await ctx.reply(f"{self.bot.emojis_dict('greenTick')} | Deleted playlist with `ID {playlist_id}`")
 
     @playlist.command(name="addsong", usage="<playlist ID> <song>")
     async def _playlist_addsong(self, ctx, playlist_id:int, *, query):
         if (check := await self.is_playlistOwner(ctx.author.id, playlist_id)) is False:
-            return await ctx.reply(f"{self.bot.redTick} | You do not own this playlist.")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | You do not own this playlist.")
         elif check is None:
-            return await ctx.reply(f"{self.bot.redTick} | This playlist doesn't seem to exist.")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | This playlist doesn't seem to exist.")
 
         query.strip('<>')
         if not URL_REG.match(query):
@@ -184,10 +184,10 @@ class Playlists(commands.Cog):
         tracks = await self.bot.wavelink.get_tracks(query)
         
         if not tracks:
-            return await ctx.reply(f"{self.bot.redTick} | The provided song was invalid. Try again with a different URL.")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | The provided song was invalid. Try again with a different URL.")
         
         if isinstance(tracks, wavelink.TrackPlaylist):
-            return await ctx.reply(f"{self.bot.redTick} | You can not add a playlist to a playlist...")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | You can not add a playlist to a playlist...")
         else:
             track = Track(tracks[0].id, tracks[0].info, requester=ctx.author)
             query = """
@@ -201,16 +201,16 @@ class Playlists(commands.Cog):
     @playlist.command(name="removesong", aliases=["rmsong", "rmsongs"], usage="<playlist ID> <song ID/song IDs>")
     async def _playlist_removesong(self, ctx, playlist_id:int, *songs):
         if not songs:
-            raise commands.BadArgument(f"{self.bot.redTick} | Please supply a song id or a list of song ID's seperated by spaces.")
+            raise commands.BadArgument(f"{self.bot.emojis_dict('redTick')} | Please supply a song id or a list of song ID's seperated by spaces.")
         if check := await self.is_playlistOwner(ctx.author.id, playlist_id) is False:
-            return await ctx.reply(f"{self.bot.redTick} | You do not own this playlist.")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | You do not own this playlist.")
         elif check is None:
-            return await ctx.reply(f"{self.bot.redTick} | This playlist doesn't seem to exist.")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | This playlist doesn't seem to exist.")
         
         playlist = await get_playlist(self.bot.db, playlist_id)
 
         if not playlist:
-            return await ctx.reply(f"{self.bot.redTick} | No playlist data was found with `ID {playlist_id}` (Empty or does not exist)")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | No playlist data was found with `ID {playlist_id}` (Empty or does not exist)")
         
         affected_rows = 0
         fails = []
@@ -218,23 +218,23 @@ class Playlists(commands.Cog):
             try:
                 res = await playlist.remove_song(self.bot.db, int(song_id))
             except ValueError:
-                raise commands.BadArgument(f"{self.bot.redTick} | `{song_id}` is not a valid ID.")
+                raise commands.BadArgument(f"{self.bot.emojis_dict('redTick')} | `{song_id}` is not a valid ID.")
             if res is None:
                 fails.append(song_id)
             else:
                 affected_rows += res
 
         if fails:
-            await ctx.reply(f"{self.bot.redTick} | The song(s) with `ID {', '.join(fails)}` does not belong to the playlist you supplied. Deleted **{affected_rows}** songs.")
+            await ctx.reply(f"{self.bot.emojis_dict('redTick')} | The song(s) with `ID {', '.join(fails)}` does not belong to the playlist you supplied. Deleted **{affected_rows}** songs.")
         else:
             await ctx.reply(f"{self.bot.minus} | Deleted **{affected_rows}** songs in total.")
     
     @playlist.command(name="play", usage="<playlist ID>")
     async def _playlist_play(self, ctx, playlist_id: int):
         if (check := await self.is_playlistOwner(ctx.author.id, playlist_id)) is False:
-            return await ctx.reply(f"{self.bot.redTick} | You do not own this playlist.")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | You do not own this playlist.")
         elif check is None:
-            return await ctx.reply(f"{self.bot.redTick} | This playlist doesn't seem to exist.")
+            return await ctx.reply(f"{self.bot.emojis_dict('redTick')} | This playlist doesn't seem to exist.")
         
         player = self.bot.get_cog("Music").get_player(ctx)
 

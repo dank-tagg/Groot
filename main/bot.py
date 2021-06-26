@@ -22,7 +22,7 @@ to_call = ListCall()
 class GrootBot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(self.get_prefix, **kwargs)
-        self.emojis = dict()
+        self.emoji_dict = {}
         self.data = currencyData(self)
         self.token = kwargs.pop("token", None)
         self.session = aiohttp.ClientSession()
@@ -82,8 +82,8 @@ class GrootBot(commands.Bot):
             'loading': '<a:loading:856978168476205066>'
         }
 
-        self.emojis = emojis
-        return self.emojis
+        self.emoji_dict = emojis
+        return self.emoji_dict
 
     @to_call.append
     def loading_cogs(self):
