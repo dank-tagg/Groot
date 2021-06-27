@@ -16,15 +16,15 @@ class Core(commands.Cog):
         self.update_status.start()
 
     async def expand_tb(self, ctx, error, msg):
-        await msg.add_reaction(self.bot.plus)
-        await msg.add_reaction(self.bot.minus)
+        await msg.add_reaction(self.bot.emoji_dict['plus'])
+        await msg.add_reaction(self.bot.emoji_dict['minus'])
         await msg.add_reaction(self.bot.emoji_dict['save'])
 
         while True:
             reaction, user = await self.bot.wait_for('reaction_add', check=lambda reaction, m: m == self.bot.owner and reaction.message == msg)
-            if str(reaction) == self.bot.plus:
+            if str(reaction) == self.bot.emoji_dict['plus']:
                 await send_traceback(self.bot.log_channel, ctx, (True, msg), 3, type(error), error, error.__traceback__)
-            elif str(reaction) == self.bot.minus:
+            elif str(reaction) == self.bot.emoji_dict['minus']:
                 await send_traceback(self.bot.log_channel, ctx, (True, msg), 0, type(error), error, error.__traceback__)
             elif str(reaction) == self.bot.emoji_dict['save']:
                 log = self.bot.get_channel(850439592352022528)

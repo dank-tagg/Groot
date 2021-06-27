@@ -271,10 +271,10 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
                 track = Track(track.id, track.info, requester=ctx.author)
                 await player.queue.put(track)
             
-            await ctx.reply(f"{self.bot.plus} | Added the playlist {tracks.data['playlistInfo']['name']} to the queue.")
+            await ctx.reply(f"{self.bot.emoji_dict['plus']} | Added the playlist {tracks.data['playlistInfo']['name']} to the queue.")
         else:
             track = Track(tracks[0].id, tracks[0].info, requester=ctx.author)
-            await ctx.reply(f"{self.bot.plus} | Added the song **{track.title}** to the queue.")
+            await ctx.reply(f"{self.bot.emoji_dict['plus']} | Added the song **{track.title}** to the queue.")
             await player.queue.put(track)
         
         if not player.is_playing:
@@ -365,7 +365,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         track = player.queue._queue[position-1]
         del player.queue._queue[position-1]
-        await ctx.reply(f"{self.bot.minus} | Removed **{position}. {track.title}** from the queue.")
+        await ctx.reply(f"{self.bot.emoji_dict['minus']} | Removed **{position}. {track.title}** from the queue.")
 
     
     @commands.command(name="volume")

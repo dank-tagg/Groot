@@ -195,7 +195,7 @@ class Playlists(commands.Cog):
                     VALUES (?, ?, ?, ?)
                     """
             await self.bot.db.execute(query, (playlist_id, track.title, track.uri, await self.new_song_id()))
-            await ctx.reply(f"{self.bot.plus} | Added the song **{track.title}** to playlist with `ID {playlist_id}`.\nSong url: <{track.uri}>")
+            await ctx.reply(f"{self.bot.emoji_dict['plus']} | Added the song **{track.title}** to playlist with `ID {playlist_id}`.\nSong url: <{track.uri}>")
         
     
     @playlist.command(name="removesong", aliases=["rmsong", "rmsongs"], usage="<playlist ID> <song ID/song IDs>")
@@ -227,7 +227,7 @@ class Playlists(commands.Cog):
         if fails:
             await ctx.reply(f"{self.bot.emoji_dict['redTick']} | The song(s) with `ID {', '.join(fails)}` does not belong to the playlist you supplied. Deleted **{affected_rows}** songs.")
         else:
-            await ctx.reply(f"{self.bot.minus} | Deleted **{affected_rows}** songs in total.")
+            await ctx.reply(f"{self.bot.emoji_dict['minus']} | Deleted **{affected_rows}** songs in total.")
     
     @playlist.command(name="play", usage="<playlist ID>")
     async def _playlist_play(self, ctx, playlist_id: int):
