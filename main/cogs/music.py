@@ -105,7 +105,7 @@ class Player(wavelink.Player):
         fields = {
             "Author": (track.author, True), 
             "Duration": (convert(int(track.length)), True),
-            "Looping": (f"{self.ctx.bot.greenTick if self.looping else self.ctx.bot.redTick}", True),
+            "Looping": (f"{self.ctx.bot.greenTick if self.looping else self.ctx.bot.emoji_dict['redTick']}", True),
             "Requested by": (track.requester.mention, True),
             "DJ": (self.dj.mention, True),
             "Volume": (f"{self.volume}%", True)
