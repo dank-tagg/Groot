@@ -10,7 +10,7 @@ from utils.useful import Embed, convert_to_int
 
 
 class Blackjack(commands.Cog):
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
         self.data = bot.data
         self.faces = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]

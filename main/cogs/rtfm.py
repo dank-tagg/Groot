@@ -6,7 +6,7 @@ from utils.useful import fuzzy, Embed
 from utils.chat_formatting import hyperlink as link
 
 class Docs(commands.Cog):
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
         self.token = self.bot.config.get('idevision')
         self.cache = {}

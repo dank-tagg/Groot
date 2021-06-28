@@ -98,7 +98,7 @@ class Embed(discord.Embed):
             self.add_field(name=n, value=v, inline=field_inline)
 
 class currencyData:
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
 
     async def create_account(self, user_id):

@@ -11,7 +11,7 @@ from utils.useful import Embed, Cooldown, send_traceback
 from utils.json_loader import read_json
 
 class Core(commands.Cog):
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
         self.cache = {}
         self.cache_usage = {}

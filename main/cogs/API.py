@@ -9,7 +9,7 @@ from utils import discordbotlist
 class API(commands.Cog):
     """Handles interactions with API (top.gg, discordbotlist)"""
 
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
 
         # Top GG

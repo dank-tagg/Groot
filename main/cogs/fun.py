@@ -10,7 +10,7 @@ from utils.useful import Embed
 
 
 class Fun(commands.Cog, description="Fun commands"):
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
 
     @commands.command(

@@ -8,7 +8,7 @@ class Beta(commands.Cog):
     """
     A cog with commands available to only the beta-testers
     """
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
     
     def cog_check(self, ctx: customContext):

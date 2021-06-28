@@ -8,7 +8,7 @@ from utils.useful import Embed
 
 
 class Support(commands.Cog):
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="report")

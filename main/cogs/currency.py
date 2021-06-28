@@ -14,7 +14,7 @@ from utils.useful import (Embed, convert_to_int, Cooldown, progress_bar,
 
 
 class Currency(commands.Cog):
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
         self.data = bot.data
         self.cache = {}

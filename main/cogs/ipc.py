@@ -7,7 +7,7 @@ from discord.ext import commands, ipc
 
 
 class Ipc(commands.Cog):
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
 
     @ipc.server.route()

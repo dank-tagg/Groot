@@ -129,7 +129,7 @@ class Player(wavelink.Player):
         self.ctx = ctx
 
 class Music(commands.Cog, wavelink.WavelinkMixin):
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
 
         if not hasattr(bot, 'wavelink'):

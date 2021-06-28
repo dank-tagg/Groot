@@ -20,7 +20,7 @@ from utils.useful import Embed, MemberConvert, RoleConvert, get_frozen
 
 
 class Moderation(commands.Cog, description="Moderation commands"):
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="kick", brief="Kicks a member")

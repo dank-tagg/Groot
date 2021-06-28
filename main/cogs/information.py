@@ -13,7 +13,7 @@ from utils.useful import Embed
 
 
 class Information(commands.Cog):
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="ping", brief="Shows the bots latency")

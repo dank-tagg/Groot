@@ -8,7 +8,7 @@ from utils.useful import RoleConvert
 
 
 class Configuration(commands.Cog):
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="tips", usage="<on|off>", brief="Toggles tips on or off")

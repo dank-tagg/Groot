@@ -23,7 +23,7 @@ async def show_result(self, menu, entry):
 class Developer(commands.Cog):
     """dev-only commands that make the bot dynamic."""
 
-    def __init__(self, bot: GrootBot):
+    def __init__(self, bot):
         self.bot = bot
 
     @staticmethod
