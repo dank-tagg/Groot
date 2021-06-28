@@ -29,7 +29,7 @@ class Information(commands.Cog):
         return f'[`{short_sha2}`](https://github.com/dank-tagg/Groot/commit/{commit.hex}) {short} ({offset})'
 
     def get_last_commits(self, count=3):
-        repo = pygit2.Repository(f'{self.bot.cwd}/.git')
+        repo = pygit2.Repository(f'{self.bot.cwd}/../.git')
         commits = list(itertools.islice(repo.walk(repo.head.target, pygit2.GIT_SORT_TOPOLOGICAL), count))
         return '\n'.join(self.format_commit(c) for c in commits)
 
