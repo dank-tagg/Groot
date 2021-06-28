@@ -1,4 +1,6 @@
-from utils._type import *
+import typing
+if typing.TYPE_CHECKING:
+    from utils._type import *
 
 import asyncio
 import re

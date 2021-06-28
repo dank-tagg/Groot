@@ -1,7 +1,8 @@
-from utils._type import *
+import typing
+if typing.TYPE_CHECKING:
+    from utils._type import *
 
 import asyncio
-import typing
 import discord
 
 from discord.ext import commands

@@ -1,11 +1,12 @@
-from utils._type import *
+import typing
+if typing.TYPE_CHECKING:
+    from utils._type import *
 
 import asyncio
 import datetime
 import random
 import re
 import string
-import typing
 import unicodedata
 import discord
 import humanize

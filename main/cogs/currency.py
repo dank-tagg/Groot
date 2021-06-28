@@ -1,9 +1,10 @@
-from utils._type import *
+import typing
+if typing.TYPE_CHECKING:
+    from utils._type import *
 
 import datetime
 import discord
 import random
-import typing
 
 
 from collections import OrderedDict

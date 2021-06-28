@@ -1,4 +1,6 @@
-from utils._type import *
+import typing
+if typing.TYPE_CHECKING:
+    from utils._type import *
 import aiodevision
 import discord
 from discord.ext import commands

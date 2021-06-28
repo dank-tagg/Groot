@@ -1,7 +1,8 @@
-from utils._type import *
+import typing
+if typing.TYPE_CHECKING:
+    from utils._type import *
 
 import wavelink
-import typing
 import textwrap
 import asyncio
 import functools
