@@ -1,13 +1,12 @@
+from utils._type import *
+
 import asyncio
-import discord
 import re
 import wavelink
-import math
-import datetime
-import typing
 import random
+
 from discord.ext import commands, menus
-from utils.useful import Embed, get_title, is_beta
+from utils.useful import Embed, get_title
 from utils import paginations
 from cogs.music import Track
 
@@ -22,7 +21,7 @@ class Playlist:
         self.length = kwargs['length']
         self.songs = kwargs['songs'] # In tuples (song_name, url, song_id)
     
-    async def play(self, ctx, wavelink, player, requester, **kwargs):
+    async def play(self, ctx: customContext, wavelink, player, requester, **kwargs):
         amt_of_songs = kwargs['songs']
         msg = await ctx.reply(f"<a:loading:856978168476205066> | `(0/{amt_of_songs})` Queueing songs... please be patient.\n_This might take a while_")
         loaded_songs = 0
@@ -84,7 +83,7 @@ async def get_playlist(db, playlist_id: int):
     
 
 class Playlists(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
     
         # Playlists -
@@ -110,7 +109,7 @@ class Playlists(commands.Cog):
     
  
     @commands.group(invoke_without_command=True, case_insensitive=True)
-    async def playlist(self, ctx):
+    async def playlist(self, ctx: customContext):
         query = """
                 SELECT playlist_name, playlist_id, 
                 (
@@ -133,7 +132,7 @@ class Playlists(commands.Cog):
         await ctx.reply(embed=em)
     
     @playlist.command(name="info", usage="<id> [page]")
-    async def _playlist_info(self, ctx, playlist_id: int):
+    async def _playlist_info(self, ctx: customContext, playlist_id: int):
         playlist = await get_playlist(self.bot.db, playlist_id)
 
         if not playlist:
@@ -144,7 +143,7 @@ class Playlists(commands.Cog):
         await menu.start(ctx)
     
     @playlist.command(name="create", usage="<name>")
-    async def _playlist_create(self, ctx, *, name):
+    async def _playlist_create(self, ctx: customContext, *, name):
         query = "SELECT Count(*) FROM playlists WHERE user_id = ?"
         cur = await self.bot.db.execute(query, (ctx.author.id, ))
         number_of_playlists = await cur.fetchone()
@@ -159,7 +158,7 @@ class Playlists(commands.Cog):
         await ctx.reply(f"{self.bot.icons['greenTick']} | Created playlist **{name}** with `ID {_id}`")
 
     @playlist.command(name="delete", aliases=["del"], usage="<id>")
-    async def _playlist_delete(self, ctx, playlist_id: int):
+    async def _playlist_delete(self, ctx: customContext, playlist_id: int):
         if check := await self.is_playlistOwner(ctx.author.id, playlist_id) is False:
             return await ctx.reply(f"{self.bot.icons['redTick']} | You do not own this playlist.")
         elif check is None:
@@ -171,7 +170,7 @@ class Playlists(commands.Cog):
         await ctx.reply(f"{self.bot.icons['greenTick']} | Deleted playlist with `ID {playlist_id}`")
 
     @playlist.command(name="addsong", usage="<playlist ID> <song>")
-    async def _playlist_addsong(self, ctx, playlist_id:int, *, query):
+    async def _playlist_addsong(self, ctx: customContext, playlist_id:int, *, query):
         if (check := await self.is_playlistOwner(ctx.author.id, playlist_id)) is False:
             return await ctx.reply(f"{self.bot.icons['redTick']} | You do not own this playlist.")
         elif check is None:
@@ -199,7 +198,7 @@ class Playlists(commands.Cog):
         
     
     @playlist.command(name="removesong", aliases=["rmsong", "rmsongs"], usage="<playlist ID> <song ID/song IDs>")
-    async def _playlist_removesong(self, ctx, playlist_id:int, *songs):
+    async def _playlist_removesong(self, ctx: customContext, playlist_id:int, *songs):
         if not songs:
             raise commands.BadArgument(f"{self.bot.icons['redTick']} | Please supply a song id or a list of song ID's seperated by spaces.")
         if check := await self.is_playlistOwner(ctx.author.id, playlist_id) is False:
@@ -230,7 +229,7 @@ class Playlists(commands.Cog):
             await ctx.reply(f"{self.bot.icons['minus']} | Deleted **{affected_rows}** songs in total.")
     
     @playlist.command(name="play", usage="<playlist ID>")
-    async def _playlist_play(self, ctx, playlist_id: int):
+    async def _playlist_play(self, ctx: customContext, playlist_id: int):
         if (check := await self.is_playlistOwner(ctx.author.id, playlist_id)) is False:
             return await ctx.reply(f"{self.bot.icons['redTick']} | You do not own this playlist.")
         elif check is None:

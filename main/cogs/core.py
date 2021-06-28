@@ -1,21 +1,24 @@
+from utils._type import *
+
 import datetime as dt
 import traceback
 import discord
 import humanize
 import wavelink
+
 from discord.ext import commands, tasks
 from utils.useful import Embed, Cooldown, send_traceback
 from utils.json_loader import read_json
 
 class Core(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         self.cache = {}
         self.cache_usage = {}
         self.loops.start()
         self.update_status.start()
 
-    async def expand_tb(self, ctx, error, msg):
+    async def expand_tb(self, ctx: customContext, error, msg):
         await msg.add_reaction(self.bot.icons['plus'])
         await msg.add_reaction(self.bot.icons['minus'])
         await msg.add_reaction(self.bot.icons['save'])
@@ -31,7 +34,7 @@ class Core(commands.Cog):
                 await send_traceback(log, ctx, (False, None), 3, type(error), error, error.__traceback__)
                 await msg.channel.send(f"Saved traceback to {log.mention}")
 
-    async def send_error(self, ctx, exc_info: dict):
+    async def send_error(self, ctx: customContext, exc_info: dict):
         em = Embed(
             title=f"{self.bot.icons['redTick']} Error while running command {exc_info['command']}",
             description=f"```py\n{exc_info['error']}```[Report error](https://discord.gg/nUUJPgemFE)"
@@ -40,7 +43,7 @@ class Core(commands.Cog):
         await ctx.send(embed=em)
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx: customContext, error):
         """Error handles everything"""
         if ctx.command and ctx.command.has_error_handler(): return
         if isinstance(error, commands.CommandInvokeError):
@@ -127,7 +130,7 @@ class Core(commands.Cog):
         await self.bot.db.commit()
 
     @commands.Cog.listener()
-    async def on_command(self, ctx):
+    async def on_command(self, ctx: customContext):
         try:
             self.cache[str(ctx.author.id)] += 1
             self.cache_usage[str(ctx.command.name)] += 1

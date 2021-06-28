@@ -1,16 +1,18 @@
-import typing
+from utils._type import *
+
 import discord
+
 from discord.ext import commands
 from discord.ext.commands import guild_only, has_guild_permissions
 from utils.useful import RoleConvert
 
 
 class Configuration(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @commands.command(name="tips", usage="<on|off>", brief="Toggles tips on or off")
-    async def _tips(self, ctx, *, mode: str):
+    async def _tips(self, ctx: customContext, *, mode: str):
         """
         Toggles tip to on or off, specified by the invoking user.
         If tips are on, you will see random messages including usefull fact/tip for the bot.
@@ -40,7 +42,7 @@ class Configuration(commands.Cog):
     )
     @guild_only()
     @has_guild_permissions(manage_guild=True)
-    async def config(self, ctx):
+    async def config(self, ctx: customContext):
         """
         Configures settings for your server.
         Manage guild permission is needed to run this.
@@ -57,7 +59,7 @@ class Configuration(commands.Cog):
             )
 
     @config.command(name="giveawaymanager", aliases=["gRole"])
-    async def _grole(self, ctx, role: RoleConvert):
+    async def _grole(self, ctx: customContext, role: RoleConvert):
         """
         Sets the required role for starting giveaways to `role`
         """
@@ -67,7 +69,7 @@ class Configuration(commands.Cog):
         await ctx.send(f"The role required for giveaways is now set to **{role.name}**")
 
     @config.command(name="prefix", usage="<prefix>")
-    async def _setprefix(self, ctx, *, prefix: str):
+    async def _setprefix(self, ctx: customContext, *, prefix: str):
         """
         Changes the bot prefix for this guild.\n
         Only applicable if you are in a guild.
@@ -86,7 +88,7 @@ class Configuration(commands.Cog):
         usage="[channel] <command>",
     )
     async def _disable(
-        self, ctx, command, snowflake_id: discord.TextChannel = None
+        self, ctx: customContext, command, snowflake_id: discord.TextChannel = None
     ):
         """
         You can use this command to disable a command for the server or channel.\n
@@ -125,7 +127,7 @@ class Configuration(commands.Cog):
         usage="[channel] <command>",
     )
     async def _enable(
-        self, ctx, command, snowflake_id: discord.TextChannel = None
+        self, ctx: customContext, command, snowflake_id: discord.TextChannel = None
     ):
         """
         You can use this command to enable a disabled command for the server or channel.\n

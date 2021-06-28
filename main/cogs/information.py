@@ -1,23 +1,23 @@
-import asyncio
-import datetime
-import math
-import time
+from utils._type import *
 
+import datetime
+import time
 import discord
 import humanize
-import utils.json_loader
-from discord.ext import commands
-from utils.chat_formatting import hyperlink
-from utils.useful import Embed, Cooldown
 import inspect
 import os
 
+from discord.ext import commands
+from utils.chat_formatting import hyperlink
+from utils.useful import Embed
+
+
 class Information(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @commands.command(name="ping", brief="Shows the bots latency")
-    async def ping(self, ctx):
+    async def ping(self, ctx: customContext):
         """
         Shows the bot's latency in miliseconds.\n
         Useful if you want to know if the bot is lagging or not
@@ -43,7 +43,7 @@ class Information(commands.Cog):
         )
 
     @commands.command(name="vote", brief="The links where you can vote for the bot.")
-    async def _vote(self, ctx):
+    async def _vote(self, ctx: customContext):
         """
         Sends an embed containing two hyperlinks,\n
         one for Top.gg and one for discordbotlist.com
@@ -57,7 +57,7 @@ class Information(commands.Cog):
         await ctx.send(embed=em)
 
     @commands.command(name="invite", brief="Sends an invite for the bot.")
-    async def invite(self, ctx):
+    async def invite(self, ctx: customContext):
         """
         Sends an invite for the bot with no permissions.\n
         Note that a few permissions are required to let the bot run smoothly,\n
@@ -80,7 +80,7 @@ class Information(commands.Cog):
 
 
     @commands.command(name="uptime", brief="Shows the bot's uptime")
-    async def _uptime(self, ctx):
+    async def _uptime(self, ctx: customContext):
         """
         Shows the bot's uptime in days | hours | minutes | seconds
         """
@@ -93,7 +93,7 @@ class Information(commands.Cog):
         await ctx.send(embed=em)
 
     @commands.command()
-    async def source(self, ctx, *, command: str = None):
+    async def source(self, ctx: customContext, *, command: str = None):
         """Displays my full source code or for a specific command.
         To display the source code of a subcommand you can separate it by
         periods, e.g. tag.create for the create subcommand of the tag command

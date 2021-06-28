@@ -1,20 +1,21 @@
+from utils._type import *
+import aiodevision
 import discord
 from discord.ext import commands
-import aiodevision
 from utils.useful import fuzzy, Embed
 from utils.chat_formatting import hyperlink as link
 
 class Docs(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         self.token = self.bot.config.get('idevision')
         self.cache = {}
     
     @commands.group(name="rtfm", aliases=["docs"])
-    async def rtfm(self, ctx, *, obj: str = None):
+    async def rtfm(self, ctx: customContext, *, obj: str = None):
         await self.lookup_rtfm(ctx, 'latest', obj)
 
-    async def lookup_rtfm(self, ctx, key, obj):
+    async def lookup_rtfm(self, ctx: customContext, key, obj):
         page_types = {
             'latest': 'https://discordpy.readthedocs.io/en/latest',
             'python': 'https://docs.python.org/3',

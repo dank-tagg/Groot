@@ -1,20 +1,19 @@
+from utils._type import *
+
 import asyncio
-import collections
 import datetime
 import io
-import math
 import os
 import pathlib
 import traceback
-
 import discord
 import mystbin
 import tabulate
 import utils.json_loader
+
 from discord.ext import commands
 from jishaku.codeblocks import codeblock_converter
 from jishaku.models import copy_context_with
-from utils.chat_formatting import box, hyperlink
 from utils.useful import Embed, BaseMenu, pages, fuzzy
 
 @pages()
@@ -24,7 +23,7 @@ async def show_result(self, menu, entry):
 class Developer(commands.Cog):
     """dev-only commands that make the bot dynamic."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @staticmethod
@@ -34,7 +33,7 @@ class Developer(commands.Cog):
         )
 
         stdout, stderr = await proc.communicate()
-
+        await asyncio.sleep(1.5)
         if stdout:
             stdout = f"```$ {code}\n{stdout.decode()}```"
         if stderr:
@@ -50,15 +49,15 @@ class Developer(commands.Cog):
             text = text.decode("ascii")
         return text.replace(f"cd {str(pathlib.Path(self.bot.cwd).parent)};", "")
 
-    async def cog_check(self, ctx):
+    async def cog_check(self, ctx: customContext):
         return await self.bot.is_owner(ctx.author)
 
     @commands.group(invoke_without_command=True, case_insensitive=True)
-    async def dev(self, ctx):
+    async def dev(self, ctx: customContext):
         return
 
     @dev.command(name="update")
-    async def _update(self, ctx, link: str, *, message: str):
+    async def _update(self, ctx: customContext, link: str, *, message: str):
         await ctx.send("Are you sure you want update me? `(y/n)`")
 
         msg = await self.bot.wait_for(
@@ -74,21 +73,21 @@ class Developer(commands.Cog):
             await ctx.send("Done!")
 
     @dev.command(name="status")
-    async def _set_status(self, ctx, *, status):
+    async def _set_status(self, ctx: customContext, *, status):
         data = utils.json_loader.read_json("status")
         data["groot"] = status
         utils.json_loader.write_json(data, "status")
         await ctx.send(f"Set status to {status}")
 
     @dev.command(name="eval", aliases=["run"])
-    async def _eval(self, ctx, *, code: codeblock_converter):
+    async def _eval(self, ctx: customContext, *, code: codeblock_converter):
         """Evaluates a code"""
 
         jsk = self.bot.get_command("jishaku py")
         return await jsk(ctx, argument=code)
 
     @dev.command(name="guilds")
-    async def _guilds(self, ctx, search=None):
+    async def _guilds(self, ctx: customContext, search=None):
         
         if not search:
             paginator = commands.Paginator(prefix=None, suffix=None, max_size=500)
@@ -117,20 +116,19 @@ class Developer(commands.Cog):
             else:
                 await ctx.send(f"No guild was found named **{search}**")
 
-
     @dev.command(name="inviteme")
-    async def _inviteme(self, ctx, *, guildid: int):
+    async def _inviteme(self, ctx: customContext, *, guildid: int):
         guild = self.bot.get_guild(guildid)
         await ctx.author.send(f"{await guild.text_channels[0].create_invite()}")
 
     @dev.command(name="restart")
-    async def _restart(self, ctx):
+    async def _restart(self, ctx: customContext):
         await self.git(arguments="pull")
         await ctx.send(f"{self.bot.icons['loading']} Restarting bot...")
         os._exit(0)
 
     @dev.command(name="sync")
-    async def _sync(self, ctx):
+    async def _sync(self, ctx: customContext):
 
         text = await self.git(arguments="pull")
         fail = ""
@@ -180,7 +178,7 @@ class Developer(commands.Cog):
                 )
 
     @dev.command()
-    async def commits(self, ctx):
+    async def commits(self, ctx: customContext):
         res = await self.bot.session.get(f"https://api.github.com/repos/dank-tagg/Groot/commits")
         res = await res.json()
         em = Embed(title=f"Commits", description="\n".join(f"[`{commit['sha'][:6]}`]({commit['html_url']}) {commit['commit']['message']}" for commit in res[:5]), url=f"https://api.github.com/repos/dank-tagg/Groot/commits")
@@ -188,7 +186,7 @@ class Developer(commands.Cog):
         await ctx.reply(embed=em, mention_author=False)
 
     @dev.command(name="sudo")
-    async def _sudo(self, ctx: commands.Context, *, command_string: str):
+    async def _sudo(self, ctx: customContext, *, command_string: str):
         """
         Run a command bypassing all checks and cooldowns.
 
@@ -202,14 +200,8 @@ class Developer(commands.Cog):
 
         return await alt_ctx.command.reinvoke(alt_ctx)
 
-    @dev.command(name="reload")
-    async def _reloadmodule(self, ctx):
-        import importlib, utils
-        importlib.reload(utils)
-        await ctx.send("Done")
-
     @dev.command()
-    async def tables(self, ctx):
+    async def tables(self, ctx: customContext):
         cmd = self.bot.get_command("dev sql")
         await ctx.invoke(
             cmd,
@@ -217,8 +209,8 @@ class Developer(commands.Cog):
         )
 
     @dev.command()
-    async def sql(self, ctx, *, query: str):
-        async with self.bot.db.execute(query) as cur:
+    async def sql(self, ctx: customContext, *, query: str):
+            cur = await self.bot.db.execute(query)
             await self.bot.db.commit()
             if cur.description:
                 columns = [tuple[0] for tuple in cur.description]
@@ -232,18 +224,18 @@ class Developer(commands.Cog):
             return await ctx.send(file=discord.File(fp=byte, filename="table.txt"))
 
     @sql.error
-    async def sql_error(self, ctx, error):
+    async def sql_error(self, ctx: customContext, error):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.message.add_reaction(f"{self.bot.icons['redTick']}")
             await ctx.send(str.capitalize(str(error.original)))
 
     @dev.command(name="git")
-    async def _git(self, ctx, *, arguments):
+    async def _git(self, ctx: customContext, *, arguments):
         text = await self.git(arguments=arguments)
         await ctx.send(text or "No output.")
 
     @commands.command(name="delete", aliases=["del", "d"])
-    async def delete_bot_message(self, ctx):
+    async def delete_bot_message(self, ctx: customContext):
         try:
             message = ctx.channel.get_partial_message(ctx.message.reference.message_id)
         except AttributeError:

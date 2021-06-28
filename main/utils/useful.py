@@ -1,20 +1,23 @@
+from utils._type import *
+
+import wavelink
+import typing
+import textwrap
 import asyncio
 import functools
-from os import stat
 import re
 import sqlite3
 import sys
 import traceback
-from datetime import datetime
 import aiohttp
 import discord
+
+from datetime import datetime
 from discord.ext import commands, menus
 from discord.ext.menus import First, Last
 from discord.utils import maybe_coroutine
 from utils.checks import can_execute_action
-import wavelink
-import typing
-import textwrap
+
 
 PAGE_REGEX = r'(Page)?(\s)?((\[)?((?P<current>\d+)/(?P<last>\d+))(\])?)'
 
@@ -64,7 +67,7 @@ class BaseMenu(menus.MenuPages):
                 return f"{page}\n{content}"
         return content
 
-    async def send_initial_message(self, ctx, channel):
+    async def send_initial_message(self, ctx: customContext, channel):
         page = await self._source.get_page(0)
         kwargs = await self._get_kwargs_from_page(page)
         return await ctx.reply(**kwargs)
@@ -96,7 +99,7 @@ class Embed(discord.Embed):
             self.add_field(name=n, value=v, inline=field_inline)
 
 class currencyData:
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     async def create_account(self, user_id):
@@ -156,7 +159,7 @@ class Cooldown:
             alter_rate, alter_per, bucket
         )
 
-    def __call__(self, ctx: commands.Context):
+    def __call__(self, ctx: customContext):
         key, key1 = (ctx.author.id, getattr(ctx.guild, "id", None))
         if key in ctx.bot.cache["premium_users"] or key1 in ctx.bot.cache["premium_users"]:
             ctx.bucket = self.altered_mapping.get_bucket(ctx.message)
@@ -329,7 +332,7 @@ def wait_ready(bot=None):
     return event_check(predicate)
 
 
-async def get_grole(self, ctx):
+async def get_grole(self, ctx: customContext):
 
     cur = await self.bot.db.execute(
         "SELECT grole FROM guild_config WHERE guild_id=?", (ctx.guild.id,)
@@ -348,7 +351,7 @@ async def get_frozen(self, guild: discord.Guild, member: discord.Member):
 
 
 async def send_traceback(
-    destination: discord.abc.Messageable, ctx: commands.Context, edit, verbosity: int, *exc_info
+    destination: discord.abc.Messageable, ctx, edit, verbosity: int, *exc_info
 ):
     """
     Sends a traceback of an exception to a destination.
@@ -378,7 +381,7 @@ async def send_traceback(
 
 # ---Converters
 class RoleConvert(commands.Converter):
-    async def convert(self, ctx, argument):
+    async def convert(self, ctx: customContext, argument):
         try:
             return await commands.RoleConverter().convert(ctx, argument)
         except commands.BadArgument:
@@ -390,7 +393,7 @@ class RoleConvert(commands.Converter):
 
 
 class MemberConvert(commands.Converter):
-    async def convert(self, ctx, argument):
+    async def convert(self, ctx: customContext, argument):
         try:
             m = await commands.MemberConverter().convert(ctx, argument)
         except commands.BadArgument:

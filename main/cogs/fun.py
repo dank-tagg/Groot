@@ -1,21 +1,23 @@
+from utils._type import *
+
 import asyncio
 import random
-
 import discord
+
 from discord.ext import commands
 from discord.ext.commands import BucketType
 from utils.useful import Embed
 
 
 class Fun(commands.Cog, description="Fun commands"):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @commands.command(
         name="guessthenumber", aliases=["gtn"], brief="Guess the number game!"
     )
     @commands.max_concurrency(1, BucketType.user, wait=False)
-    async def gtn(self, ctx):
+    async def gtn(self, ctx: customContext):
         """Play a guess the number game! You have three chances to guess the number 1-10"""
 
         no = random.randrange(1, 10)
@@ -85,7 +87,7 @@ class Fun(commands.Cog, description="Fun commands"):
                 )
 
     @commands.command(name="gayrate", aliases=["howgay"], brief="Rates your gayness")
-    async def gayrate(self, ctx, member: discord.Member = None):
+    async def gayrate(self, ctx: customContext, member: discord.Member = None):
         """Rate your gayness or another users gayness. 1-100% is returned"""
         user = member.name + " is" if member else "You are"
 
@@ -97,7 +99,7 @@ class Fun(commands.Cog, description="Fun commands"):
         await ctx.send(embed=emb)
 
     @gayrate.error
-    async def gayrate_error(self, ctx, error):
+    async def gayrate_error(self, ctx: customContext, error):
         if isinstance(error, commands.MemberNotFound):
             emb = Embed(
                 title="gay r8 machine",
@@ -107,7 +109,7 @@ class Fun(commands.Cog, description="Fun commands"):
             await ctx.send(embed=emb)
 
     @commands.command(aliases=["memes"], brief="Shows a meme from reddit")
-    async def meme(self, ctx):
+    async def meme(self, ctx: customContext):
         """Shows a meme from r/memes."""
         res = await self.bot.session.get("https://www.reddit.com/r/memes/random/.json")
         data = await res.json()
@@ -127,7 +129,7 @@ class Fun(commands.Cog, description="Fun commands"):
         await ctx.send(embed=em)
 
     @commands.command(name="8ball", brief="Ask the 8-ball a question!")
-    async def eightball(self, ctx, *, question):
+    async def eightball(self, ctx: customContext, *, question):
         """The almighty eightball answers all your questions"""
         answers = [
             "It is certain.",
@@ -155,20 +157,20 @@ class Fun(commands.Cog, description="Fun commands"):
     @commands.group(
         invoke_without_command=True, case_insensitive=True, usage="<encode | decode>"
     )
-    async def binary(self, ctx):
+    async def binary(self, ctx: customContext):
         """Encode or decode something to binary!"""
         await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
         return
 
     @binary.command()
-    async def encode(self, ctx, *, text):
+    async def encode(self, ctx: customContext, *, text):
         """Encodes given text to binary"""
         res = await self.bot.session.get(f"https://some-random-api.ml/binary?text={text}")
         data = await res.json()
         await ctx.send(data["binary"])
 
     @binary.command()
-    async def decode(self, ctx, *, binary):
+    async def decode(self, ctx: customContext, *, binary):
         """Decodes given text to binary"""
         res = await self.bot.session.get(f"https://some-random-api.ml/binary?decode={binary}")
         data = await res.json()
@@ -176,7 +178,7 @@ class Fun(commands.Cog, description="Fun commands"):
 
     @commands.command(name="fight")
     @commands.max_concurrency(1, BucketType.user, wait=False)
-    async def fight(self, ctx, member: discord.Member):
+    async def fight(self, ctx: customContext, member: discord.Member):
         """
         Challenge an user to a duel!
         The user cannot be a bot.
@@ -353,7 +355,7 @@ class Fun(commands.Cog, description="Fun commands"):
             x += 1
 
     @commands.command(brief="Let me tell a joke!")
-    async def joke(self, ctx):
+    async def joke(self, ctx: customContext):
         """
         Returns a random joke from https://official-joke-api.appspot.com/jokes/random.
         """
@@ -362,7 +364,7 @@ class Fun(commands.Cog, description="Fun commands"):
         await ctx.send(f'{data["setup"]}\n||{data["punchline"]}||')
 
     @commands.command(name="challenge")
-    async def challenge(self, ctx):
+    async def challenge(self, ctx: customContext):
         """If you solve the challenge, you get premium forever"""
         await ctx.send(
             file=discord.File(f"{self.bot.cwd}/data/extra/challengeHidden.jpg")

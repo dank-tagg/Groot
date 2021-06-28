@@ -1,3 +1,5 @@
+from utils._type import *
+
 import re
 import sqlite3
 import time
@@ -6,11 +8,11 @@ from discord.ext import commands
 
 
 class Tags(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @commands.group(invoke_without_command=True, case_insensitive=True)
-    async def tag(self, ctx, tag):
+    async def tag(self, ctx: customContext, tag):
         tag = tag.lower()
 
         query = "SELECT tag_content FROM tags WHERE tag_guild_id = ? AND tag_name = ?"
@@ -31,7 +33,7 @@ class Tags(commands.Cog):
 
         await ctx.send(row[0])
 
-    async def convert_tag(self, ctx, tag, content):
+    async def convert_tag(self, ctx: customContext, tag, content):
 
         tag = tag.lower()
         if re.match(r"<[#@](!?&)(\d+)>", tag):
@@ -57,7 +59,7 @@ class Tags(commands.Cog):
             )
 
     @tag.command()
-    async def create(self, ctx, tag, content):
+    async def create(self, ctx: customContext, tag, content):
         """Creates a new tag owned by you.
         This tag is server-specific and cannot be used in other servers.
         Note that server moderators can delete your tag.
@@ -78,7 +80,7 @@ class Tags(commands.Cog):
             )
 
     @tag.command()
-    async def delete(self, ctx, tag):
+    async def delete(self, ctx: customContext, tag):
 
         tag = tag.lower()
         query = "SELECT tag_author FROM tags WHERE tag_name = ? AND tag_guild_id = ?"

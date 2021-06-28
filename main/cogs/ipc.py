@@ -1,9 +1,13 @@
-from discord.ext import commands, ipc
+from utils._type import *
+
 import humanize
 import datetime
 
+from discord.ext import commands, ipc
+
+
 class Ipc(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @ipc.server.route()
@@ -16,7 +20,7 @@ class Ipc(commands.Cog):
         stats = {
             "users": len(self.bot.users),
             "guilds": len(self.bot.guilds),
-            "commands": len(self.bot.commands),
+            "commands": len(list(self.bot.walk_commands())),
             "uptime": humanize.precisedelta(datetime.datetime.utcnow() - self.bot.launch_time, format='%.0f')
         }
         return stats

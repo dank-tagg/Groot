@@ -1,12 +1,10 @@
-from __future__ import annotations
+from utils._type import *
 
 import asyncio
 import typing
-
 import discord
-from discord.ext import commands
 
-from bot import GrootBot
+from discord.ext import commands
 
 
 class Moderator(commands.Cog):
@@ -16,7 +14,7 @@ class Moderator(commands.Cog):
     
     @commands.group(name="mod", invoke_without_command=True, case_insensitive=True)
     @commands.is_owner()
-    async def mod(self, ctx):
+    async def mod(self, ctx: customContext):
         await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
 
     @mod.command(name="blacklist", hidden=True, aliases=["bl", "poo"])
@@ -93,7 +91,7 @@ class Moderator(commands.Cog):
 
     @mod.command(name="edit")
     async def _edit_(
-        self, ctx, action, user: typing.Union[discord.Member, discord.User], amount: int
+        self, ctx: customContext, action, user: typing.Union[discord.Member, discord.User], amount: int
     ):
         self.bot.cache["users"][user.id][action] += amount
         return await ctx.send(
@@ -101,7 +99,7 @@ class Moderator(commands.Cog):
         )
 
     @mod.command(name="create")
-    async def _create_item_for_shop(self, ctx):
+    async def _create_item_for_shop(self, ctx: customContext):
         q = [
             "What should the item be called?",
             "What should it's price be?",
@@ -137,7 +135,7 @@ class Moderator(commands.Cog):
         return await ctx.invoke(cmd, item=a[0])
 
     @mod.command(name="delete")
-    async def _delete_item_from_shop(self, ctx, *, item):
+    async def _delete_item_from_shop(self, ctx: customContext, *, item):
         item = item.lower()
         query = """
                 DELETE FROM item_info

@@ -1,14 +1,16 @@
+from utils._type import *
+
 import asyncio
 import random
-
 import discord
+
 from discord.ext import commands
 from utils.chat_formatting import hyperlink as link
 from utils.useful import Embed, convert_to_int
 
 
 class Blackjack(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         self.data = bot.data
         self.faces = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
@@ -16,7 +18,7 @@ class Blackjack(commands.Cog):
         self.suits = ["spades", "hearts", "diamonds", "clubs"]
 
     @commands.command(name="play_blackjack")
-    async def play_blackjack(self, ctx, amount):
+    async def play_blackjack(self, ctx: customContext, amount):
         wallet = await self.data.get_data(ctx.author.id)
         if wallet >= 10000000:
             raise commands.BadArgument(
@@ -42,7 +44,6 @@ class Blackjack(commands.Cog):
         ctx.amount = amount
         ctx.wallet = wallet
         stood = False
-        won = None
         deck = [
             {"face": face, "suit": suit} for suit in self.suits for face in self.faces
         ]
@@ -175,7 +176,7 @@ class Blackjack(commands.Cog):
         else:
             return self.total_value(user_cards)
 
-    def start(self, ctx, cards):
+    def start(self, ctx: customContext, cards):
         user_cards_visual = "".join(
             [
                 link(
@@ -205,7 +206,7 @@ class Blackjack(commands.Cog):
         em.set_footer(text="K, Q, J = 10  |  A = 1 or 11")
         return em
 
-    async def end(self, ctx, cards, kwargs: dict):
+    async def end(self, ctx: customContext, cards, kwargs: dict):
         result = kwargs.pop("result")
         message = kwargs.pop("message")
         message = "**{}**".format(message)
@@ -250,7 +251,7 @@ class Blackjack(commands.Cog):
         em.set_footer(text="K, Q, J = 10  |  A = 1 or 11")
         return em
 
-    async def dealersTurn(self, ctx, cards, deck):
+    async def dealersTurn(self, ctx: customContext, cards, deck):
         if self.total_value(cards["user_cards"]) > 21:
             return await self.end(
                 ctx, cards, self.score(True, cards["user_cards"], cards["bot_cards"])

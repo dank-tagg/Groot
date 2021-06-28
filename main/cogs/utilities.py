@@ -1,9 +1,11 @@
+from utils._type import *
+
 import asyncio
 import datetime
 import random
-
 import discord
 import json
+
 from discord.ext import commands
 from humanize.time import precisedelta
 from PIL import Image, ImageDraw, ImageFont
@@ -13,7 +15,7 @@ from wonderwords import RandomSentence, RandomWord
 
 
 class Utilities(commands.Cog, description="Handy dandy utils"):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         self.index = 0
         self.snipe_cache = {}
@@ -38,7 +40,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         self.snipe_cache.pop(message.channel.id, None)
 
     @commands.command(name="snipe", brief="Retrieves a recent deleted message")
-    async def snipe(self, ctx):
+    async def snipe(self, ctx: customContext):
         """
         Acts like a message log, but for channel specific and command only.\n
         Only returns the most recent message.
@@ -63,7 +65,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             return await ctx.send("There's nothing to snipe!")
 
     @commands.command(name="editsnipe", brief="Retrieves a recently edited message")
-    async def editsnipe(self, ctx):
+    async def editsnipe(self, ctx: customContext):
         """
         Same as `snipe`, but for edited messages.
         A bot's edited message is ignored.
@@ -90,7 +92,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             return await ctx.send("There's nothing to snipe!")
 
     @commands.command(name="choose")
-    async def choose(self, ctx, *, choice):
+    async def choose(self, ctx: customContext, *, choice):
         choicelist = choice.split(" ")
         await ctx.send(random.choice(choicelist))
 
@@ -111,7 +113,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
 
     @commands.command(name="gstart", brief="Starts a giveaway")
     @commands.max_concurrency(5, commands.BucketType.channel, wait=False)
-    async def gstart(self, ctx, time, winners: str, *, prize):
+    async def gstart(self, ctx: customContext, time, winners: str, *, prize):
         """
         For this to work, the user has to have the giveaway role for the current server.\n
         Starts a giveaway, with given time, amount of winners and prize.\n
@@ -268,7 +270,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         brief="Rerolls a giveaway from a message ID",
         usage="<channel> <messageID>",
     )
-    async def reroll(self, ctx, id_: int):
+    async def reroll(self, ctx: customContext, id_: int):
         """
         Rerolls a giveaway from the current channel.\n
         For this to work, the user must have the giveaway role.\n
@@ -302,7 +304,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         brief="A special form of giveaway.",
     )
     @commands.max_concurrency(1, commands.BucketType.channel, wait=False)
-    async def drop(self, ctx):
+    async def drop(self, ctx: customContext):
         """
         This is a special form if giveaway.\n
         It drops a given or random sentence and the user that types it the fastest, gets the prize.\n
@@ -312,7 +314,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
     
     @drop.command(brief="Drops a prize with a custom sentence")
     @commands.max_concurrency(1, commands.BucketType.channel, wait=False)
-    async def custom(self, ctx, *, prize):
+    async def custom(self, ctx: customContext, *, prize):
         """
         Drops a prize with a custom sentence, that the author specifies after invoking the command.\n
         Note that timer is not supported here as it is in `drop normal`\n
@@ -383,7 +385,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
 
     @drop.command()
     @commands.max_concurrency(1, commands.BucketType.channel, wait=False)
-    async def normal(self, ctx, prize, time=None):
+    async def normal(self, ctx: customContext, prize, time=None):
         """
         Drops a prize with a random sentence.\n
         Unlike `drop normal`, you can specify the time after the prize.\n
@@ -501,7 +503,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
     @commands.command(
         name="ui", aliases=["info", "whois"], brief="Displays an user's information"
     )
-    async def ui(self, ctx, member: discord.Member = None):
+    async def ui(self, ctx: customContext, member: discord.Member = None):
         """
         Shows all the information about the specified user.\n
         If none is specified, it defaults to the author.
@@ -550,7 +552,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         await ctx.send(embed=em)
 
     @commands.command(name="avatar", aliases=["av"], brief="Displays a member's avatar")
-    async def avatar(self, ctx, member: discord.Member = None):
+    async def avatar(self, ctx: customContext, member: discord.Member = None):
         """
         Displays a 1024 pixel sized image of the given member's avatar.\n
         If no member is specified, it defaults to the author's avatar.
@@ -566,7 +568,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             await ctx.send(embed=em)
 
     @commands.command(name="rickroll", brief="Detects rickroll from given link")
-    async def _rickroll(self, ctx, *, link):
+    async def _rickroll(self, ctx: customContext, *, link):
         """
         Detects if the given link is a rickroll.\n
         The link must start with https://.\n
@@ -583,7 +585,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
     @commands.command(
         brief="Previews a hex color (format is #FFFFFF)", usage="<hexadecimal>"
     )
-    async def hex(self, ctx, *, args=None):
+    async def hex(self, ctx: customContext, *, args=None):
         """Previews a hex color (format is #FFFFFF).\n
         Sends an embed with the color as the thumbnail"""
         if args:
@@ -613,11 +615,11 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             return await ctx.send(embed=em)
     
     @commands.command(name="id")
-    async def _get_id(self, ctx, any: Union[discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.CategoryChannel, discord.Emoji, discord.User]):
+    async def _get_id(self, ctx: customContext, any: Union[discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.CategoryChannel, discord.Emoji, discord.User]):
         return await ctx.send(any.id)
     
     @commands.command(name="embed")
-    async def _send_embed(self, ctx, *, embed: str):
+    async def _send_embed(self, ctx: customContext, *, embed: str):
         em = discord.Embed.from_dict(json.loads(embed))
         await ctx.send(embed=em)
 

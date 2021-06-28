@@ -1,10 +1,14 @@
+from utils._type import *
+
 import discord
-from discord.ext import commands
-from utils.useful import Embed, Cooldown
 import contextlib
-from itertools import chain
-from utils.json_loader import read_json
+
 from datetime import datetime
+from itertools import chain
+from discord.ext import commands
+from utils.json_loader import read_json
+from utils.useful import Cooldown, Embed
+
 
 class GrootHelp(commands.HelpCommand):
 
@@ -66,7 +70,7 @@ class GrootHelp(commands.HelpCommand):
 
         em = Embed(description=
             f"Prefix for **{ctx.guild.name}** is `{ctx.prefix or 'g.'}`\n"
-            f"Total commands: {len(bot.commands)} | Usable by you: {len(await self.filter_commands(bot.commands, sort=True))} \n"
+            f"Total commands: {len(list(bot.walk_commands()))} | Usable by you: {len(await self.filter_commands(bot.commands, sort=True))} \n"
             "```diff\n- [] = optional argument\n"
             "- <> = required argument\n"
             f"+ Type {ctx.prefix}help [command | category] for "
@@ -167,7 +171,7 @@ class GrootHelp(commands.HelpCommand):
             
 
 class Help(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         help_command = GrootHelp()
         help_command.cog = self

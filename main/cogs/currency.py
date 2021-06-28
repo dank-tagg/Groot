@@ -1,9 +1,12 @@
+from utils._type import *
+
 import datetime
+import discord
 import random
 import typing
-from collections import OrderedDict
 
-import discord
+
+from collections import OrderedDict
 from discord.ext import commands, tasks
 from utils.chat_formatting import hyperlink as link
 from utils.useful import (Embed, convert_to_int, Cooldown, progress_bar,
@@ -11,13 +14,13 @@ from utils.useful import (Embed, convert_to_int, Cooldown, progress_bar,
 
 
 class Currency(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         self.data = bot.data
         self.cache = {}
         self.levels.start()
 
-    async def cog_before_invoke(self, ctx):
+    async def cog_before_invoke(self, ctx: customContext):
         query = """
                 DELETE FROM user_Inventory
                 WHERE amount = 0
@@ -42,7 +45,7 @@ class Currency(commands.Cog):
                 "prestige": r[7],
             }
 
-    async def cog_after_invoke(self, ctx):
+    async def cog_after_invoke(self, ctx: customContext):
         exp = random.randint(0, 3)
         if ctx.author.id in self.bot.cache["premium_users"]:
             exp += 2
@@ -55,7 +58,7 @@ class Currency(commands.Cog):
         name="profile", aliases=["lvl"], brief="Shows your stats and level"
     )
     @commands.check(Cooldown(1, 10, 1, 5, commands.BucketType.user))
-    async def _profile(self, ctx, member: discord.Member = None):
+    async def _profile(self, ctx: customContext, member: discord.Member = None):
         """Shows your statistics and experience/level total and the commands issued."""
         member = member if member is not None else ctx.author
         if member.id not in self.bot.cache["users"]:
@@ -98,7 +101,7 @@ class Currency(commands.Cog):
             1, 1 * 60 * 60 * 24, 1, 1 * 60 * 60 * 24, commands.BucketType.user
         )
     )
-    async def _prestige(self, ctx):
+    async def _prestige(self, ctx: customContext):
         check = lambda prestige, level: level > 15 * prestige + 15
         level = await self.data.get_data(ctx.author.id, mode="lvl")
         exp = await self.data.get_data(ctx.author.id, mode="exp")
@@ -120,7 +123,7 @@ class Currency(commands.Cog):
 
     @commands.command(name="balance", aliases=["bal"], brief="Displays your money.")
     @commands.check(Cooldown(1, 5, 1, 1, commands.BucketType.user))
-    async def _balance(self, ctx, member: discord.Member = None):
+    async def _balance(self, ctx: customContext, member: discord.Member = None):
         """Shows your balance (wallet, bank and net worth)"""
         member = member if member is not None else ctx.author
         if member.id not in self.bot.cache["users"]:
@@ -152,7 +155,7 @@ class Currency(commands.Cog):
         return await ctx.maybe_reply(embed=em)
 
     @commands.command(name="inventory", aliases=["inv"], brief="Display your inventory")
-    async def _inventory(self, ctx):
+    async def _inventory(self, ctx: customContext):
         """
         Displays amount and item name of everything you own.
         """
@@ -176,7 +179,7 @@ class Currency(commands.Cog):
 
     @commands.command(name="buy", brief="Buy something from the shop")
     @commands.check(Cooldown(1, 10, 1, 5, commands.BucketType.user))
-    async def _buy(self, ctx, amount: typing.Optional[int] = 1, *, item):
+    async def _buy(self, ctx: customContext, amount: typing.Optional[int] = 1, *, item):
         """
         This command is used to buy something from the shop.
         Amount is an optional argument, which defaults to one.
@@ -215,7 +218,7 @@ class Currency(commands.Cog):
         return await ctx.send(embed=em)
 
     @commands.command(name="shop", brief="Get something from the shop!")
-    async def _shop(self, ctx, item=None):
+    async def _shop(self, ctx: customContext, item=None):
         if item:
             query = """
                     SELECT item_name, item_description, item_price
@@ -248,7 +251,7 @@ class Currency(commands.Cog):
 
     @commands.command(name="sell", brief="Sell something you own")
     @commands.check(Cooldown(1, 10, 1, 5, commands.BucketType.user))
-    async def _sell(self, ctx, amount: typing.Optional[int] = 1, *, item):
+    async def _sell(self, ctx: customContext, amount: typing.Optional[int] = 1, *, item):
         item = item.lower()
         query = """
                 SELECT item_info.item_price, user_Inventory.amount, item_info.item_name, item_info.item_id
@@ -282,7 +285,7 @@ class Currency(commands.Cog):
         name="deposit", aliases=["dep"], brief="Deposit money from your wallet."
     )
     @commands.check(Cooldown(1, 5, 1, 1, commands.BucketType.user))
-    async def _deposit(self, ctx, amount: str):
+    async def _deposit(self, ctx: customContext, amount: str):
         """
         Deposit money from your wallet into your bank.\n
         If the amount given is more than your wallet or if your bank has reached it's max space it will raise an error.
@@ -314,7 +317,7 @@ class Currency(commands.Cog):
 
     @commands.command(name="withdraw", aliases=["with"], brief="Withdraw money")
     @commands.check(Cooldown(1, 5, 1, 1, commands.BucketType.user))
-    async def _withdraw(self, ctx, amount: str):
+    async def _withdraw(self, ctx: customContext, amount: str):
         """
         Withdraw money from your bank.
         If you try to withdraw more than you have it will raise an error.
@@ -338,7 +341,7 @@ class Currency(commands.Cog):
 
     @commands.command(name="fish", brief="Fish for fishes and money.")
     @commands.check(Cooldown(1, 20, 1, 10, commands.BucketType.user))
-    async def _fish(self, ctx, info=None):
+    async def _fish(self, ctx: customContext, info=None):
         """Fish for fishes that you automatically sell for cash!"""
         if not await self.bot.data.has_item(ctx.author.id, "fishing rod"):
             raise commands.BadArgument(
@@ -401,7 +404,7 @@ class Currency(commands.Cog):
 
     @commands.command(name="hunt", brief="Hunt for animals and cash.")
     @commands.check(Cooldown(1, 20, 1, 10, commands.BucketType.user))
-    async def _hunt(self, ctx, info=None):
+    async def _hunt(self, ctx: customContext, info=None):
         """Hunt for animals that you automatically sell for cash!"""
         boost = self.bot.cache["users"][ctx.author.id]["boost"]
         times_caught = random.randint(1, 3)
@@ -462,7 +465,7 @@ class Currency(commands.Cog):
         return await ctx.maybe_reply(content=ctx.author.mention, embed=em)
 
     @commands.command(name="give", brief="Share coins to someone else.")
-    async def _give(self, ctx, amount, member: discord.Member):
+    async def _give(self, ctx: customContext, amount, member: discord.Member):
         """
         Give your coins to another member!\n
         Numbers such as 5e5, 10k etc are supported. Some are not.
@@ -498,7 +501,7 @@ class Currency(commands.Cog):
 
     @commands.command(name="slots", brief="Gamble your money for huuuge winnings!")
     @commands.check(Cooldown(1, 5, 1, 3, commands.BucketType.user))
-    async def _slots(self, ctx, amount: str):
+    async def _slots(self, ctx: customContext, amount: str):
         """
         Slots some coins and get huge winnings (if you win)\n
         Number such as 5e5, 10k etc are supported. Some are not.
@@ -570,7 +573,7 @@ class Currency(commands.Cog):
     @commands.command(name="blackjack", aliases=["bj"], brief="Play blackjack!")
     @commands.max_concurrency(1, commands.BucketType.user, wait=False)
     @commands.check(Cooldown(1, 5, 1, 3, commands.BucketType.user))
-    async def _blackjack(self, ctx, amount: str):
+    async def _blackjack(self, ctx: customContext, amount: str):
         """
         Play blackjack! READ THE RULES FIRST, before calling it a scam.
         Aces count as 1 or 11. Counts as 11 if your total value is smaller than 11,

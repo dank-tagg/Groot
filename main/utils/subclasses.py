@@ -10,6 +10,26 @@ class customContext(commands.Context):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    class processing:
+        __slots__ = ("ctx", "delete_after", "m")
+
+        def __init__(self, ctx, delete_after: bool = True):
+            self.ctx = ctx
+            self.delete_after = delete_after
+            self.m = None
+
+        async def __aenter__(self, *args, **kwargs):
+            self.m = await asyncio.wait_for(self.ctx.send(f"{self.ctx.bot.icons['loading']} Processing command, please wait..."), timeout=3.0)
+            await self.ctx.trigger_typing()
+            return self
+
+        async def __aexit__(self, *args, **kwargs):
+            if self.delete_after:
+                try:
+                    await self.m.delete()
+                except discord.HTTPException:
+                    return
+
     async def send(self, content=None, **kwargs):
         if self.author.id in self.bot.cache["tips_are_on"]:
             tip = random.choice(

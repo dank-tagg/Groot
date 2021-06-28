@@ -1,14 +1,15 @@
+from utils._type import *
+
 import asyncio
 import async_timeout
 import discord
 import re
 import wavelink
 import math
-import datetime
-import typing
 import random
+
 from discord.ext import commands, menus
-from utils.useful import Embed, get_title, is_beta
+from utils.useful import Embed, get_title
 from utils import paginations
 
 
@@ -124,11 +125,11 @@ class Player(wavelink.Player):
         except KeyError:
             pass
     
-    def update_context(self, ctx):
+    def update_context(self, ctx: customContext):
         self.ctx = ctx
 
 class Music(commands.Cog, wavelink.WavelinkMixin):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
         if not hasattr(bot, 'wavelink'):
@@ -162,7 +163,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
                 node_num += 1
                 created = True
     
-    def required(self, ctx: commands.Context):
+    def required(self, ctx: customContext):
         """Method which returns required votes based on amount of members in a channel."""
         player = self.get_player(ctx)
         channel = self.bot.get_channel(int(player.channel_id))
@@ -174,12 +175,12 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         return required
     
-    def get_player(self, ctx):
+    def get_player(self, ctx: customContext):
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
         player.update_context(ctx)
         return player
     
-    def is_privileged(self, ctx):
+    def is_privileged(self, ctx: customContext):
         player = self.get_player(ctx)
         return ctx.author in [player.dj, getattr(player.current, "requester", None)] or ctx.author.guild_permissions.kick_members
 
@@ -235,7 +236,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             player.dj = member
 
     @commands.command(name='connect', usage="[channel]")
-    async def _connect(self, ctx, channel: discord.VoiceChannel = None, invoked_from=None):
+    async def _connect(self, ctx: customContext, channel: discord.VoiceChannel = None, invoked_from=None):
         """Connects to the given voice channel. If none is given, it defaults to the voice channel the user is in"""
         player = self.get_player(ctx)
 
@@ -251,7 +252,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         await player.connect(channel.id)
     
     @commands.command(name='play')
-    async def _play(self, ctx, *, query: str):
+    async def _play(self, ctx: customContext, *, query: str):
         """Searches YouTube for the query, plays the song found."""
         player = self.get_player(ctx)
 
@@ -281,7 +282,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await player.play_next()
     
     @commands.command(name="loop")
-    async def _loop(self, ctx):
+    async def _loop(self, ctx: customContext):
         """Loops the current song or turns the loop off"""
         player = self.get_player(ctx)
 
@@ -295,7 +296,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         return await ctx.reply(f"{self.bot.icons['greenTick']} | {message}")
         
     @commands.command(name="skip", aliases=["next"])
-    async def _skip(self, ctx):
+    async def _skip(self, ctx: customContext):
         """Skips the current song"""
         player = self.get_player(ctx)
         
@@ -318,7 +319,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await ctx.reply(f"{ctx.author.mention} has voted to skip this song (`{votes}/{required}`)")
 
     @commands.command(name="stop")
-    async def _stop(self, ctx):
+    async def _stop(self, ctx: customContext):
         """Stops the current player"""
         player = self.get_player(ctx)
         
@@ -340,7 +341,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await ctx.reply(f'{ctx.author.mention} has voted to stop the player. (`{votes}/{required}`)')
 
     @commands.group(case_insensitive=True,invoke_without_command=True, aliases=['q', 'que'])
-    async def queue(self, ctx):
+    async def queue(self, ctx: customContext):
         """Display the players queued songs."""
         player = self.get_player(ctx)
 
@@ -357,7 +358,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         await menu.start(ctx)
     
     @queue.command(name="remove")
-    async def _remove(self, ctx, position: int):
+    async def _remove(self, ctx: customContext, position: int):
         player = self.get_player(ctx)
 
         if not player.is_connected:
@@ -369,7 +370,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     
     @commands.command(name="volume")
-    async def _volume(self, ctx, volume: int):
+    async def _volume(self, ctx: customContext, volume: int):
         """Changes the volume"""
         player = self.get_player(ctx)
 
@@ -386,7 +387,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         await ctx.reply(f"{self.bot.icons['greenTick']} | Changed volume to {volume}%")
 
     @commands.command(name="shuffle")
-    async def _shuffle(self, ctx):
+    async def _shuffle(self, ctx: customContext):
         """Shuffles the queue"""
         player = self.get_player(ctx)
 
@@ -411,7 +412,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await ctx.reply(f'{ctx.author.mention} has voted to shuffle the playlist. (`{votes}/{required}`)')
     
     @commands.command(name="nowplaying", aliases=["np", "current"])
-    async def _nowplaying(self, ctx):
+    async def _nowplaying(self, ctx: customContext):
         """Shows the current playing song"""
         player = self.get_player(ctx)
 
@@ -421,7 +422,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         await player.send_embed()
 
     @commands.command(aliases=['eq'], usage="<flat|boost|metal|piano>")
-    async def equalizer(self, ctx, *, equalizer: str):
+    async def equalizer(self, ctx: customContext, *, equalizer: str):
         """Change the players equalizer."""
         player = self.get_player(ctx)
 
@@ -448,7 +449,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         await player.set_eq(eq)
 
     @commands.command(aliases=['dj', 'swap'])
-    async def swap_dj(self, ctx, member: discord.Member = None):
+    async def swap_dj(self, ctx: customContext, member: discord.Member = None):
         """Swap the current DJ to another member in the voice channel."""
         player = self.get_player(ctx)
 

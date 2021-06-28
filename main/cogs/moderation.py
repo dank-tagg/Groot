@@ -1,3 +1,5 @@
+from utils._type import *
+
 import asyncio
 import datetime
 import random
@@ -5,11 +7,11 @@ import re
 import string
 import typing
 import unicodedata
-
 import discord
 import humanize
 import stringcase
 import unidecode
+
 from discord.ext import commands
 from discord.ext.commands import BucketType, ColourConverter
 from dpymenus import Page, PaginatedMenu
@@ -18,12 +20,12 @@ from utils.useful import Embed, MemberConvert, RoleConvert, get_frozen
 
 
 class Moderation(commands.Cog, description="Moderation commands"):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @commands.command(name="kick", brief="Kicks a member")
     @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx, member: MemberConvert):
+    async def kick(self, ctx: customContext, member: MemberConvert):
         """
         Kicks a member from the server.\n
         Member must be in the server at the moment of running the command
@@ -50,7 +52,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
 
     @commands.command(name="unban", brief="Unbans a user")
     @commands.has_permissions(ban_members=True)
-    async def unban(self, ctx, *, member: discord.User):
+    async def unban(self, ctx: customContext, *, member: discord.User):
         """
         Unbans an user from the server.
         Raises an error if the user is not a previously banned member.
@@ -116,7 +118,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
 
     @commands.command(name="lock", brief="Locks a channel")
     @commands.has_permissions(manage_channels=True)
-    async def lock(self, ctx, channel: discord.TextChannel = None):
+    async def lock(self, ctx: customContext, channel: discord.TextChannel = None):
         """
         Sets the `send_messages` permission to False for everyone.\n
         If no channel is given, this defaults to the channel the command is run in.\n
@@ -130,7 +132,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
 
     @commands.command(name="unlock", brief="Unlocks a channel")
     @commands.has_permissions(manage_channels=True)
-    async def unlock(self, ctx, channel: discord.TextChannel = None):
+    async def unlock(self, ctx: customContext, channel: discord.TextChannel = None):
         """
         Sets the `send_messages` permission to True for everyone.\n
         If no channel is given, this defaults to the channel the command is run in.
@@ -161,7 +163,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
 
     @commands.command(name="decancer", aliases=["dc"], usage="<member>")
     @commands.has_permissions(manage_nicknames=True)
-    async def decancer(self, ctx, target: MemberConvert):
+    async def decancer(self, ctx: customContext, target: MemberConvert):
         """
         Decancers the given member's nickname.\n
         This means that it removes all _cancerous_ characters,\n
@@ -201,7 +203,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
     @commands.command(
         cooldown_after_parsing=True, brief="Decancers all members in the given role."
     )
-    async def dehoist(self, ctx: commands.Context, *, role: RoleConvert = None):
+    async def dehoist(self, ctx: customContext, *, role: RoleConvert = None):
         """
         Decancers all members of the targeted role.
         Role defaults to all members of the server.
@@ -285,7 +287,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
 
     @commands.command(brief="Freeze a member's nickname")
     @commands.has_guild_permissions(manage_nicknames=True)
-    async def freezenick(self, ctx, member: MemberConvert, *, nickname: str):
+    async def freezenick(self, ctx: customContext, member: MemberConvert, *, nickname: str):
         """
         Freeze a member's nickname.\n
         This means that when the frozen member changes their nickname,\n
@@ -321,7 +323,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
 
     @commands.command(brief="Unfreezes a member's nickname.")
     @commands.has_guild_permissions(manage_nicknames=True)
-    async def unfreezenick(self, ctx, member: MemberConvert):
+    async def unfreezenick(self, ctx: customContext, member: MemberConvert):
         """
         Removes a freezenick from the member given.\n
         If the member is not freezed, this raises an error.
@@ -359,7 +361,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
         name="slowmode", aliases=["sm"], brief="Changes the slowmode of the channel."
     )
     @commands.has_permissions(manage_channels=True)
-    async def slowmode(self, ctx, interval=None):
+    async def slowmode(self, ctx: customContext, interval=None):
         """
         Sets the slowmode in the current channel to the given amount of time.\n
         If no time is given, this disables the current slowmode.\n
@@ -404,7 +406,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
         aliases=["perms"],
         brief="Lists the permissions the bot has.",
     )
-    async def _permissions(self, ctx):
+    async def _permissions(self, ctx: customContext):
         """
         Shows a list of permissions the bot has in the server,\n
         if any recommended permission are missing, this will also show up.
@@ -441,7 +443,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
         invoke_without_command=True, case_insensitive=True, usage="<member> <role>"
     )
     @commands.has_guild_permissions(manage_roles=True)
-    async def role(self, ctx, member: discord.Member, *, role: RoleConvert):
+    async def role(self, ctx: customContext, member: discord.Member, *, role: RoleConvert):
         """
         Gives a role to a member.\n
         """
@@ -452,7 +454,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
         await ctx.send(f"Added **{role}** to **{member}**")
 
     @role.command(name="info", brief="Shows information about a role")
-    async def _info(self, ctx, role: RoleConvert = None):
+    async def _info(self, ctx: customContext, role: RoleConvert = None):
         if role == None:
             return await ctx.reply(
                 "You need to give me a role id!", mention_author=False
@@ -504,7 +506,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
 
     @role.command(name="create", usage="<name> <color> [...]")
     @commands.has_permissions(manage_roles=True)
-    async def _create(self, ctx, name: str, color, hoist=False, mentionable=False):
+    async def _create(self, ctx: customContext, name: str, color, hoist=False, mentionable=False):
         """
         **Optional Parameters:**
         __hoist__ (`bool`) – Indicates if the role should be shown separately in the member list. Defaults to `False`

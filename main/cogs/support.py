@@ -1,16 +1,18 @@
-import asyncio
-from datetime import datetime as dt
+from utils._type import *
 
+import asyncio
+
+from datetime import datetime as dt
 from discord.ext import commands
 from utils.useful import Embed
 
 
 class Support(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @commands.command(name="report")
-    async def _report(self, ctx):
+    async def _report(self, ctx: customContext):
         questions = [
             "What do you want to report?",
             "Write a descriptive overview of what you are reporting.\n"
@@ -66,7 +68,7 @@ class Support(commands.Cog):
     
     
     @commands.command(name="suggest")
-    async def _suggest_feature(self, ctx, *, suggestion):
+    async def _suggest_feature(self, ctx: customContext, *, suggestion):
         channel = self.bot.get_channel(857544734338449448)
         msg = await channel.send(f"{ctx.author}: {suggestion}")
         await msg.add_reaction("👍")
@@ -74,7 +76,7 @@ class Support(commands.Cog):
         await ctx.send(f"Submitted your suggestion in {channel.mention}. Join the support server to see the status of your suggestion.")
     
     @commands.command(name="supportserver")
-    async def _support_server_invite(self, ctx):
+    async def _support_server_invite(self, ctx: customContext):
         await ctx.send("https://discord.gg/nUUJPgemFE")
 
 

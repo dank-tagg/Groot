@@ -1,4 +1,7 @@
+from utils._type import *
+
 import topgg
+
 from discord.ext import commands, tasks
 from utils import discordbotlist
 
@@ -6,7 +9,7 @@ from utils import discordbotlist
 class API(commands.Cog):
     """Handles interactions with API (top.gg, discordbotlist)"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
         # Top GG
