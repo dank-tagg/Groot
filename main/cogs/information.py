@@ -25,7 +25,7 @@ class Information(commands.Cog):
         commit_time = datetime.datetime.fromtimestamp(commit.commit_time).astimezone(commit_tz)
 
         # [`hash`](url) message (offset)
-        offset = time.human_timedelta(commit_time.astimezone(datetime.timezone.utc).replace(tzinfo=None), accuracy=1)
+        offset = commit_time
         return f'[`{short_sha2}`](https://github.com/dank-tagg/Groot/commit/{commit.hex}) {short} ({offset})'
 
     def get_last_commits(self, count=3):
