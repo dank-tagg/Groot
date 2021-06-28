@@ -1,7 +1,4 @@
-from __future__ import annotations
-import typing
-if typing.TYPE_CHECKING:
-    from utils._type import *
+from utils._type import *
 
 import asyncio
 import datetime
@@ -13,6 +10,7 @@ import discord
 import humanize
 import stringcase
 import unidecode
+
 
 from discord.ext import commands
 from discord.ext.commands import BucketType, ColourConverter

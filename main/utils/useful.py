@@ -1,8 +1,4 @@
-from __future__ import annotations
-from __future__ import annotations
-import typing
-if typing.TYPE_CHECKING:
-    from utils._type import *
+from utils._type import *
 
 import wavelink
 import textwrap

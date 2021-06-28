@@ -1,11 +1,9 @@
-from __future__ import annotations
-import typing
-if typing.TYPE_CHECKING:
-    from utils._type import *
+from utils._type import *
 
 import datetime
 import discord
 import random
+
 
 
 from collections import OrderedDict
