@@ -6,6 +6,8 @@ import discord
 import humanize
 import inspect
 import os
+import pygit2
+import itertools
 
 from discord.ext import commands
 from utils.chat_formatting import hyperlink
@@ -15,6 +17,21 @@ from utils.useful import Embed
 class Information(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    def format_commit(self, commit):
+        short, _, _ = commit.message.partition('\n')
+        short_sha2 = commit.hex[0:6]
+        commit_tz = datetime.timezone(datetime.timedelta(minutes=commit.commit_time_offset))
+        commit_time = datetime.datetime.fromtimestamp(commit.commit_time).astimezone(commit_tz)
+
+        # [`hash`](url) message (offset)
+        offset = time.human_timedelta(commit_time.astimezone(datetime.timezone.utc).replace(tzinfo=None), accuracy=1)
+        return f'[`{short_sha2}`](https://github.com/dank-tagg/Groot/commit/{commit.hex}) {short} ({offset})'
+
+    def get_last_commits(self, count=3):
+        repo = pygit2.Repository('.git')
+        commits = list(itertools.islice(repo.walk(repo.head.target, pygit2.GIT_SORT_TOPOLOGICAL), count))
+        return '\n'.join(self.format_commit(c) for c in commits)
 
     @commands.command(name="ping", brief="Shows the bots latency")
     async def ping(self, ctx: customContext):
@@ -118,5 +135,20 @@ class Information(commands.Cog):
         final_url = f'<{source_url}/tree/{branch}/main/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>'
         await ctx.send(final_url)
 
+    @commands.command(name="about")
+    async def _about_me(self, ctx: customContext):
+        revision = self.get_last_commits()
+        em = Embed(
+            title="Groot",
+            url="https://grootdiscordbot.xyz/invite",
+            description="A simple yet multipurpose discord bot.\n\n" +
+                        "Latest Changes:\n" + revision
+        )
+
+        # Contributors
+        contributors = [711057339360477184, 746807014658801704, 493451846543998977, 144126010642792449]
+        em.add_field(name="Contributors:\n", value=", ".join(f"[`{self.bot.get_user(m)}`](https://discord.com/users/{m})" for m in contributors))
+
+        await ctx.send(embed=em)
 def setup(bot):
     bot.add_cog(Information(bot), category="Information")
