@@ -16,24 +16,24 @@ class Core(commands.Cog):
         self.update_status.start()
 
     async def expand_tb(self, ctx, error, msg):
-        await msg.add_reaction(self.bot.emoji_dict['plus'])
-        await msg.add_reaction(self.bot.emoji_dict['minus'])
-        await msg.add_reaction(self.bot.emoji_dict['save'])
+        await msg.add_reaction(self.bot.icons['plus'])
+        await msg.add_reaction(self.bot.icons['minus'])
+        await msg.add_reaction(self.bot.icons['save'])
 
         while True:
             reaction, user = await self.bot.wait_for('reaction_add', check=lambda reaction, m: m == self.bot.owner and reaction.message == msg)
-            if str(reaction) == self.bot.emoji_dict['plus']:
+            if str(reaction) == self.bot.icons['plus']:
                 await send_traceback(self.bot.log_channel, ctx, (True, msg), 3, type(error), error, error.__traceback__)
-            elif str(reaction) == self.bot.emoji_dict['minus']:
+            elif str(reaction) == self.bot.icons['minus']:
                 await send_traceback(self.bot.log_channel, ctx, (True, msg), 0, type(error), error, error.__traceback__)
-            elif str(reaction) == self.bot.emoji_dict['save']:
+            elif str(reaction) == self.bot.icons['save']:
                 log = self.bot.get_channel(850439592352022528)
                 await send_traceback(log, ctx, (False, None), 3, type(error), error, error.__traceback__)
                 await msg.channel.send(f"Saved traceback to {log.mention}")
 
     async def send_error(self, ctx, exc_info: dict):
         em = Embed(
-            title=f"{self.bot.emoji_dict['redTick']} Error while running command {exc_info['command']}",
+            title=f"{self.bot.icons['redTick']} Error while running command {exc_info['command']}",
             description=f"```py\n{exc_info['error']}```[Report error](https://discord.gg/nUUJPgemFE)"
         )
         em.set_footer(text="Please report this error in our support server if it persists.")
@@ -48,16 +48,16 @@ class Core(commands.Cog):
             if isinstance(error, discord.errors.Forbidden):
                 try:
                     return await ctx.reply(
-                        f"{self.bot.emoji_dict['redTick']} I am missing permissions to do that!"
+                        f"{self.bot.icons['redTick']} I am missing permissions to do that!"
                     )
                 except discord.Forbidden:
                     return await ctx.author.send(
-                        f"{self.bot.emoji_dict['redTick']} I am missing permissions to do that!"
+                        f"{self.bot.icons['redTick']} I am missing permissions to do that!"
                     )
 
         elif isinstance(error, commands.MaxConcurrencyReached):
             return await ctx.send(
-                f"{self.bot.emoji_dict['redTick']} The maximum concurrency is already reached for `{ctx.command}` ({error.number}). Try again later."
+                f"{self.bot.icons['redTick']} The maximum concurrency is already reached for `{ctx.command}` ({error.number}). Try again later."
             )
         elif isinstance(error, wavelink.errors.ZeroConnectedNodes):
             await self.bot.reload_extension("Music")
@@ -86,15 +86,15 @@ class Core(commands.Cog):
             return await ctx.send(str(error))
         elif isinstance(error, commands.MissingPermissions):
             return await ctx.send(
-                f"{self.bot.emoji_dict['redTick']} You are missing the `{error.missing_perms[0]}` permission to do that!"
+                f"{self.bot.icons['redTick']} You are missing the `{error.missing_perms[0]}` permission to do that!"
             )
         elif isinstance(error, commands.MemberNotFound):
             return await ctx.send(
-                f"{self.bot.emoji_dict['redTick']} I couldn't find `{error.argument}`. Have you spelled their name correctly? Try mentioning them."
+                f"{self.bot.icons['redTick']} I couldn't find `{error.argument}`. Have you spelled their name correctly? Try mentioning them."
             )
         elif isinstance(error, commands.RoleNotFound):
             return await ctx.send(
-                f"{self.bot.emoji_dict['redTick']} I couldn't find the role `{error.argument}`. Did you spell it correctly? Capitalization matters!"
+                f"{self.bot.icons['redTick']} I couldn't find the role `{error.argument}`. Did you spell it correctly? Capitalization matters!"
             )
         elif isinstance(error, commands.CommandNotFound):
             return
@@ -193,7 +193,7 @@ class Core(commands.Cog):
     async def update_status(self):
         status = read_json('config')
         
-        groot_status = f"{self.bot.emoji_dict[status['status'].get('groot', 'offline')]} {str.title(status['status'].get('groot', 'offline'))}"
+        groot_status = f"{self.bot.icons[status['status'].get('groot', 'offline')]} {str.title(status['status'].get('groot', 'offline'))}"
         message = f"**BOT STATUS** \n\n {groot_status} | Groot\n\nRefreshes every second"
     
         em = Embed(

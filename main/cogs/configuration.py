@@ -30,7 +30,7 @@ class Configuration(commands.Cog):
         await self.bot.db.execute(query, (modus, ctx.author.id))
         await self.bot.db.commit()
         return await ctx.send(
-            f"{self.bot.emoji_dict['greenTick']} Toggled your tips to `{mode.upper()}`"
+            f"{self.bot.icons['greenTick']} Toggled your tips to `{mode.upper()}`"
         )
 
     @commands.group(
@@ -109,7 +109,7 @@ class Configuration(commands.Cog):
             await self.bot.db.execute(query, (snowflake_id.id, command))
         except Exception:
             raise commands.BadArgument(
-                f"{self.bot.emoji_dict['redTick']} That command is already disabled{txt}!"
+                f"{self.bot.icons['redTick']} That command is already disabled{txt}!"
             )
         else:
             await self.bot.db.commit()
@@ -117,7 +117,7 @@ class Configuration(commands.Cog):
                 self.bot.cache["disabled_commands"][command].append(snowflake_id.id)
             except KeyError:
                 self.bot.cache["disabled_commands"][command] = [ctx.guild.id]
-            await ctx.send(f"{self.bot.emoji_dict['greenTick']} Disabled command `{command}`{txt}")
+            await ctx.send(f"{self.bot.icons['greenTick']} Disabled command `{command}`{txt}")
 
     @commands.command(
         name="enable",
@@ -151,14 +151,14 @@ class Configuration(commands.Cog):
 
         if row is None:
             raise commands.BadArgument(
-                f"{self.bot.emoji_dict['redTick']} That command is not disabled{txt}!"
+                f"{self.bot.icons['redTick']} That command is not disabled{txt}!"
             )
         else:
             query = "DELETE FROM disabled_commands WHERE snowflake_id = ? AND command_name = ?"
             self.bot.cache["disabled_commands"][command].remove(snowflake_id.id)
             await self.bot.db.execute(query, (snowflake_id.id, command))
             await self.bot.db.commit()
-            await ctx.send(f"{self.bot.emoji_dict['greenTick']} Enabled command `{command}`{txt}")
+            await ctx.send(f"{self.bot.icons['greenTick']} Enabled command `{command}`{txt}")
 
 
 def setup(bot):

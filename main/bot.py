@@ -22,7 +22,7 @@ to_call = ListCall()
 class GrootBot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(self.get_prefix, **kwargs)
-        self.emoji_dict = {}
+        self.icons = {}
         self.data = currencyData(self)
         self.token = kwargs.pop("token", None)
         self.session = aiohttp.ClientSession()
@@ -75,6 +75,7 @@ class GrootBot(commands.Bot):
             'online': '<:online:808613541774360576>', 
             'offline': '<:offline:817034738014879845>', 
             'idle': '<:idle:817035319165059102>',
+            'dnd': '<:dnd:817035352925536307>',
             'boosters': '<:Boosters:814930829461553152>',
             'typing': '<a:typing:826939777290076230>',
             'database': '<:database:857553072909189191>',
@@ -82,8 +83,8 @@ class GrootBot(commands.Bot):
             'loading': '<a:loading:856978168476205066>'
         }
 
-        self.emoji_dict = emojis
-        return self.emoji_dict
+        self.icons = emojis
+        return self.icons
 
     @to_call.append
     def loading_cogs(self):

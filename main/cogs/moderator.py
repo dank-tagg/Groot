@@ -30,7 +30,7 @@ class Moderator(commands.Cog):
 
         if mode != "remove" and mode != "add":
             return await ctx.send(
-                f"{self.bot.emoji_dict['redTick']} Accepted values are `add/remove` for `mode`"
+                f"{self.bot.icons['redTick']} Accepted values are `add/remove` for `mode`"
             )
 
         target_type = "user" if isinstance(target, discord.User) else "guild"
@@ -66,7 +66,7 @@ class Moderator(commands.Cog):
 
         if mode != "remove" and mode != "add":
             return await ctx.send(
-                f"{self.bot.emoji_dict['redTick']} Accepted values are `add/remove` for `mode`"
+                f"{self.bot.icons['redTick']} Accepted values are `add/remove` for `mode`"
             )
 
         target_type = "user" if isinstance(target, discord.User) else "guild"
@@ -97,7 +97,7 @@ class Moderator(commands.Cog):
     ):
         self.bot.cache["users"][user.id][action] += amount
         return await ctx.send(
-            f"{self.bot.emoji_dict['greenTick']} Successfully gave {user.mention} {amount:,} `{action}`."
+            f"{self.bot.icons['greenTick']} Successfully gave {user.mention} {amount:,} `{action}`."
         )
 
     @mod.command(name="create")
@@ -145,7 +145,7 @@ class Moderator(commands.Cog):
                 """
         await self.bot.db.execute(query, (item,))
         await self.bot.db.commit()
-        return await ctx.send(f"{self.bot.emoji_dict['greenTick']} Deleted item `{item}` from shop.")
+        return await ctx.send(f"{self.bot.icons['greenTick']} Deleted item `{item}` from shop.")
 
 def setup(bot):
     bot.add_cog(Moderator(bot))

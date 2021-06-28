@@ -39,7 +39,7 @@ class Information(commands.Cog):
 
         sql_ping = (end - start) * 1000
         await msg.edit(
-            content=f"{self.bot.emoji_dict['typing']} ** | Typing**: {round(typing_ping, 1)} ms\n{self.bot.emoji_dict['groot']} ** | Websocket**: {round(self.bot.latency*1000)} ms\n{self.bot.emoji_dict['database']} ** | Database**: {round(sql_ping, 1)} ms"
+            content=f"{self.bot.icons['typing']} ** | Typing**: {round(typing_ping, 1)} ms\n{self.bot.icons['groot']} ** | Websocket**: {round(self.bot.latency*1000)} ms\n{self.bot.icons['database']} ** | Database**: {round(sql_ping, 1)} ms"
         )
 
     @commands.command(name="vote", brief="The links where you can vote for the bot.")
