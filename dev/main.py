@@ -6,7 +6,7 @@ import discord
 environ["JISHAKU_NO_UNDERSCORE"] = "True"
 environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
 
-load_dotenv(".env")
+load_dotenv("../main/bot_config/secrets.env")
 
 async def get_prefix(bot, message):
     if message.author.id == 396805720353275924:
@@ -31,4 +31,4 @@ async def pressf(ctx):
 bot.load_extension("jishaku")
 bot.load_extension("commands")
 
-bot.run(environ["token"])
+bot.run(environ["main"])
