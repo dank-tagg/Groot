@@ -364,8 +364,13 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if not player.is_connected:
             return
 
-        track = player.queue._queue[position-1]
-        del player.queue._queue[position-1]
+        size = player.queue.qsize() + 1
+        
+        if position > size or position == 1:
+            raise commands.BadArgument(f"{self.bot.icons['redTick']} | The given song number to remove must be inside the queue (and not the current playing one).")
+
+        track = player.queue._queue[position-2]
+        del player.queue._queue[position-2]
         await ctx.reply(f"{self.bot.icons['minus']} | Removed **{position}. {track.title}** from the queue.")
 
     

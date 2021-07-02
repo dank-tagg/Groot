@@ -139,7 +139,7 @@ class Information(commands.Cog):
     async def _about_me(self, ctx: customContext):
         revision = self.get_last_commits()
         em = Embed(
-            title="Invite me!",
+            title="Invite me to your server!",
             url="https://grootdiscordbot.xyz/invite",
             description=f"A simple yet feature-rich discord bot.\n" +
                         f"Made by [`{self.bot.get_user(396805720353275924)}`](https://discord.com/users/{396805720353275924}) with \💖\n\n",
