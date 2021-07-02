@@ -9,16 +9,19 @@ from discord.ext import commands
 class customContext(commands.Context):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.processing = self.processing(self)
 
     class processing:
-        __slots__ = ("ctx", "delete_after", "m")
+        __slots__ = ("ctx", "delete_after", "m", "task")
 
         def __init__(self, ctx):
             self.ctx = ctx
             self.m = None
+            self.task = None
+
         async def __aenter__(self, *args, **kwargs):
             self.m = await asyncio.wait_for(self.ctx.send(f"{self.ctx.bot.icons['loading']} Processing command, please wait..."), timeout=3.0)
-            self.ctx.typing().__enter__()
+            self.task = self.ctx.typing().__enter__()
             return self
 
         async def __aexit__(self, *args, **kwargs):
@@ -27,7 +30,7 @@ class customContext(commands.Context):
             except discord.HTTPException:
                 return
             else:
-                self.ctx.typing().__exit__()
+                self.task.__exit__(None, None, None)
 
     async def send(self, content=None, **kwargs):
         if self.author.id in self.bot.cache["tips_are_on"]:
