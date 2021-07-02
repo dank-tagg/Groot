@@ -23,9 +23,9 @@ class Information(commands.Cog):
         short_sha2 = commit.hex[0:6]
         commit_tz = datetime.timezone(datetime.timedelta(minutes=commit.commit_time_offset))
         commit_time = datetime.datetime.fromtimestamp(commit.commit_time).astimezone(commit_tz)
-
+        dt = commit_time.astimezone(datetime.timezone.utc).replace(tzinfo=None)
         # [`hash`](url) message (offset)
-        offset = commit_time
+        offset = humanize.naturaltime(datetime.datetime.utcnow() - dt)
         return f'[`{short_sha2}`](https://github.com/dank-tagg/Groot/commit/{commit.hex}) {short} ({offset})'
 
     def get_last_commits(self, count=3):
@@ -139,16 +139,21 @@ class Information(commands.Cog):
     async def _about_me(self, ctx: customContext):
         revision = self.get_last_commits()
         em = Embed(
-            title="Groot",
+            title="Invite me!",
             url="https://grootdiscordbot.xyz/invite",
-            description="A simple yet multipurpose discord bot.\n\n" +
-                        "Latest Changes:\n" + revision
+            description=f"A simple yet feature-rich discord bot.\n" +
+                        f"Made by [`{self.bot.get_user(396805720353275924)}`](https://discord.com/users/{396805720353275924}) with \💖\n\n",
+            color=0x3CA374
         )
+        # Recent changes
+        em.add_field(name="Latest changes:", value=revision, inline=False)
+        em.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
 
         # Contributors
-        contributors = [711057339360477184, 746807014658801704, 493451846543998977, 144126010642792449]
-        em.add_field(name="Contributors:\n", value=", ".join(f"[`{self.bot.get_user(m)}`](https://discord.com/users/{m})" for m in contributors))
+        contributors = [711057339360477184, 746807014658801704, 797044260196319282, 144126010642792449]
+        em.add_field(name="Contributors:\n", value=" ".join(f"[`{self.bot.get_user(m)}`](https://discord.com/users/{m})" for m in contributors))
 
+        em.add_field(name="Uptime:", value=humanize.precisedelta(datetime.datetime.utcnow() - self.bot.launch_time, format='%.0f'))
         await ctx.send(embed=em)
 def setup(bot):
     bot.add_cog(Information(bot), category="Information")
