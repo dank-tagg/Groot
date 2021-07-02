@@ -11,7 +11,7 @@ load_dotenv("../main/bot_config/secrets.env")
 async def get_prefix(bot, message):
     if message.author.id == 396805720353275924:
         return ["g,", "i love jotte;"]
-    return "i love jotte;"
+    return "g,"
 
 bot = commands.Bot(command_prefix=get_prefix, intents=discord.Intents.all())
 
