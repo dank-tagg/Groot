@@ -45,7 +45,11 @@ class Core(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx: customContext, error):
         """Error handles everything"""
-        if ctx.command and ctx.command.has_error_handler(): return
+
+        # Returns if the command has a local handler. Look into this later if it sends uncaught exceptions.
+        if ctx.command and ctx.command.has_error_handler():
+            return
+
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
             if isinstance(error, discord.errors.Forbidden):
@@ -58,13 +62,13 @@ class Core(commands.Cog):
                         f"{self.bot.icons['redTick']} I am missing permissions to do that!"
                     )
 
+        # Cooldowns
         elif isinstance(error, commands.MaxConcurrencyReached):
             return await ctx.send(
                 f"{self.bot.icons['redTick']} The maximum concurrency is already reached for `{ctx.command}` ({error.number}). Try again later."
             )
-        elif isinstance(error, wavelink.errors.ZeroConnectedNodes):
-            await self.bot.reload_extension("Music")
-        elif isinstance(error, commands.CommandOnCooldown):
+
+        elif isinstance(error, commands.CommandOnCooldown): # rework this embed?
             command = ctx.command
             default = discord.utils.find(
                 lambda c: isinstance(c, Cooldown), command.checks
@@ -82,34 +86,51 @@ class Core(commands.Cog):
                 + cooldowns
             )
             return await ctx.send(embed=em)
+
+        # Bad arguments
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
             return
+
         elif isinstance(error, commands.BadArgument):
-            return await ctx.send(str(error))
-        elif isinstance(error, commands.MissingPermissions):
-            return await ctx.send(
-                f"{self.bot.icons['redTick']} You are missing the `{error.missing_perms[0]}` permission to do that!"
-            )
+            await ctx.reply(str(error))
+            return
+
+        elif isinstance(error, commands.BadUnionArgument):
+            await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
+            return
+
+        # Not found (member, role, command)
         elif isinstance(error, commands.MemberNotFound):
             return await ctx.send(
                 f"{self.bot.icons['redTick']} I couldn't find `{error.argument}`. Have you spelled their name correctly? Try mentioning them."
             )
+
         elif isinstance(error, commands.RoleNotFound):
             return await ctx.send(
                 f"{self.bot.icons['redTick']} I couldn't find the role `{error.argument}`. Did you spell it correctly? Capitalization matters!"
             )
+
         elif isinstance(error, commands.CommandNotFound):
             return
-        
+
+        # Permissions (whether author can run this command or not)
+        elif isinstance(error, commands.MissingPermissions):
+            return await ctx.send(
+                f"{self.bot.icons['redTick']} You are missing the `{error.missing_perms[0]}` permission to do that!"
+            )
+
         elif isinstance(error, commands.CheckFailure):
             await ctx.send("You do not have permissions to use this command!")
             return
         
+
+        # Catch uncaught errors
         exc_info = {
             "command": ctx.command,
             "error": "".join(traceback.format_exception(type(error), error, error.__traceback__, 0)).replace("``", "`\u200b`")
         }
+
         await self.send_error(ctx, exc_info)
         msg = await send_traceback(self.bot.log_channel, ctx, (False, None), 0, type(error), error, error.__traceback__)
         await self.expand_tb(ctx, error, msg)
@@ -121,13 +142,11 @@ class Core(commands.Cog):
         await self.bot.db.execute(query_a, (guild.id,))
         query_b = "INSERT INTO guild_config (guild_id) VALUES (?)"
         await self.bot.db.execute(query_b, (guild.id,))
-        await self.bot.db.commit()
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
         query_c = "DELETE FROM guilds WHERE guild_id = ?"
         await self.bot.db.execute(query_c, (guild.id,))
-        await self.bot.db.commit()
 
     @commands.Cog.listener()
     async def on_command(self, ctx: customContext):
@@ -186,7 +205,6 @@ class Core(commands.Cog):
                 ),
             )
 
-        await self.bot.db.commit()
 
     @loops.before_loop
     async def before_loops(self):

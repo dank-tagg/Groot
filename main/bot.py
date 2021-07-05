@@ -170,7 +170,7 @@ class GrootBot(commands.Bot):
 
         self.categories[category].add(cog.__cog_name__)
         super().add_cog(cog)
-        
+
     def get_message(self, message_id):
         """Gets the message from the cache"""
         return self._connection._get_message(message_id)
@@ -181,11 +181,33 @@ class GrootBot(commands.Bot):
         return context
 
     async def process_commands(self, message):
-        """Override process_commands to call typing every invoke"""
+        """Override process_commands to check, and call typing every invoke"""
         if message.author.bot:
             return
 
+        # Checks etc for blacklist ...
         ctx = await self.get_context(message)
+        if message.author.id == self.owner.id:
+            await self.invoke(ctx)
+            return
+
+        if self.maintenance and ctx.valid:
+            await message.channel.send("Bot is in maintenance. Please try again later.")
+            return
+
+        if (message.author.id in self.cache["blacklisted_users"] or getattr(message.guild, "id", None) in self.cache["blacklisted_users"]):
+            return
+
+        if ctx.valid and ctx.command.name in self.cache["disabled_commands"].keys():
+            if (
+                ctx.valid
+                and message.channel.id in self.cache["disabled_commands"][ctx.command.name]
+                or ctx.valid
+                and message.guild.id in self.cache["disabled_commands"][ctx.command.name]
+            ):
+                return
+        
+        # Trigger typing every invoke
         if ctx.valid and getattr(ctx.cog, "qualified_name", None) != "Jishaku":
             await ctx.trigger_typing()
         await self.invoke(ctx)

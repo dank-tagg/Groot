@@ -26,7 +26,7 @@ class Information(commands.Cog):
         dt = commit_time.astimezone(datetime.timezone.utc).replace(tzinfo=None)
         # [`hash`](url) message (offset)
         offset = humanize.naturaltime(datetime.datetime.utcnow() - dt)
-        return f'[`{short_sha2}`](https://github.com/dank-tagg/Groot/commit/{commit.hex}) {short} ({offset})'
+        return f'[`{short_sha2}`](https://github.com/dank-tagg/Groot/commit/{commit.hex}) \\{short} ({offset})'
 
     def get_last_commits(self, count=3):
         repo = pygit2.Repository(f'{self.bot.cwd}/../.git')
@@ -141,7 +141,7 @@ class Information(commands.Cog):
         em = Embed(
             title="Invite me to your server!",
             url="https://grootdiscordbot.xyz/invite",
-            description=f"A simple yet feature-rich discord bot.\n" +
+            description="Groot is a simple yet feature-rich discord bot.\nFeaturing over 150 commands, the best discord bot you could ask for!\n" +
                         f"Made by [`{self.bot.get_user(396805720353275924)}`](https://discord.com/users/{396805720353275924}) with \💖\n\n",
             color=0x3CA374
         )

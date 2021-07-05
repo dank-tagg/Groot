@@ -12,7 +12,7 @@ class Tags(commands.Cog):
         self.bot = bot
 
     @commands.group(invoke_without_command=True, case_insensitive=True)
-    async def tag(self, ctx: customContext, tag):
+    async def tag(self, ctx: customContext, *, tag):
         tag = tag.lower()
 
         query = "SELECT tag_content FROM tags WHERE tag_guild_id = ? AND tag_name = ?"
@@ -59,7 +59,7 @@ class Tags(commands.Cog):
             )
 
     @tag.command()
-    async def create(self, ctx: customContext, tag, content):
+    async def create(self, ctx: customContext, tag, *, content):
         """Creates a new tag owned by you.
         This tag is server-specific and cannot be used in other servers.
         Note that server moderators can delete your tag.
@@ -74,13 +74,12 @@ class Tags(commands.Cog):
         except sqlite3.IntegrityError:
             await ctx.send(f"{self.bot.icons['redTick']} That tag already exists!")
         else:
-            await self.bot.db.commit()
             return await ctx.send(
                 f"{self.bot.icons['greenTick']} Done! Created tag **{tag}**. `{await self.bot.get_prefix(ctx.message)}tag {tag}`"
             )
 
     @tag.command()
-    async def delete(self, ctx: customContext, tag):
+    async def delete(self, ctx: customContext, *, tag):
 
         tag = tag.lower()
         query = "SELECT tag_author FROM tags WHERE tag_name = ? AND tag_guild_id = ?"
@@ -101,7 +100,6 @@ class Tags(commands.Cog):
 
         query = "DELETE FROM tags WHERE tag_name = ? AND tag_guild_id = ?"
         cur = await self.bot.db.execute(query, (tag, ctx.guild.id))
-        await self.bot.db.commit()
         return await ctx.send(f"{self.bot.icons['greenTick']} Deleted tag `{tag}`.")
 
 

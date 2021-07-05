@@ -83,15 +83,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
         Purges messages, searches the channel with the limit of `amount`.\n
         Optionally from `user` or contains `matches`.
         """
-        pins = 0
-        for msg in await ctx.channel.pins():
-            pins += 1
         await ctx.message.delete()
-        counter = 0
-        async for msg in ctx.channel.history(limit=amount + pins):
-            counter += 1
-            if msg.pinned:
-                counter += 1
 
         def check_msg(msg):
             if msg.id == ctx.message.id:
@@ -108,13 +100,25 @@ class Moderation(commands.Cog, description="Moderation commands"):
             return await ctx.send(
                 "You can not purge more than 1000 messages each time!"
             )
+
         amount = await ctx.channel.purge(limit=amount, check=check_msg)
-        if amount == 0:
+        if len(amount) == 0:
             return await ctx.send("There are no messages that I can delete!")
+
         await ctx.send(
             f"{len(amount)} messages have been purged by {ctx.author.mention}",
             delete_after=3,
         )
+    
+    @commands.command(name="cleanup")
+    async def _self_cleanup(self, ctx):
+        """
+        Cleanup the bot's messages
+        """
+        after = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+        deleted = await ctx.channel.purge(after=after, check=lambda m: m.author == self.bot.user, bulk=False)
+
+        await ctx.send(f"Deleted **{len(deleted)}** messages from me.")
 
     @commands.command(name="lock", brief="Locks a channel")
     @commands.has_permissions(manage_channels=True)

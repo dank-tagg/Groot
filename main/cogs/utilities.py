@@ -511,30 +511,33 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         member = member if member else ctx.author
         guild = ctx.guild
         status = member.raw_status
-
+        
+        def format_dt(dt: datetime.datetime, style=None):
+            if style is None:
+                return f'<t:{int(dt.timestamp())}>'
+            return f'<t:{int(dt.timestamp())}:{style}>'
         em = Embed(
             title="",
             description=f"{member.mention}",
-            color=guild.me.colour,
             timestamp=datetime.datetime.utcnow(),
         )
         em.add_field(
-            name="Joined", value=member.joined_at.strftime("%a, %b %d, %Y %H:%M %p")
+            name="Joined at", value=f"{format_dt(member.joined_at)} ({format_dt(member.joined_at, 'R')})"
         )
         em.add_field(
-            name="Created", value=member.created_at.strftime("%a, %b %d, %Y %H:%M %p")
+            name="Created at", value=f"{format_dt(member.created_at)} ({format_dt(member.created_at, 'R')})"
         )
-        roles = member.roles[1:]
+        roles = member.roles[1:30]
 
         if roles:
             em.add_field(
-                name=f"Roles [{len(roles)}]",
+                name=f"Roles [{len(member.roles) -1}]",
                 value=" ".join(f"{role.mention}" for role in roles),
                 inline=False,
             )
         else:
             em.add_field(
-                name=f"Roles [{len(roles)}]",
+                name=f"Roles [{len(member.roles) -1}]",
                 value="This member has no roles",
                 inline=False,
             )
@@ -542,8 +545,11 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
 
 
         em.add_field(name=f"Status:", value=f"{self.bot.icons[status]} {status.capitalize()}")
-        if member.activity:
-            em.add_field(name="Activity:", value=member.activity, inline=False)
+
+        # Activity
+        activity = member.activity or "No activity currently"
+        if isinstance(activity, discord.BaseActivity):
+            em.add_field(name="Activity:", value=activity.name, inline=False)
         else:
             em.add_field(name="Activity:", value="No activity currently", inline=False)
         em.set_thumbnail(url=member.avatar_url)
@@ -566,6 +572,25 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             )
             em.set_image(url=member.avatar_url)
             await ctx.send(embed=em)
+
+    @commands.command(name="archive", aliases=['save', 'arch'])
+    async def _archive(self, ctx, *, message: typing.Optional[discord.Message]):
+        if not message:
+            message = getattr(ctx.message.reference, "resolved", None)
+        
+        if not message:
+            raise commands.BadArgument(f"{self.bot.icons['redTick']} | You must either reply to a message, or pass in a message ID/jump url")
+
+        # Resort message
+        content = message.content or "_No content_"
+        em = Embed(title="You archived a message!", url=message.jump_url, description=content, timestamp=datetime.datetime.utcnow())
+        em.set_author(name=message.author, icon_url=message.author.avatar_url)
+        try:
+            msg = await ctx.author.send(embed=em)
+            await msg.pin()
+            await ctx.send(f"Archived the message in your DMs!\n{msg.jump_url}")
+        except discord.Forbidden:
+            await ctx.send("Oops! I couldn't send you a message. Are you sure your DMs are on?")
 
     @commands.command(name="rickroll", brief="Detects rickroll from given link")
     async def _rickroll(self, ctx: customContext, *, link):
@@ -614,9 +639,16 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             )
             return await ctx.send(embed=em)
     
-    @commands.command(name="id")
-    async def _get_id(self, ctx: customContext, any: Union[discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.CategoryChannel, discord.Emoji, discord.User]):
-        return await ctx.send(any.id)
+    @commands.command(name="id", usage="<channel | emoji | user>")
+    async def _get_id(self, ctx: customContext, arg: Union[discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.CategoryChannel, discord.Emoji, discord.User]):
+        """
+        Gets the ID from either a channel, an emoji or a user
+        The emoji can **not** be a default emoji (they don't have ID's)
+        """
+        if not isinstance(arg, discord.Emoji):
+            await ctx.send(f"\\{arg.mention}", allowed_mentions=discord.AllowedMentions(users=False))
+        else:
+            await ctx.send(f"\\<:{arg.name}:{arg.id}>")
     
     @commands.command(name="embed")
     async def _send_embed(self, ctx: customContext, *, embed: str):

@@ -43,16 +43,17 @@ class GrootHelp(commands.HelpCommand):
             inline=False
         )
 
-        if not isinstance(command, commands.Group):
+        if not isinstance(command, commands.Group) or not command.commands:
             return em
+
         # Subcommands
         all_subs = [
-            f"`{sub.name}` {f'`{sub.signature}`' if sub.signature else ''}" for sub in command.walk_commands()
+            f"{sub.name}{f' {sub.signature}' or ''}" for sub in command.walk_commands()
         ]
         
         em.add_field(
             name="Subcommands", 
-            value="\n".join(all_subs)
+            value='```\n' + '\n'.join(all_subs) + '```'
         )
 
         return em
@@ -70,7 +71,7 @@ class GrootHelp(commands.HelpCommand):
 
         em = Embed(description=
             f"Prefix for **{ctx.guild.name}** is `{ctx.prefix or 'g.'}`\n"
-            f"Total commands: {len(list(bot.walk_commands()))} | Usable by you: {len(await self.filter_commands(bot.commands, sort=True))} \n"
+            f"Total commands: {len(list(bot.walk_commands()))} | Usable by you: {len(await self.filter_commands(list(bot.walk_commands()), sort=True))} \n"
             "```diff\n- [] = optional argument\n"
             "- <> = required argument\n"
             f"+ Type {ctx.prefix}help [command | category] for "

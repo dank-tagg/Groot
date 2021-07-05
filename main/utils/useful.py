@@ -107,7 +107,6 @@ class currencyData:
         query = "INSERT INTO currency_data (user_id) VALUES (?)"
         try:
             await self.bot.db.execute(query, (user_id,))
-            await self.bot.db.commit()
             self.bot.cache["users"].setdefault(
                 user_id,
                 {

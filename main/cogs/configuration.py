@@ -30,7 +30,6 @@ class Configuration(commands.Cog):
 
         query = "UPDATE users_data SET tips = ? WHERE user_id = ?"
         await self.bot.db.execute(query, (modus, ctx.author.id))
-        await self.bot.db.commit()
         return await ctx.send(
             f"{self.bot.icons['greenTick']} Toggled your tips to `{mode.upper()}`"
         )
@@ -65,7 +64,6 @@ class Configuration(commands.Cog):
         """
         query = "INSERT INTO guild_config (guild_id, grole) VALUES (?, ?) ON CONFLICT (guild_id) DO UPDATE SET grole = ?"
         await self.bot.db.execute(query, (ctx.guild.id, role.id, role.id))
-        await self.bot.db.commit()
         await ctx.send(f"The role required for giveaways is now set to **{role.name}**")
 
     @config.command(name="prefix", usage="<prefix>")
@@ -76,7 +74,6 @@ class Configuration(commands.Cog):
         """
         query = "INSERT INTO guild_config (guild_id, prefix) VALUES (?, ?) ON CONFLICT (guild_id) DO UPDATE SET prefix = ?"
         await self.bot.db.execute(query, (ctx.guild.id, prefix, prefix))
-        await self.bot.db.commit()
         self.bot.cache["prefix"][ctx.guild.id] = prefix
         await ctx.send(
             f"The prefix has been set to `{prefix}`. To change the prefix again, use `{prefix}config prefix <prefix>`"
@@ -114,7 +111,6 @@ class Configuration(commands.Cog):
                 f"{self.bot.icons['redTick']} That command is already disabled{txt}!"
             )
         else:
-            await self.bot.db.commit()
             try:
                 self.bot.cache["disabled_commands"][command].append(snowflake_id.id)
             except KeyError:
@@ -159,9 +155,35 @@ class Configuration(commands.Cog):
             query = "DELETE FROM disabled_commands WHERE snowflake_id = ? AND command_name = ?"
             self.bot.cache["disabled_commands"][command].remove(snowflake_id.id)
             await self.bot.db.execute(query, (snowflake_id.id, command))
-            await self.bot.db.commit()
             await ctx.send(f"{self.bot.icons['greenTick']} Enabled command `{command}`{txt}")
 
+    @commands.command(name="resetmydata")
+    async def _reset_my_data(self, ctx):
+        await ctx.send(f"⚠️ Are you sure you want to remove all your data?\n_Respond with `yes` or `no`_")
+        m = await self.bot.wait_for('message', check=lambda m: m.author == ctx.author)
+        if m.content.lower() != 'yes':
+            await ctx.send("Ok... your data won't be deleted.")
+            return
+        
+        await ctx.send(f"⚠️⚠️⚠️ Are you **REALLY** sure you want to remove **ALL** your data?⚠️⚠️⚠️\n_Respond with `yes` or `no`_")
+        m = await self.bot.wait_for('message', check=lambda m: m.author == ctx.author)
+        if m.content.lower() != 'yes':
+            await ctx.send("Ok... your data won't be deleted.")
+            return
+        
+        queries = [
+            "DELETE FROM currency_data WHERE user_id = ?"
+            "DELETE FROM user_Inventory WHERE user_id = ?"
+        ]
+
+        for query in queries:
+            await self.bot.db.execute(query, (ctx.author.id, ))
+        
+        del self.bot.cache['users']
+        await ctx.send(f"{self.bot.greenTick} Removed all your data")
+        
+
+        
 
 def setup(bot):
     bot.add_cog(Configuration(bot), category="Configuration")

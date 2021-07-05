@@ -1,7 +1,10 @@
+import sys
+sys.dont_write_bytecode = True
+
+import discord
 from discord.ext import commands
 from os import environ
 from dotenv import load_dotenv
-import discord
 
 environ["JISHAKU_NO_UNDERSCORE"] = "True"
 environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
@@ -24,9 +27,7 @@ async def on_message_edit(before, after):
     if after.author.id != 396805720353275924:
         return
     await bot.process_commands(after)
-@bot.command()
-async def pressf(ctx):
-    await ctx.send("Press oof")
+
 
 bot.load_extension("jishaku")
 bot.load_extension("commands")

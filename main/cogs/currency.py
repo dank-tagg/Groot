@@ -210,7 +210,6 @@ class Currency(commands.Cog):
                 ON CONFLICT(user_id, item_id) DO UPDATE SET amount = amount + ?
                 """
         await self.bot.db.execute(query, (ctx.author.id, item, amount, amount))
-        await self.bot.db.commit()
         em = Embed(
             description=f"Successfully bought `{amount}` `{item}` for **⛻{data[0]*amount:,}**"
         )

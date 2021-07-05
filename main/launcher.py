@@ -1,5 +1,4 @@
 import logging
-import re
 import sys
 
 sys.dont_write_bytecode = True
@@ -44,37 +43,5 @@ logging.basicConfig(
     style="{",
     level=logging.INFO,
 )
-
-
-@bot.event
-@wait_ready(bot=bot)
-async def on_message(message):
-    if re.fullmatch("<@(!)?812395879146717214>", message.content):
-        await message.channel.send(f"My prefix is `{await bot.get_prefix(message)}`")
-        return
-
-    ctx = await bot.get_context(message)
-    if message.author.id == bot.owner.id:
-        return await bot.process_commands(message)
-    
-    if bot.maintenance and ctx.valid:
-        await message.channel.send("Bot is in maintenance. Please try again later.")
-        return
-
-    if (
-        message.author.id in bot.cache["blacklisted_users"]
-        or getattr(message.guild, "id", None) in bot.cache["blacklisted_users"]
-    ):
-        return
-    if ctx.valid and ctx.command.name in bot.cache["disabled_commands"].keys():
-        if (
-            ctx.valid
-            and message.channel.id in bot.cache["disabled_commands"][ctx.command.name]
-            or ctx.valid
-            and message.guild.id in bot.cache["disabled_commands"][ctx.command.name]
-        ):
-            return
-    await bot.process_commands(message)
-
 
 bot.starter()

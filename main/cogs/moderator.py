@@ -130,7 +130,6 @@ class Moderator(commands.Cog):
                 VALUES (?,?,?,?,?)
                 """
         await self.bot.db.execute(query, (a[4], a[1], a[0], a[3], a[2]))
-        await self.bot.db.commit()
         cmd = self.bot.get_command("shop")
         return await ctx.invoke(cmd, item=a[0])
 
@@ -142,7 +141,6 @@ class Moderator(commands.Cog):
                 WHERE lower(item_name) = ?
                 """
         await self.bot.db.execute(query, (item,))
-        await self.bot.db.commit()
         return await ctx.send(f"{self.bot.icons['greenTick']} Deleted item `{item}` from shop.")
 
 def setup(bot):

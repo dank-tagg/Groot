@@ -123,7 +123,10 @@ class Developer(commands.Cog):
 
     @dev.command(name="restart")
     async def _restart(self, ctx: customContext):
+        # Stuff to do first before start
         await self.git(arguments="pull")
+        await self.bot.db.commit()
+        
         await ctx.send(f"{self.bot.icons['loading']} Restarting bot...")
         os._exit(0)
 
@@ -211,7 +214,6 @@ class Developer(commands.Cog):
     @dev.command()
     async def sql(self, ctx: customContext, *, query: str):
             cur = await self.bot.db.execute(query)
-            await self.bot.db.commit()
             if cur.description:
                 columns = [tuple[0] for tuple in cur.description]
             else:
