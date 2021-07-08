@@ -3,8 +3,9 @@
 [![Discord Bots](https://top.gg/api/widget/owner/812395879146717214.svg)](https://top.gg/bot/812395879146717214)
 
 # Groot
-A multipurpose discord bot, for educational and experimental purposes.<br>
-Made by `dank tagg#6017`
+Groot is a simple yet feature-rich discord bot.<br>
+Featuring over 150 commands, the best discord bot you could ask for!<br>
+Made by [`dank tagg#6017`](https://discord.com/users/396805720353275924) with 💖
 
 ## List of contents
 - [Usage](#usage)
@@ -18,7 +19,7 @@ Made by `dank tagg#6017`
 
 ## Usage
 If you anyhow want to _copy_ my code, feel free to. Be sure to read the [license](#licensing-information) though.<br>
-You can find me at the [support server](https://discord.gg/nUUJPgemFE) for Groot, or just shoot me a DM.<br>
+You can find me at the [support server](https://discord.gg/nUUJPgemFE) for Groot, or just shoot me a [DM](https://discord.com/users/396805720353275924).<br>
 
 ## Features
 ```css
@@ -67,13 +68,13 @@ I would be more than happy to talk to you.
 
 ### Requirements to contribute
 - [ ] It must be written in Python
-- [ ] It must be able to run on `python 3.9.4` and `discord.py 1.7.1`
+- [ ] It must be able to run on `python 3.9.5` and `discord.py 1.7.3`
 
 
 
 ## Contact me
 **DISCORD:**<br>
-dank tagg#6017 _or_ [support server](https://discord.gg/nUUJPgemFE)\
+[dank tagg#6017](https://discord.com/users/396805720353275924) _or_ [support server](https://discord.gg/nUUJPgemFE)\
 **EMAIL:**<br>
 grootdiscordbot@gmail.com
 
