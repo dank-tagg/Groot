@@ -8,10 +8,6 @@ import inspect
 import os
 import pygit2
 import itertools
-import pwd
-import pathlib
-import distro
-import psutil
 
 from discord.ext import commands
 from utils.chat_formatting import hyperlink
@@ -146,7 +142,7 @@ class Information(commands.Cog):
             title="Invite me to your server!",
             url="https://grootdiscordbot.xyz/invite",
             description="Groot is a simple yet feature-rich discord bot.\nFeaturing over 150 commands, the best discord bot you could ask for!\n" +
-                        f"Made by [`{self.bot.get_user(396805720353275924)}`](https://discord.com/users/{396805720353275924}) with \💖\n\n",
+                        f"Made by [`{self.bot.get_user(396805720353275924)}`](https://discord.com/users/396805720353275924) with \💖\n\n",
             color=0x3CA374
         )
         # Recent changes
@@ -160,114 +156,5 @@ class Information(commands.Cog):
         em.add_field(name="Uptime:", value=humanize.precisedelta(datetime.datetime.utcnow() - self.bot.launch_time, format='%.0f'))
         await ctx.send(embed=em)
 
-    @commands.command(aliases=["sys"])
-    @commands.is_owner()
-    async def system(self, ctx):
-        async with ctx.processing:
-            uname = os.uname()
-            system_platform = uname.sysname
-            system_name = pwd.getpwuid(os.getuid())[0] 
-            system_distribution = distro.linux_distribution()
-            system_node = uname.nodename
-
-            cpu_count = psutil.cpu_count()
-            cpu_frequency = str(round(psutil.cpu_freq().current, 2))+"Mhz"
-            cpu_percentage = str(psutil.cpu_percent())+"%"
-
-            memory = psutil.virtual_memory()
-            memory_total = humanize.naturalsize(memory.total)
-            memory_used = humanize.naturalsize(memory.used)
-            memory_available = humanize.naturalsize(memory.available)
-            memory_percentage = str(memory.percent)+"%"
-
-            disk = psutil.disk_usage('/')
-            disk_total = humanize.naturalsize(disk.total)
-            disk_used = humanize.naturalsize(disk.used)
-            disk_free = humanize.naturalsize(disk.free)
-            disk_percentage = str(disk.percent)+"%"
-
-            network = psutil.net_io_counters()
-            network_sent = humanize.naturalsize(network.bytes_sent)
-            network_recieved = humanize.naturalsize(network.bytes_recv)
-            network_packets_sent = humanize.intcomma(network.packets_sent)
-            network_packets_recieved = humanize.intcomma(network.packets_recv)
-
-            def line_count():
-                files = classes = funcs = comments = lines = letters = 0
-                p = pathlib.Path("./")
-                for f in p.rglob("*.py"):
-                    files += 1
-                    with f.open() as of:
-                        letters = sum(len(f.open().read()) for f in p.rglob("*.py"))
-                        for line in of.readlines():
-                            line = line.strip()
-                            if line.startswith("class"):
-                                classes += 1
-                            if line.startswith("def"):
-                                funcs += 1
-                            if line.startswith("async def"):
-                                funcs += 1
-                            if "#" in line:
-                                comments += 1
-                            lines += 1
-                return files, classes, funcs, comments, lines, letters
-                
-            files, classes, funcs, comments, lines, letters = await self.bot.loop.run_in_executor(None, line_count)
-
-        started_at = datetime.datetime.fromtimestamp(int(psutil.boot_time()))
-        em=Embed()
-        em.set_footer(text=f"Booted {humanize.naturaltime(started_at)}")
-        em.add_field(name="System", value=f"""
-```lua
-Platform: {system_platform}
-Distribution: {' '.join(system_distribution)}
-Name: {system_name}
-Node: {system_node}
-```
-""")    
-        em.add_field(name="CPU", value=f"""
-```lua
-Count: {cpu_count}
-Frequency: {cpu_frequency}
-Percentage: {cpu_percentage}
-```
-""")
-        em.add_field(name="Memory", value=f"""
-```lua
-Total: {memory_total}
-Used: {memory_used}
-Available: {memory_available}
-Percentage: {memory_percentage}
-```
-""")
-        em.add_field(name="Disk", value=f"""
-```lua
-Total: {disk_total}
-Used: {disk_used}
-Free: {disk_free}
-Percentage: {disk_percentage}
-```
-""")
-        em.add_field(name="Network", value=f"""
-```lua
-Sent: {network_sent}
-Recieved: {network_recieved}
-Packets Sent: {network_packets_sent}
-Packets Recieved: {network_packets_recieved}
-```
-""")
-        em.add_field(
-            name="Files",
-            value=f"""
-```lua
-Files: {files}
-Characters: {letters}
-Lines: {lines}
-Classes: {classes}
-Functions: {funcs}
-Comments: {comments}
-```
-""")
-        await ctx.send(embed=em)
 def setup(bot):
     bot.add_cog(Information(bot), cat_name="Information")

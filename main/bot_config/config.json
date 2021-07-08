@@ -1,8 +1,8 @@
 {
     "updates": {
-        "date": "2021-06-20 14:06:17.413375",
-        "message": "\ud83c\udfb5  NEW CATEGORY: **Music** is back!\n- To play music, use `play`\n- Multiple `play` commands will form a queue. `queue`\n- Don't like the song? `skip`\n- Volume too low? `volume 100`\n- Shuffle the playlist with `shuffle`\n- Tired of listening to awesome music? `stop`",
-        "link": "https://discord.com/channels/707869808129081364/823585905167433729/856172858496516107"
+        "date": "2021-07-08 13:29:58.510024",
+        "message": "**Deprecating low-quality commands soon** (giveaway, drop)\n \\\ud83d\udcddAdded a few hyperlinks that point to my DM's in the github README.md\n \\\ud83c\udfa8Reworked `bot.categories` and `ext.category`\n \\\u26a1Added `g.resetmydata` command.\n\\\ud83c\udfb5 Fixed music queue remove\n\\\ud83d\ude80 A nice about-me page on command `g.about`",
+        "link": "https://discord.com/channels/707869808129081364/823585905167433729/862633185497448448"
     },
     "status": {
         "groot": "online"

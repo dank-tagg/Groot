@@ -14,8 +14,7 @@ import utils.json_loader
 
 from discord.ext import commands
 from jishaku.codeblocks import codeblock_converter
-from jishaku.models import copy_context_with
-from utils.useful import Embed, BaseMenu, pages, fuzzy
+from utils.useful import Embed, pages
 
 @pages()
 async def show_result(self, menu, entry):
@@ -88,38 +87,10 @@ class Developer(commands.Cog):
         f = io.StringIO()
         with contextlib.redirect_stdout(f):
             await jsk(ctx, argument=code)
-        stdout = f.getvalue()
-        await ctx.send(stdout or "No output")
-
-    @dev.command(name="guilds")
-    async def _guilds(self, ctx: customContext, search=None):
         
-        if not search:
-            paginator = commands.Paginator(prefix=None, suffix=None, max_size=500)
-            for guild in sorted(self.bot.guilds, key=lambda guild: len(guild.members), reverse=True):
-                summary = f"GUILD: {guild.name} [{guild.id}]\nOWNER: {guild.owner} [{guild.owner_id}]\nMEMBERS: {len(guild.members)}\n"
-                paginator.add_line(summary)
-
-            menu = BaseMenu(source=show_result(paginator.pages))
-            await menu.start(ctx)
-        else:
-            collection = {guild.name: guild.id for guild in self.bot.guilds}
-            found = fuzzy.finder(search, collection, lazy=False)[:5]
-            
-            if len(found) == 1:
-                guild = self.bot.get_guild(collection[found[0]])
-                em = Embed(
-                    description=f"ID: {guild.id}\nTotal members: {len(guild.members)}"
-                )
-                em.set_author(name=found[0])
-                await ctx.send(embed=em)
-            elif len(found) > 1:
-                newline = "\n"
-                await ctx.send(
-                    f"{len(found)} guilds found:\n{newline.join(found)}"
-                )
-            else:
-                await ctx.send(f"No guild was found named **{search}**")
+        stdout = f.getvalue()
+        if stdout:
+            await ctx.send(f"```ps\n[stdout]\n{stdout}```")
 
     @dev.command(name="inviteme")
     async def _inviteme(self, ctx: customContext, *, guildid: int):
@@ -129,9 +100,10 @@ class Developer(commands.Cog):
     @dev.command(name="restart")
     async def _restart(self, ctx: customContext):
         # Stuff to do first before start
-        await self.git(arguments="pull")
-        await self.bot.db.commit()
-        
+        async with ctx.processing:
+            await self.git(arguments="pull")
+            await self.bot.db.commit()
+
         await ctx.send(f"{self.bot.icons['loading']} Restarting bot...")
         os._exit(0)
 
@@ -184,37 +156,6 @@ class Developer(commands.Cog):
                 await ctx.send(
                     f"Oops, an exception occured while handling an exception. Error was send here: {str(paste)}"
                 )
-
-    @dev.command()
-    async def commits(self, ctx: customContext):
-        res = await self.bot.session.get(f"https://api.github.com/repos/dank-tagg/Groot/commits")
-        res = await res.json()
-        em = Embed(title=f"Commits", description="\n".join(f"[`{commit['sha'][:6]}`]({commit['html_url']}) {commit['commit']['message']}" for commit in res[:5]), url=f"https://api.github.com/repos/dank-tagg/Groot/commits")
-        em.set_thumbnail(url="https://image.flaticon.com/icons/png/512%2F25%2F25231.png")
-        await ctx.reply(embed=em, mention_author=False)
-
-    @dev.command(name="sudo")
-    async def _sudo(self, ctx: customContext, *, command_string: str):
-        """
-        Run a command bypassing all checks and cooldowns.
-
-        This also bypasses permission checks so this has a high possibility of making commands raise exceptions.
-        """
-
-        alt_ctx = await copy_context_with(ctx, content=ctx.prefix + command_string)
-
-        if alt_ctx.command is None:
-            return await ctx.send(f'Command "{alt_ctx.invoked_with}" is not found')
-
-        return await alt_ctx.command.reinvoke(alt_ctx)
-
-    @dev.command()
-    async def tables(self, ctx: customContext):
-        cmd = self.bot.get_command("dev sql")
-        await ctx.invoke(
-            cmd,
-            query="SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%';",
-        )
 
     @dev.command()
     async def sql(self, ctx: customContext, *, query: str):

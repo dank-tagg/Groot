@@ -13,78 +13,69 @@ class Fun(commands.Cog, description="Fun commands"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(
-        name="guessthenumber", aliases=["gtn"], brief="Guess the number game!"
+@commands.command(
+    name="guessthenumber", aliases=["gtn"], brief="Guess the number game!"
+)
+@commands.max_concurrency(1, BucketType.user, wait=False)
+async def gtn(self, ctx: customContext):
+    """Play a guess the number game! You have three chances to guess the number 1-10"""
+
+    no = random.randint(1, 10) # randrange to randint
+    await ctx.send(
+        "A number between **1 and 10** has been chosen, You have 3 attempts to guess the right number! Type your guess in the chat as a valid number!"
+        # no f
     )
-    @commands.max_concurrency(1, BucketType.user, wait=False)
-    async def gtn(self, ctx: customContext):
-        """Play a guess the number game! You have three chances to guess the number 1-10"""
-
-        no = random.randrange(1, 10)
-        await ctx.send(
-            f"A number between **1 and 10** has been chosen, You have 3 attempts to guess the right number! Type your guess in the chat as a valid number!"
-        )
-        for i in range(0, 3):
-            try:
-                response = await self.bot.wait_for(
-                    "message",
-                    timeout=10,
-                    check=lambda m: m.author == ctx.author and m.channel == ctx.channel,
-                )
-                guess = int(response.content)
-
-                if guess > 10 or guess < 1:
-                    if 2 - i == 0:
-                        await ctx.send(
-                            f"Unlucky, you ran out of attempts. The number was **{no}**"
-                        )
-                        return
-                    else:
-                        await ctx.send(
-                            "That is not a valid number! It costed you one attempt..."
-                        )
-
-                else:
-                    if guess > no:
-                        if 2 - i == 0:
-                            await ctx.send(
-                                f"Unlucky, you ran out of attempts. The number was **{no}**"
-                            )
-                            return
-                        else:
-                            await ctx.send(
-                                f"The number is smaller than {guess}\n`{2-i}` attempts left"
-                            )
-                    elif guess < no:
-                        if 2 - i == 0:
-                            await ctx.send(
-                                f"Unlucky, you ran out of attempts. The number was **{no}**"
-                            )
-                            return
-                        else:
-                            await ctx.send(
-                                f"The number is bigger than {guess}\n`{2-i}` attempts left"
-                            )
-
-                    else:
-                        await ctx.send(
-                            f"Good stuff, you got the number right. I was thinking of **{no}**"
-                        )
-                        return
-            except asyncio.TimeoutError:
+    for i in range(3):
+        try:
+            response = await self.bot.wait_for(
+                "message",
+                timeout=10,
+                check=lambda m: m.author == ctx.author and m.channel == ctx.channel,
+            )
+        except asyncio.TimeoutError:
+            await ctx.send(
+                "You got to give me a number... game ended due to inactivity"
+            )
+            return
+        
+        if not response.content.isdigit():
+            if 2 - i == 0:
                 await ctx.send(
-                    "You got to give me a number... game ended due to inactivity"
+                    f"Unlucky, you ran out of attempts. The number was **{no}**"
                 )
                 return
-            except Exception:
-                if 2 - i == 0:
-                    await ctx.send(
-                        f"Unlucky, you ran out of attempts. The number was **{no}**"
-                    )
-                    return
-                await ctx.send(
-                    "That is not a valid number! It costed you one attempt..."
-                )
+            await ctx.send(
+                "That is not a valid number! It costed you one attempt..."
+            )
+            continue
+        guess = int(response.content)
+
+        if guess > 10 or guess < 1:
+            await ctx.send(
+                "That is not a valid number! It costed you one attempt..."
+            )
+            continue
+        
+        if guess != no and 2 - i == 0:
+            await ctx.send(
+                f"Unlucky, you ran out of attempts. The number was **{no}**"
+            )
+            return
+
+        if guess > no:
+            await ctx.send(
+                f"The number is smaller than {guess}\n`{2-i}` attempts left"
+            )
+        elif guess < no:
+            await ctx.send(
+                f"The number is bigger than {guess}\n`{2-i}` attempts left"
+            )
+
+        else:
+            await ctx.send(
+                f"Good stuff, you got the number right. I was thinking of **{no}**"
+            )
+            return
 
     @commands.command(name="gayrate", aliases=["howgay"], brief="Rates your gayness")
     async def gayrate(self, ctx: customContext, member: discord.Member = None):
@@ -93,7 +84,7 @@ class Fun(commands.Cog, description="Fun commands"):
 
         emb = Embed(
             title="gay r8 machine",
-            description=f"{user} {random.randrange(0, 100)}% gay 🌈",
+            description=f"{user} {random.randint(0, 100)}% gay 🌈",
             color=discord.Color.random(),
         )
         await ctx.send(embed=emb)
@@ -103,10 +94,12 @@ class Fun(commands.Cog, description="Fun commands"):
         if isinstance(error, commands.MemberNotFound):
             emb = Embed(
                 title="gay r8 machine",
-                description=f"{error.argument} is {random.randrange(0, 100)}% gay 🌈",
+                description=f"{error.argument} is {random.randint(0, 100)}% gay 🌈",
                 color=discord.Color.random(),
             )
             await ctx.send(embed=emb)
+        else:
+            raise error
 
     @commands.command(aliases=["memes"], brief="Shows a meme from reddit")
     async def meme(self, ctx: customContext):
@@ -153,28 +146,6 @@ class Fun(commands.Cog, description="Fun commands"):
             colour=discord.Color.random(),
         )
         await ctx.send(embed=em)
-
-    @commands.group(
-        invoke_without_command=True, case_insensitive=True, usage="<encode | decode>"
-    )
-    async def binary(self, ctx: customContext):
-        """Encode or decode something to binary!"""
-        await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
-        return
-
-    @binary.command()
-    async def encode(self, ctx: customContext, *, text):
-        """Encodes given text to binary"""
-        res = await self.bot.session.get(f"https://some-random-api.ml/binary?text={text}")
-        data = await res.json()
-        await ctx.send(data["binary"])
-
-    @binary.command()
-    async def decode(self, ctx: customContext, *, binary):
-        """Decodes given text to binary"""
-        res = await self.bot.session.get(f"https://some-random-api.ml/binary?decode={binary}")
-        data = await res.json()
-        await ctx.send(data["text"])
 
     @commands.command(name="fight")
     @commands.max_concurrency(1, BucketType.user, wait=False)

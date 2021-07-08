@@ -18,4 +18,3 @@ python-dotenv
 aiosqlite
 dpymenus
 pygit2
-distro
