@@ -13,139 +13,139 @@ class Fun(commands.Cog, description="Fun commands"):
     def __init__(self, bot):
         self.bot = bot
 
-@commands.command(
-    name="guessthenumber", aliases=["gtn"], brief="Guess the number game!"
-)
-@commands.max_concurrency(1, BucketType.user, wait=False)
-async def gtn(self, ctx: customContext):
-    """Play a guess the number game! You have three chances to guess the number 1-10"""
-
-    no = random.randint(1, 10) # randrange to randint
-    await ctx.send(
-        "A number between **1 and 10** has been chosen, You have 3 attempts to guess the right number! Type your guess in the chat as a valid number!"
-        # no f
+    @commands.command(
+        name="guessthenumber", aliases=["gtn"], brief="Guess the number game!"
     )
-    for i in range(3):
-        try:
-            response = await self.bot.wait_for(
-                "message",
-                timeout=10,
-                check=lambda m: m.author == ctx.author and m.channel == ctx.channel,
-            )
-        except asyncio.TimeoutError:
-            await ctx.send(
-                "You got to give me a number... game ended due to inactivity"
-            )
-            return
-        
-        if not response.content.isdigit():
-            if 2 - i == 0:
+    @commands.max_concurrency(1, BucketType.user, wait=False)
+    async def gtn(self, ctx: customContext):
+        """Play a guess the number game! You have three chances to guess the number 1-10"""
+
+        no = random.randint(1, 10) # randrange to randint
+        await ctx.send(
+            "A number between **1 and 10** has been chosen, You have 3 attempts to guess the right number! Type your guess in the chat as a valid number!"
+            # no f
+        )
+        for i in range(3):
+            try:
+                response = await self.bot.wait_for(
+                    "message",
+                    timeout=10,
+                    check=lambda m: m.author == ctx.author and m.channel == ctx.channel,
+                )
+            except asyncio.TimeoutError:
+                await ctx.send(
+                    "You got to give me a number... game ended due to inactivity"
+                )
+                return
+            
+            if not response.content.isdigit():
+                if 2 - i == 0:
+                    await ctx.send(
+                        f"Unlucky, you ran out of attempts. The number was **{no}**"
+                    )
+                    return
+                await ctx.send(
+                    "That is not a valid number! It costed you one attempt..."
+                )
+                continue
+            guess = int(response.content)
+
+            if guess > 10 or guess < 1:
+                await ctx.send(
+                    "That is not a valid number! It costed you one attempt..."
+                )
+                continue
+            
+            if guess != no and 2 - i == 0:
                 await ctx.send(
                     f"Unlucky, you ran out of attempts. The number was **{no}**"
                 )
                 return
-            await ctx.send(
-                "That is not a valid number! It costed you one attempt..."
-            )
-            continue
-        guess = int(response.content)
 
-        if guess > 10 or guess < 1:
-            await ctx.send(
-                "That is not a valid number! It costed you one attempt..."
-            )
-            continue
-        
-        if guess != no and 2 - i == 0:
-            await ctx.send(
-                f"Unlucky, you ran out of attempts. The number was **{no}**"
-            )
-            return
+            if guess > no:
+                await ctx.send(
+                    f"The number is smaller than {guess}\n`{2-i}` attempts left"
+                )
+            elif guess < no:
+                await ctx.send(
+                    f"The number is bigger than {guess}\n`{2-i}` attempts left"
+                )
 
-        if guess > no:
-            await ctx.send(
-                f"The number is smaller than {guess}\n`{2-i}` attempts left"
-            )
-        elif guess < no:
-            await ctx.send(
-                f"The number is bigger than {guess}\n`{2-i}` attempts left"
-            )
+            else:
+                await ctx.send(
+                    f"Good stuff, you got the number right. I was thinking of **{no}**"
+                )
+                return
 
-        else:
-            await ctx.send(
-                f"Good stuff, you got the number right. I was thinking of **{no}**"
-            )
-            return
+        @commands.command(name="gayrate", aliases=["howgay"], brief="Rates your gayness")
+        async def gayrate(self, ctx: customContext, member: discord.Member = None):
+            """Rate your gayness or another users gayness. 1-100% is returned"""
+            user = member.name + " is" if member else "You are"
 
-    @commands.command(name="gayrate", aliases=["howgay"], brief="Rates your gayness")
-    async def gayrate(self, ctx: customContext, member: discord.Member = None):
-        """Rate your gayness or another users gayness. 1-100% is returned"""
-        user = member.name + " is" if member else "You are"
-
-        emb = Embed(
-            title="gay r8 machine",
-            description=f"{user} {random.randint(0, 100)}% gay 🌈",
-            color=discord.Color.random(),
-        )
-        await ctx.send(embed=emb)
-
-    @gayrate.error
-    async def gayrate_error(self, ctx: customContext, error):
-        if isinstance(error, commands.MemberNotFound):
             emb = Embed(
                 title="gay r8 machine",
-                description=f"{error.argument} is {random.randint(0, 100)}% gay 🌈",
+                description=f"{user} {random.randint(0, 100)}% gay 🌈",
                 color=discord.Color.random(),
             )
             await ctx.send(embed=emb)
-        else:
-            raise error
 
-    @commands.command(aliases=["memes"], brief="Shows a meme from reddit")
-    async def meme(self, ctx: customContext):
-        """Shows a meme from r/memes."""
-        res = await self.bot.session.get("https://www.reddit.com/r/memes/random/.json")
-        data = await res.json()
+        @gayrate.error
+        async def gayrate_error(self, ctx: customContext, error):
+            if isinstance(error, commands.MemberNotFound):
+                emb = Embed(
+                    title="gay r8 machine",
+                    description=f"{error.argument} is {random.randint(0, 100)}% gay 🌈",
+                    color=discord.Color.random(),
+                )
+                await ctx.send(embed=emb)
+            else:
+                raise error
 
-        image = data[0]["data"]["children"][0]["data"]["url"]
-        permalink = data[0]["data"]["children"][0]["data"]["permalink"]
-        url = f"https://reddit.com{permalink}"
-        title = data[0]["data"]["children"][0]["data"]["title"]
-        ups = data[0]["data"]["children"][0]["data"]["ups"]
-        downs = data[0]["data"]["children"][0]["data"]["downs"]
-        comments = data[0]["data"]["children"][0]["data"]["num_comments"]
+        @commands.command(aliases=["memes"], brief="Shows a meme from reddit")
+        async def meme(self, ctx: customContext):
+            """Shows a meme from r/memes."""
+            res = await self.bot.session.get("https://www.reddit.com/r/memes/random/.json")
+            data = await res.json()
 
-        em = Embed(colour=discord.Color.blurple(), title=title, url=url)
-        em.set_image(url=image)
-        em.set_footer(text=f"👍 {ups} 👎 {downs} 💬 {comments}")
+            image = data[0]["data"]["children"][0]["data"]["url"]
+            permalink = data[0]["data"]["children"][0]["data"]["permalink"]
+            url = f"https://reddit.com{permalink}"
+            title = data[0]["data"]["children"][0]["data"]["title"]
+            ups = data[0]["data"]["children"][0]["data"]["ups"]
+            downs = data[0]["data"]["children"][0]["data"]["downs"]
+            comments = data[0]["data"]["children"][0]["data"]["num_comments"]
 
-        await ctx.send(embed=em)
+            em = Embed(colour=discord.Color.blurple(), title=title, url=url)
+            em.set_image(url=image)
+            em.set_footer(text=f"👍 {ups} 👎 {downs} 💬 {comments}")
 
-    @commands.command(name="8ball", brief="Ask the 8-ball a question!")
-    async def eightball(self, ctx: customContext, *, question):
-        """The almighty eightball answers all your questions"""
-        answers = [
-            "It is certain.",
-            "It is decidedly so.",
-            "Without a doubt.",
-            "Is Trump's skin orange?",
-            "Definitely",
-            "Why don't you go ask your mom smh.",
-            "What? No!",
-            "Unscramble `esy`",
-            "Doubtful...",
-            "I'm lazy rn, don't want to answer it.",
-            "Ok, no",
-            "Possibly so!",
-            "Yes. Yes. Yes.",
-        ]
+            await ctx.send(embed=em)
 
-        em = Embed(
-            title="Magic 8-ball",
-            description=f"You: {question}\n🎱: {random.choice(answers)}",
-            colour=discord.Color.random(),
-        )
-        await ctx.send(embed=em)
+        @commands.command(name="8ball", brief="Ask the 8-ball a question!")
+        async def eightball(self, ctx: customContext, *, question):
+            """The almighty eightball answers all your questions"""
+            answers = [
+                "It is certain.",
+                "It is decidedly so.",
+                "Without a doubt.",
+                "Is Trump's skin orange?",
+                "Definitely",
+                "Why don't you go ask your mom smh.",
+                "What? No!",
+                "Unscramble `esy`",
+                "Doubtful...",
+                "I'm lazy rn, don't want to answer it.",
+                "Ok, no",
+                "Possibly so!",
+                "Yes. Yes. Yes.",
+            ]
+
+            em = Embed(
+                title="Magic 8-ball",
+                description=f"You: {question}\n🎱: {random.choice(answers)}",
+                colour=discord.Color.random(),
+            )
+            await ctx.send(embed=em)
 
     @commands.command(name="fight")
     @commands.max_concurrency(1, BucketType.user, wait=False)
