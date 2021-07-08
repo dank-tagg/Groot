@@ -176,4 +176,4 @@ class Docs(commands.Cog):
         await self.do_rtfm(ctx, 'master', obj)
 
 def setup(bot):
-    bot.add_cog(Docs(bot), category="Information")
+    bot.add_cog(Docs(bot), cat_name="Information")

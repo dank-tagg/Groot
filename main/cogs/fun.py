@@ -372,4 +372,4 @@ class Fun(commands.Cog, description="Fun commands"):
 
 
 def setup(bot):
-    bot.add_cog(Fun(bot), category="Fun")
+    bot.add_cog(Fun(bot), cat_name="Fun")

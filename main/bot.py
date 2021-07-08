@@ -9,6 +9,8 @@ from pathlib import Path
 import aiohttp
 import aiosqlite
 import discord
+
+from ext.category import Category
 from discord.ext import commands, ipc
 
 from utils.cache import CacheManager
@@ -164,16 +166,23 @@ class GrootBot(commands.Bot):
             return match.group(1)
         return prefix
 
-    def add_cog(self, cog: commands.Cog, category: str = "Unlisted"):
-        if not category in self.categories:
-            self.categories[category] = set()
+    def add_cog(self, cog: commands.Cog, cat_name: str = "Unlisted"):
+        category = self.get_category(cat_name)
 
-        self.categories[category].add(cog.__cog_name__)
+        if not category:
+            category = Category(cat_name)
+            self.categories[category.name] = category
+
+        category.add_cog(cog)
         super().add_cog(cog)
 
     def get_message(self, message_id):
         """Gets the message from the cache"""
         return self._connection._get_message(message_id)
+
+    def get_category(self, name):
+        """Gets the category with the given name."""
+        return self.categories.get(name)
 
     async def get_context(self, message, *, cls=None):
         """Override get_context to use a custom Context"""

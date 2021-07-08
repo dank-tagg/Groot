@@ -136,10 +136,8 @@ class GrootHelp(commands.HelpCommand):
 
         if to_find not in categories: return None
         
-        category = categories[to_find]
-        cogs = [self.context.bot.get_cog(cog) for cog in category]
-        commands = [cog.get_commands() for cog in cogs]
-        commands = [f"`{command.name}`" for command in chain(*commands)]
+        category = self.context.bot.get_category(to_find)
+        commands = [f"`{command.name}`" for command in category.walk_commands()]
         
         em = Embed(description=' '.join(commands))
         em.set_author(name=f"{to_find} [{len(commands)}]")
@@ -179,4 +177,4 @@ class Help(commands.Cog):
         bot.help_command = help_command
     
 def setup(bot):
-    bot.add_cog(Help(bot), category="Information")
+    bot.add_cog(Help(bot), cat_name="Information")

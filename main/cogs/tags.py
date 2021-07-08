@@ -104,4 +104,4 @@ class Tags(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Tags(bot), category="Utilities")
+    bot.add_cog(Tags(bot), cat_name="Utilities")

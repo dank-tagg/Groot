@@ -4,7 +4,7 @@ import datetime as dt
 import traceback
 import discord
 import humanize
-import wavelink
+import re
 
 from discord.ext import commands, tasks
 from utils.useful import Embed, Cooldown, send_traceback
@@ -134,7 +134,12 @@ class Core(commands.Cog):
         await self.send_error(ctx, exc_info)
         msg = await send_traceback(self.bot.log_channel, ctx, (False, None), 0, type(error), error, error.__traceback__)
         await self.expand_tb(ctx, error, msg)
-        
+    
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if re.fullmatch("<@(!)?812395879146717214>", message.content):
+            await message.channel.send(f"My prefix is `{await self.bot.get_prefix(message)}`")
+            return
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):

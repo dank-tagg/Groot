@@ -81,4 +81,4 @@ class Support(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Support(bot), category="Support")
+    bot.add_cog(Support(bot), cat_name="Support")

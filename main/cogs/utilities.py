@@ -656,4 +656,4 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         await ctx.send(embed=em)
 
 def setup(bot):
-    bot.add_cog(Utilities(bot), category="Utilities")
+    bot.add_cog(Utilities(bot), cat_name="Utilities")

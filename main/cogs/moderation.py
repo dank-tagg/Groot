@@ -539,4 +539,4 @@ class Moderation(commands.Cog, description="Moderation commands"):
 
 
 def setup(bot):
-    bot.add_cog(Moderation(bot), category="Moderation")
+    bot.add_cog(Moderation(bot), cat_name="Moderation")

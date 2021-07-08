@@ -245,4 +245,4 @@ class Playlists(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Playlists(bot), category="Music")
+    bot.add_cog(Playlists(bot), cat_name="Music")

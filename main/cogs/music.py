@@ -488,4 +488,4 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
                 return await ctx.send(f"{self.bot.icons['greenTick']} | {member.mention} is now the DJ.")
 
 def setup(bot):
-    bot.add_cog(Music(bot), category="Music")
+    bot.add_cog(Music(bot), cat_name="Music")

@@ -8,6 +8,7 @@ import pathlib
 import traceback
 import discord
 import mystbin
+import contextlib
 import tabulate
 import utils.json_loader
 
@@ -84,7 +85,11 @@ class Developer(commands.Cog):
         """Evaluates a code"""
 
         jsk = self.bot.get_command("jishaku py")
-        return await jsk(ctx, argument=code)
+        f = io.StringIO()
+        with contextlib.redirect_stdout(f):
+            await jsk(ctx, argument=code)
+        stdout = f.getvalue()
+        await ctx.send(stdout or "No output")
 
     @dev.command(name="guilds")
     async def _guilds(self, ctx: customContext, search=None):

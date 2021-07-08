@@ -1,3 +1,4 @@
+from re import A
 from utils._type import *
 
 import datetime
@@ -581,6 +582,33 @@ class Currency(commands.Cog):
         cmd = self.bot.get_command("play_blackjack")
         await ctx.invoke(cmd, amount=amount)
 
+    @commands.command(name="rob", aliases=["steal"])
+    @commands.check(Cooldown(1, 30, 1, 15, commands.BucketType.user))
+    async def _rob(self, ctx: customContext, target: discord.Member):
+        if target.bot or target == self.bot.owner:
+            raise commands.BadArgument(f"No no you can't rob a bot that is just low.")
+        
+        wallet = await self.data.get_data(ctx.author.id)
+
+        if wallet < 500:
+            raise commands.BadArgument(f"Oops. You don't have enough money to rob {target} `({wallet}/500)`")
+
+        success = random.choices([True, False], weights=[30, 70])
+        if not success:
+            await self.data.update_data(ctx.author.id, -500)
+            await ctx.send("Rip. You got caught robbing. You lost **⛻500**")
+            return
+        
+        winnings = random.choices([(25, 50), (50, 75), (75, 100)], weights=[40, 40, 20])
+        winnings = random.randint(winnings[0][0], winnings[0][1])
+        target_loot = await self.data.get_data(target.id)
+
+        amt_won = round(target_loot * winnings / 100)
+        await self.data.update_data(ctx.author.id, amt_won)
+        await self.data.update_data(target.id, -amt_won)
+        
+        await ctx.send(f"You robbed {target} and gained ⛻{amt_won:,}. Hooray!")
+
     @tasks.loop(seconds=10)
     async def levels(self):
         for user in self.cache:
@@ -604,4 +632,4 @@ class Currency(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Currency(bot), category="Currency")
+    bot.add_cog(Currency(bot), cat_name="Currency")
