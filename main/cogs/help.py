@@ -137,7 +137,7 @@ class GrootHelp(commands.HelpCommand):
         if to_find not in categories: return None
         
         category = self.context.bot.get_category(to_find)
-        commands = [f"`{command.name}`" for command in category.walk_commands()]
+        commands = [f"`{command.name}`" for command in category.get_commands()]
         
         em = Embed(description=' '.join(commands))
         em.set_author(name=f"{to_find} [{len(commands)}]")

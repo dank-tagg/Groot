@@ -115,7 +115,7 @@ class Developer(commands.Cog):
 
         async with ctx.typing():
             for file in os.listdir(f"{self.bot.cwd}/cogs"):
-                if file.endswith(".py"):
+                if file.endswith(".py") and file[:-3] not in self.bot.non_sync:
                     try:
                         self.bot.reload_extension(f"cogs.{file[:-3]}")
                     except discord.ext.commands.ExtensionNotLoaded as e:
@@ -156,6 +156,16 @@ class Developer(commands.Cog):
                 await ctx.send(
                     f"Oops, an exception occured while handling an exception. Error was send here: {str(paste)}"
                 )
+
+    @dev.command(name="reload")
+    async def _reload_ext(self, ctx: customContext, *, ext: str):
+        async with ctx.processing:
+            try:
+                self.bot.reload_extension(f"cogs.{ext}")
+            except commands.ExtensionNotLoaded:
+                await ctx.send(f'`cogs.{ext}` is not loaded.')
+                return
+        await ctx.send(f"{self.bot.icons['greenTick']} Reloaded `cogs.{ext}`")
 
     @dev.command()
     async def sql(self, ctx: customContext, *, query: str):
