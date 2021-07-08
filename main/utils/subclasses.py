@@ -9,28 +9,28 @@ from discord.ext import commands
 class customContext(commands.Context):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.processing = self.processing(self)
 
     class processing:
-        __slots__ = ("ctx", "delete_after", "m", "task")
 
-        def __init__(self, ctx):
+        def __init__(self, ctx, **kwargs):
             self.ctx = ctx
+            self.delete_after = kwargs.get("delete_after")
+            self.message = kwargs.get("message")
             self.m = None
             self.task = None
 
         async def __aenter__(self, *args, **kwargs):
-            self.m = await asyncio.wait_for(self.ctx.send(f"{self.ctx.bot.icons['loading']} Processing command, please wait..."), timeout=3.0)
+            self.m = await self.ctx.send(f"{self.ctx.bot.icons['loading']} {self.message or 'Processing command, please wait...'}")
             self.task = self.ctx.typing().__enter__()
             return self
 
         async def __aexit__(self, *args, **kwargs):
-            try:
-                await self.m.delete()
-            except discord.HTTPException:
-                return
-            else:
-                self.task.__exit__(None, None, None)
+            if self.delete_after:
+                try:
+                    await self.m.delete()
+                except discord.HTTPException:
+                    pass
+            self.task.__exit__(None, None, None)
 
     async def send(self, content=None, **kwargs):
         if self.author.id in self.bot.cache["tips_are_on"]:

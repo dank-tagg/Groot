@@ -150,7 +150,14 @@ class Information(commands.Cog):
         em.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
 
         # Contributors
-        contributors = [711057339360477184, 746807014658801704, 797044260196319282, 144126010642792449]
+        contributors = [
+            711057339360477184,
+            746807014658801704,
+            797044260196319282,
+            144126010642792449,
+            852788943229288449,
+            525843819850104842
+        ]
         em.add_field(name="Contributors:\n", value=" ".join(f"[`{self.bot.get_user(m)}`](https://discord.com/users/{m})" for m in contributors))
 
         em.add_field(name="Uptime:", value=humanize.precisedelta(datetime.datetime.utcnow() - self.bot.launch_time, format='%.0f'))

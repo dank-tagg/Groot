@@ -17,6 +17,7 @@ from utils.cache import CacheManager
 from utils.subclasses import customContext
 from utils.useful import (Cooldown, ListCall, call, currencyData,
                           print_exception)
+from utils.json_loader import read_json
 
 to_call = ListCall()
 
@@ -245,6 +246,13 @@ class GrootBot(commands.Bot):
     async def on_ready(self):
         logging.warning(f"Logged in as {self.user}, SQLite3 database initialized.")
         print(f"Logged in as {self.user}")
+
+        # Edit restart message
+        data = read_json('config')
+        channel = self.get_channel(data['messages']['lastChannel'])
+        msg = await channel.fetch_message(data['messages']['lastMessage'])
+        if msg is not None:
+            await msg.edit(content=f"Back online {self.owner.mention}!")
 
     async def on_ipc_error(self, endpoint, error):
         logging.warning(f"{endpoint} raised {error}")

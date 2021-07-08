@@ -3,4 +3,5 @@
 *.env
 *.log
 *.pyc
+*.json
 .git-credentials

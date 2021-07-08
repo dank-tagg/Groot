@@ -15,6 +15,7 @@ import utils.json_loader
 from discord.ext import commands
 from jishaku.codeblocks import codeblock_converter
 from utils.useful import Embed, pages
+from utils.json_loader import read_json, write_json
 
 @pages()
 async def show_result(self, menu, entry):
@@ -100,11 +101,14 @@ class Developer(commands.Cog):
     @dev.command(name="restart")
     async def _restart(self, ctx: customContext):
         # Stuff to do first before start
-        async with ctx.processing:
+        async with ctx.processing(ctx, message="Restarting bot...") as process:
             await self.git(arguments="pull")
             await self.bot.db.commit()
 
-        await ctx.send(f"{self.bot.icons['loading']} Restarting bot...")
+        data = read_json("config")
+        data['messages']['lastMessage'] = process.m.id
+        data['messages']['lastChannel'] = process.m.channel.id
+        write_json(data, "config")
         os._exit(0)
 
     @dev.command(name="sync")
@@ -159,7 +163,7 @@ class Developer(commands.Cog):
 
     @dev.command(name="reload")
     async def _reload_ext(self, ctx: customContext, *, ext: str):
-        async with ctx.processing:
+        async with ctx.processing(ctx, message="Reloading extension...", delete_after=True):
             try:
                 self.bot.reload_extension(f"cogs.{ext}")
             except commands.ExtensionNotLoaded:
