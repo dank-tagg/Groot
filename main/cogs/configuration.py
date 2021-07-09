@@ -62,6 +62,8 @@ class Configuration(commands.Cog):
         """
         Sets the required role for starting giveaways to `role`
         """
+        if role is None:
+            raise commands.BadArgument("That is not a valid role. Either ping it or give its ID.")
         query = "INSERT INTO guild_config (guild_id, grole) VALUES (?, ?) ON CONFLICT (guild_id) DO UPDATE SET grole = ?"
         await self.bot.db.execute(query, (ctx.guild.id, role.id, role.id))
         await ctx.send(f"The role required for giveaways is now set to **{role.name}**")

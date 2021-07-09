@@ -5,6 +5,7 @@ import traceback
 import discord
 import humanize
 import re
+import logging
 
 from discord.ext import commands, tasks
 from utils.useful import Embed, Cooldown, send_traceback
@@ -134,6 +135,7 @@ class Core(commands.Cog):
         await self.send_error(ctx, exc_info)
         msg = await send_traceback(self.bot.log_channel, ctx, (False, None), 0, type(error), error, error.__traceback__)
         await self.expand_tb(ctx, error, msg)
+        logging.error(error)
     
     @commands.Cog.listener()
     async def on_message(self, message):

@@ -13,7 +13,7 @@ class Category:
         self.cogs : dict = {}
 
     def __repr__(self):
-        return f'<Category name={self.name} cogs={len(self.cogs)}>'
+        return f'<Category name={self.name} cogs={self.cogs}>'
 
     def add_cog(self, cog: Cog, override: bool = True) -> None:
         
