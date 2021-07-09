@@ -116,6 +116,7 @@ class currencyData:
                     "boost": 1,
                     "exp": 0,
                     "lvl": 0,
+                    "prestige": 0
                 },
             )
             return True
