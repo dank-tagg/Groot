@@ -153,7 +153,8 @@ class Information(commands.Cog):
             797044260196319282,
             144126010642792449,
             852788943229288449,
-            525843819850104842
+            525843819850104842,
+            750135653638865017
         ]
         em.add_field(name="Contributors:\n", value=" ".join(f"[`{self.bot.get_user(m)}`](https://discord.com/users/{m})" for m in contributors))
 
