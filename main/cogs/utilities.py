@@ -34,7 +34,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         
         cache.append({"author": before.author, "before_content": before.content, "after_content": message.content, "message_obj": message})
         await asyncio.sleep(300)
-        del cache[cache.index({"author": before.author, "before_content": before.content, "after_content": message.content})]
+        del cache[cache.index({"author": before.author, "before_content": before.content, "after_content": message.content, "message_obj": message})]
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
