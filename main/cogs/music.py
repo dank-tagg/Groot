@@ -251,6 +251,17 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await ctx.reply(f"{self.bot.icons['greenTick']} | Connected to {channel.mention}")
         await player.connect(channel.id)
     
+    @commands.command(name='disconnect')
+    async def _disconnect(self, ctx: customContext):
+        player = self.get_player(ctx)
+        
+        if self.is_privileged(ctx):
+            await ctx.reply(f"{self.bot.icons['greenTick']} | The song requester/DJ ({ctx.author.mention}) has disconnected the bot.")
+            player.stop_votes.clear()
+            await player.teardown()
+        else:
+            await ctx.reply("You aren't allowed to do that. Please ask the DJ or an admin to run this command.")
+
     @commands.command(name='play')
     async def _play(self, ctx: customContext, *, query: str):
         """Searches YouTube for the query, plays the song found."""
