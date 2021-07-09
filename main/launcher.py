@@ -40,7 +40,7 @@ logging.basicConfig(
     datefmt="%d-%b-%y %H:%M:%S",
     format="[{asctime}] {levelname:<10} | {name:<10}: {message}",
     style="{",
-    level=logging.INFO,
+    level=logging.WARNING,
 )
 
 bot.starter()
