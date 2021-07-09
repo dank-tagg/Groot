@@ -17,7 +17,7 @@ class QueueSource(menus.ListPageSource):
     def __init__(self, data, player):
         super().__init__(data, per_page=10)
         self.player = player
-    
+
     async def format_page(self, menu, entries):
         em = Embed(
             description=f"**Currently playing:**\n **1.** [{self.player.current.title}]({self.player.current.uri})\nRequested by {self.player.current.requester.mention}\n\n"+
@@ -26,4 +26,3 @@ class QueueSource(menus.ListPageSource):
         )
         em.set_footer(text=f"Page {menu.current_page + 1} of {self.get_max_pages()} | Looping track: {'❌' if not self.player.looping else '✅' }")
         return em
-

@@ -26,7 +26,7 @@ class BaseMenu(menus.MenuPages):
         super().__init__(source, delete_message_after=kwargs.pop('delete_message_after', True), **kwargs)
         self.info = False
         self._generate_page = generate_page
-    
+
     @menus.button('◀️', position=First(1))
     async def _go_before(self, payload):
         await self.show_checked_page(self.current_page - 1)
@@ -209,10 +209,9 @@ def pages(per_page=1, show_page=True):
         return type(coro.__name__, (menus.ListPageSource,), kwargs)
     return page_source
 
-def WrapText(text : str, length : int):
+def WrapText(text: str, length: int):
     wrapper = textwrap.TextWrapper(width=length)
-    words = wrapper.wrap(text=text)
-    return words
+    return wrapper.wrap(text=text)
 
 def roman_num(num):
     num_map = [
@@ -362,7 +361,6 @@ async def send_traceback(
     """
 
     base = f"An error occured while **{ctx.author}** [`{ctx.author.id}`] ran the command `{ctx.command.name}` at {datetime.utcnow().strftime('%H:%M:%S')} UTC\n"
-    
     etype, value, trace = exc_info
 
     traceback_content = "".join(
@@ -371,10 +369,9 @@ async def send_traceback(
 
     final = base + f"```py\n{traceback_content}```"
     if not edit[0]:
-        msg = await destination.send(final)
+        return await destination.send(final)
     else:
-        msg = await edit[1].edit(content=final)
-    return msg
+        return await edit[1].edit(content=final)
 
 
 # ---Converters
