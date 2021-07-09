@@ -46,6 +46,7 @@ class Player(wavelink.Player):
         self.waiting = False
         self.updating = False
         self.looping = False
+        self.loading = False
 
         self.previous = None
         self.queue = asyncio.Queue()
@@ -55,7 +56,7 @@ class Player(wavelink.Player):
         self.shuffle_votes = set()
     
     async def play_next(self):
-        if self.is_playing or self.waiting:
+        if self.is_playing or self.waiting or self.loading:
             return
         
         self.skip_votes.clear()
@@ -356,7 +357,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         """Display the players queued songs."""
         player = self.get_player(ctx)
 
-        if not player.is_connected:
+        if not player.is_connected or player.loading:
             return
 
         if player.queue.qsize() == 0:

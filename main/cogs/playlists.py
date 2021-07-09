@@ -25,6 +25,7 @@ class Playlist:
         amt_of_songs = kwargs['songs']
         msg = await ctx.reply(f"<a:loading:856978168476205066> | `(0/{amt_of_songs})` Queueing songs... please be patient.\n_This might take a while_")
         loaded_songs = 0
+        player.loading = True
         for song in self.songs:
             if random.randint(0, 20) > 16:
                 await msg.edit(content=f"<a:loading:856978168476205066> | `({loaded_songs}/{amt_of_songs})` Queueing songs... please be patient.\n_This might take a while_")
@@ -36,7 +37,7 @@ class Playlist:
             else:
                 await player.queue.put(track)
             loaded_songs += 1
-        
+        player.loading = False
         await msg.edit(content=f"<:greenTick:814504388139155477> | `({loaded_songs}/{amt_of_songs})` Queued songs! Now playing...")
         await asyncio.sleep(0.5)
         await player.play_next()
