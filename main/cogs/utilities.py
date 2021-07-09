@@ -115,9 +115,13 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         await ctx.send(embed=em)
 
     @commands.command(name="choose")
-    async def choose(self, ctx: customContext, *, choice):
-        choicelist = choice.split(" ")
-        await ctx.send(random.choice(choicelist))
+    async def choose(self, ctx: customContext, *choices):
+        """
+        Choose between the supplied things seperated by spaces.
+        """
+        if len(choices) < 2:
+            raise commands.BadArgument(f"Please supply at least two choices.")
+        await ctx.send(random.choice(choices))
 
     @commands.command(
         name="ui", aliases=["info", "whois"], brief="Displays an user's information"
@@ -251,6 +255,40 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         """
         em = discord.Embed.from_dict(json.loads(embed))
         await ctx.send(embed=em)
+    
+
+    # AFK command related things.
+    def is_afk(self, user_id) -> bool:
+        return user_id in self.bot.cache['afk_users']
+    
+    def get_afk(self, user_id) -> dict:
+        return self.bot.cache['afk_users'][user_id]
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+
+        if self.is_afk(message.author.id):
+            del self.bot.cache['afk_users'][message.author.id]
+            return await message.channel.send(f"Welcome back {message.author.name}! I've removed your **AFK** status.")
+        
+        mentions = [member.id for member in message.mentions]
+        for mention in mentions:
+            if self.is_afk(mention):
+                user_data = self.get_afk(mention)
+                return await message.channel.send(f"{self.bot.get_user(mention)} is **AFK** with message: {user_data[0]} (<t:{user_data[1]}:R>)")
+
+
+    @commands.command(name='afk', aliases=['setafk'])
+    async def _set_afk(self, ctx: customContext, *, reason: str = "No reason provided."):
+        if self.is_afk(ctx.author.id):
+            del self.bot.cache['afk_users'][ctx.author.id]
+        
+        await ctx.reply(f"{self.bot.icons['greenTick']} **{ctx.author.name}** is now AFK: {reason}")
+
+        await asyncio.sleep(3)
+        self.bot.cache['afk_users'][ctx.author.id] = (reason, int(datetime.datetime.utcnow().timestamp()))
 
 def setup(bot):
     bot.add_cog(Utilities(bot), cat_name="Utilities")

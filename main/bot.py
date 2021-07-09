@@ -147,6 +147,7 @@ class GrootBot(commands.Bot):
         #   for cmd, _group in itertools.groupby(data, key=operator.itemgetter(0))
         #}
         self.cache["users"] = {}
+        self.cache['afk_users'] = {}
 
     async def get_prefix(self, message):
         """Handles custom prefixes, this function is invoked every time process_command method is invoke thus returning
