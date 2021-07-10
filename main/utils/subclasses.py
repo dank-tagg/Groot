@@ -1,36 +1,68 @@
 import asyncio
 import contextlib
 import random
-
+import time
 import discord
 from discord.ext import commands
 
 
+class Processing:
+
+    def __init__(self, ctx, **kwargs):
+        self.ctx = ctx
+        self.delete_after = kwargs.get("delete_after")
+        self.message = kwargs.get("message")
+        self.m = None
+        self.task = None
+
+        # Timer properties
+        self._start = None
+        self._end = None
+
+    # Timer utilities
+    def start(self):
+        self._start = time.perf_counter()
+    
+    def stop(self):
+        self._end = time.perf_counter()
+
+    def __int__(self):
+        return round(self.time)
+
+    def __float__(self):
+        return self.time
+
+    def __str__(self):
+        return str(self.time)
+
+    # Actual methods
+    async def __aenter__(self, *args, **kwargs):
+        self.start()
+        self.m = await self.ctx.send(f"{self.ctx.bot.icons['loading']} {self.message or 'Processing command, please wait...'}")
+        self.task = self.ctx.typing().__enter__()
+        return self
+
+    async def __aexit__(self, *args, **kwargs):
+        self.stop()
+        if self.delete_after:
+            try:
+                await self.m.delete()
+            except discord.HTTPException:
+                pass
+        self.task.__exit__(None, None, None)
+    
+    @property
+    def time(self):
+        if self._end is None:
+            raise ValueError("Timer has not been ended.")
+        return self._end - self._start
+
 class customContext(commands.Context):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.processing = Processing
 
-    class processing:
 
-        def __init__(self, ctx, **kwargs):
-            self.ctx = ctx
-            self.delete_after = kwargs.get("delete_after")
-            self.message = kwargs.get("message")
-            self.m = None
-            self.task = None
-
-        async def __aenter__(self, *args, **kwargs):
-            self.m = await self.ctx.send(f"{self.ctx.bot.icons['loading']} {self.message or 'Processing command, please wait...'}")
-            self.task = self.ctx.typing().__enter__()
-            return self
-
-        async def __aexit__(self, *args, **kwargs):
-            if self.delete_after:
-                try:
-                    await self.m.delete()
-                except discord.HTTPException:
-                    pass
-            self.task.__exit__(None, None, None)
 
     async def send(self, content=None, **kwargs):
         if self.author.id in self.bot.cache["tips_are_on"]:

@@ -26,7 +26,7 @@ class GrootBot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(self.get_prefix, **kwargs)
         self.icons = {}
-        self.non_sync = ["music", "core"]
+        self.non_sync = ["music", "core", "rtfm"]
         self.data = currencyData(self)
         self.token = kwargs.pop("token", None)
         self.session = aiohttp.ClientSession()
