@@ -1,6 +1,7 @@
 import sys
 sys.dont_write_bytecode = True
 
+import os
 import discord
 from discord.ext import commands
 from os import environ
@@ -29,7 +30,14 @@ async def on_message_edit(before, after):
     await bot.process_commands(after)
 
 
-bot.load_extension("jishaku")
-bot.load_extension("commands")
+cogs = ()
+for file in os.listdir("cogs"):
+    if file.endswith(".py"):
+        cogs += (file[:-3],)
+
+cogs += ("jishaku", )
+for cog in cogs:
+    ext = "cogs." if cog != "jishaku" else ""
+    bot.load_extension(f"{ext}{cog}")
 
 bot.run(environ["main"])
