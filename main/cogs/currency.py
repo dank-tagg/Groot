@@ -180,7 +180,7 @@ class Currency(commands.Cog):
 
     @commands.command(name="buy", brief="Buy something from the shop")
     @commands.check(Cooldown(1, 10, 1, 5, commands.BucketType.user))
-    async def _buy(self, ctx: customContext, amount: typing.Optional[int] = 1, *, item):
+    async def _buy(self, ctx: customContext, amount: Optional[int] = 1, *, item):
         """
         This command is used to buy something from the shop.
         Amount is an optional argument, which defaults to one.
@@ -251,7 +251,7 @@ class Currency(commands.Cog):
 
     @commands.command(name="sell", brief="Sell something you own")
     @commands.check(Cooldown(1, 10, 1, 5, commands.BucketType.user))
-    async def _sell(self, ctx: customContext, amount: typing.Optional[int] = 1, *, item):
+    async def _sell(self, ctx: customContext, amount: Optional[int] = 1, *, item):
         item = item.lower()
         query = """
                 SELECT item_info.item_price, user_Inventory.amount, item_info.item_name, item_info.item_id

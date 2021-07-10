@@ -1,4 +1,3 @@
 """Typehints that are frequently used"""
-import typing
-
+from typing import *
 from .subclasses import customContext

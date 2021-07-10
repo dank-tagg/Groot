@@ -38,7 +38,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
     async def ban(
         self,
         ctx,
-        member: typing.Union[MemberConvert, discord.User],
+        member: Union[MemberConvert, discord.User],
         *,
         reason: str = "No reason provided.",
     ):
@@ -75,7 +75,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
         self,
         ctx,
         amount: int,
-        user: typing.Optional[discord.Member] = None,
+        user: Optional[discord.Member] = None,
         *,
         matches=None,
     ):

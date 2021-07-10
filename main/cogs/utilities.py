@@ -32,9 +32,10 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         except KeyError:
             cache = self.esnipe_cache[message.channel.id] = []
         
-        cache.append({"author": before.author, "before_content": before.content, "after_content": message.content, "message_obj": message})
+        data = {"author": before.author, "before_content": before.content, "after_content": message.content, "message_obj": message}
+        cache.append(data)
         await asyncio.sleep(300)
-        del cache[cache.index({"author": before.author, "before_content": before.content, "after_content": message.content, "message_obj": message})]
+        cache.remove(data)
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
@@ -48,7 +49,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         cache.append(message)
 
         await asyncio.sleep(300)
-        del cache[cache.index(message)]
+        cache.remove(message)
 
     @commands.command(name="snipe", brief="Retrieves a recent deleted message")
     async def snipe(self, ctx: customContext, index=1):
@@ -197,7 +198,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             await ctx.send(embed=em)
 
     @commands.command(name="archive", aliases=['save', 'arch'])
-    async def _archive(self, ctx, *, message: typing.Optional[discord.Message]):
+    async def _archive(self, ctx, *, message: Optional[discord.Message]):
         """
         Archive a message to your DM's by either
         supplying a message ID or replying to one.

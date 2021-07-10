@@ -21,7 +21,7 @@ class Moderator(commands.Cog):
     async def _blacklist(
         self,
         ctx,
-        target: typing.Union[discord.User, discord.Guild],
+        target: Union[discord.User, discord.Guild],
         *,
         mode: str = "add",
     ):
@@ -57,7 +57,7 @@ class Moderator(commands.Cog):
     async def _givepremium(
         self,
         ctx,
-        target: typing.Union[discord.User, discord.Guild],
+        target: Union[discord.User, discord.Guild],
         *,
         mode: str = "add",
     ):
@@ -91,7 +91,7 @@ class Moderator(commands.Cog):
 
     @mod.command(name="edit")
     async def _edit_(
-        self, ctx: customContext, action, user: typing.Union[discord.Member, discord.User], amount: int
+        self, ctx: customContext, action, user: Union[discord.Member, discord.User], amount: int
     ):
         self.bot.cache["users"][user.id][action] += amount
         return await ctx.send(

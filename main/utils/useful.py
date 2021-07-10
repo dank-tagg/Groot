@@ -279,7 +279,7 @@ def event_check(func):
 
     return check
 
-def run_in_executor(func: typing.Callable):
+def run_in_executor(func: Callable):
     
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
