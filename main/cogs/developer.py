@@ -73,13 +73,6 @@ class Developer(commands.Cog):
                 utils.json_loader.write_json(data, "config")
             await ctx.send("Done!")
 
-    @dev.command(name="status")
-    async def _set_status(self, ctx: customContext, *, status):
-        data = utils.json_loader.read_json("status")
-        data["groot"] = status
-        utils.json_loader.write_json(data, "status")
-        await ctx.send(f"Set status to {status}")
-
     @dev.command(name="eval", aliases=["run"])
     async def _eval(self, ctx: customContext, *, code: codeblock_converter):
         """Evaluates a code"""

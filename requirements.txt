@@ -19,3 +19,4 @@ aiosqlite
 dpymenus
 pygit2
 polaroid
+dateparser

@@ -88,3 +88,11 @@ CREATE TABLE playlist_songs (
     playlist_url TEXT NOT NULL,
     song_id INT NOT NULL DEFAULT -1
 )
+
+CREATE TABLE timers (
+    id INTEGER PRIMARY KEY,
+    expires TIMESTAMP NOT NULL,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    event TEXT NOT NULL,
+    extra TEXT
+)

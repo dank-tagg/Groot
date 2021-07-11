@@ -17,7 +17,6 @@ class Core(commands.Cog):
         self.cache = {}
         self.cache_usage = {}
         self.loops.start()
-        self.update_status.start()
 
     async def expand_tb(self, ctx: customContext, error, msg):
         await msg.add_reaction(self.bot.icons['plus'])
@@ -217,31 +216,6 @@ class Core(commands.Cog):
     async def before_loops(self):
         await self.bot.wait_until_ready()
 
-    @tasks.loop(seconds=10)
-    async def update_status(self):
-        status = read_json('config')
-        
-        groot_status = f"{self.bot.icons[status['status'].get('groot', 'offline')]} {str.title(status['status'].get('groot', 'offline'))}"
-        message = f"**BOT STATUS** \n\n {groot_status} | Groot\n\nRefreshes every second"
-    
-        em = Embed(
-                description=message,
-                timestamp=dt.datetime.utcnow()
-            )
-        em.set_footer(text="Last updated at")
-    
-        channel = self.bot.get_channel(846450009721012294)
-        message = await channel.fetch_message(851052521757081630)
-        try:
-            await message.edit(embed=em)
-        except Exception as error:
-            await send_traceback(
-                        self.bot.log_channel, 10, type(error), error, error.__traceback__
-                    )
-
-    @update_status.before_loop
-    async def before_status(self):
-        await self.bot.wait_until_ready()
 
 def setup(bot):
     bot.add_cog(Core(bot))
