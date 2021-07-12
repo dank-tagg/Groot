@@ -10,12 +10,11 @@ import discord
 import mystbin
 import contextlib
 import tabulate
-import utils.json_loader
 
 from discord.ext import commands
 from jishaku.codeblocks import codeblock_converter
 from utils.useful import Embed, pages
-from utils.json_loader import read_json, write_json
+from utils.json import read_json, write_json
 
 @pages()
 async def show_result(self, menu, entry):
@@ -66,11 +65,11 @@ class Developer(commands.Cog):
         )
         if msg.content.lower() == "y":
             async with ctx.typing():
-                data = utils.json_loader.read_json("config")
+                data = read_json("config")
                 data["updates"]["date"] = str(datetime.datetime.utcnow())
                 data["updates"]["message"] = message
                 data["updates"]["link"] = link
-                utils.json_loader.write_json(data, "config")
+                write_json(data, "config")
             await ctx.send("Done!")
 
     @dev.command(name="eval", aliases=["run"])

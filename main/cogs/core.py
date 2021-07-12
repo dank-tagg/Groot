@@ -9,7 +9,7 @@ import logging
 
 from discord.ext import commands, tasks
 from utils.useful import Embed, Cooldown, send_traceback
-from utils.json_loader import read_json
+from utils.json import read_json
 
 class Core(commands.Cog):
     def __init__(self, bot):
@@ -196,20 +196,6 @@ class Core(commands.Cog):
             )
 
         self.cache_usage = {}
-        for user in self.bot.cache["users"]:
-            query = "UPDATE currency_data SET wallet = ?, bank = ?, max_bank = ?, boost = ?, exp = ?, lvl = ? WHERE user_id = ?"
-            await self.bot.db.execute(
-                query,
-                (
-                    self.bot.cache["users"][user]["wallet"],
-                    self.bot.cache["users"][user]["bank"],
-                    self.bot.cache["users"][user]["max_bank"],
-                    round(self.bot.cache["users"][user]["boost"], 2),
-                    self.bot.cache["users"][user]["exp"],
-                    self.bot.cache["users"][user]["lvl"],
-                    user,
-                ),
-            )
 
 
     @loops.before_loop

@@ -15,9 +15,9 @@ from discord.ext import commands, ipc
 
 from utils.cache import CacheManager
 from utils.subclasses import customContext
-from utils.useful import (Cooldown, ListCall, call, currencyData,
+from utils.useful import (Cooldown, ListCall, call,
                           print_exception)
-from utils.json_loader import read_json
+from utils.json import read_json
 
 to_call = ListCall()
 
@@ -27,7 +27,6 @@ class GrootBot(commands.Bot):
         super().__init__(self.get_prefix, **kwargs)
         self.icons = {}
         self.non_sync = ["music", "core", "rtfm"]
-        self.data = currencyData(self)
         self.token = kwargs.pop("token", None)
         self.session = aiohttp.ClientSession()
         self.maintenance = False

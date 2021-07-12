@@ -172,19 +172,8 @@ class Configuration(commands.Cog):
         if m.content.lower() != 'yes':
             await ctx.send("Ok... your data won't be deleted.")
             return
-        
-        queries = [
-            "DELETE FROM currency_data WHERE user_id = ?"
-            "DELETE FROM user_Inventory WHERE user_id = ?"
-        ]
-
-        for query in queries:
-            await self.bot.db.execute(query, (ctx.author.id, ))
-        
-        del self.bot.cache['users']
+        # Removed currency.
         await ctx.send(f"{self.bot.greenTick} Removed all your data")
-        
-
         
 
 def setup(bot):

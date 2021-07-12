@@ -50,17 +50,6 @@ CREATE TABLE disabled_commands (
     PRIMARY KEY(snowflake_id, command_name)
 )
 
-CREATE TABLE currency_data (
-    user_id BIGINT PRIMARY KEY UNIQUE,
-    wallet INT DEFAULT 200,
-    bank INT DEFAULT 200,
-    max_bank INT DEFAULT 200,
-    boost INT DEFAULT 1,
-    exp INT DEFAULT 0,
-    lvl INT DEFAULT 0,
-    prestige INT NOT NULL DEFAULT 0
-)
-
 CREATE TABLE "item_info" (
     item_id INTEGER PRIMARY KEY NOT NULL,
     item_price INTEGER NOT NULL,

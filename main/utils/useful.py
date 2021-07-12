@@ -5,7 +5,6 @@ import textwrap
 import asyncio
 import functools
 import re
-import sqlite3
 import sys
 import traceback
 import aiohttp
@@ -97,53 +96,6 @@ class Embed(discord.Embed):
         for n, v in fields:
             self.add_field(name=n, value=v, inline=field_inline)
 
-class currencyData:
-    def __init__(self, bot):
-        self.bot = bot
-
-    async def create_account(self, user_id):
-        if user_id in self.bot.cache["users"]:
-            return False
-        query = "INSERT INTO currency_data (user_id) VALUES (?)"
-        try:
-            await self.bot.db.execute(query, (user_id,))
-            self.bot.cache["users"].setdefault(
-                user_id,
-                {
-                    "wallet": 200,
-                    "bank": 200,
-                    "max_bank": 200,
-                    "boost": 1,
-                    "exp": 0,
-                    "lvl": 0,
-                    "prestige": 0
-                },
-            )
-            return True
-        except sqlite3.IntegrityError:
-            return False
-
-    async def get_data(self, user_id, mode="wallet"):
-        return self.bot.cache["users"][user_id][mode]
-
-    async def update_data(self, user_id, amount: int, mode="wallet"):
-        self.bot.cache["users"][user_id][mode] += amount
-        return True
-
-    async def has_item(self, user_id, item):
-        item = item.lower()
-        query = """
-                SELECT item_id
-                FROM user_inventory
-                INNER JOIN item_info
-                USING(item_id)
-                WHERE user_id = ? AND lower(item_name) = ?
-                """
-        cur = await self.bot.db.execute(query, (user_id, item))
-        data = await cur.fetchone()
-        return bool(data)
-
-
 class Cooldown:
     def __init__(
         self,
@@ -214,30 +166,6 @@ def WrapText(text: str, length: int):
     wrapper = textwrap.TextWrapper(width=length)
     return wrapper.wrap(text=text)
 
-def roman_num(num):
-    num_map = [
-        (1000, "M"),
-        (900, "CM"),
-        (500, "D"),
-        (400, "CD"),
-        (100, "C"),
-        (90, "XC"),
-        (50, "L"),
-        (40, "XL"),
-        (10, "X"),
-        (9, "IX"),
-        (5, "V"),
-        (4, "IV"),
-        (1, "I"),
-    ]
-
-    roman = ""
-    while num > 0:
-        for i, r in num_map:
-            while num >= i:
-                roman += r
-                num -= i
-    return roman
 
 def get_title(track, length=35):
     if isinstance(track, wavelink.Track):
@@ -245,23 +173,6 @@ def get_title(track, length=35):
     if len(track) > length:
         track = f"{track[:length]}..."
     return track
-
-def progress_bar(progress):
-    progress = round(progress / 10)
-    return ("■" * progress) + ("□" * (10 - progress))
-
-
-async def convert_to_int(amount, max_amt):
-    amount = amount.replace("max", f"{max_amt}")
-    amount = amount.replace("all", f"{max_amt}")
-    amount = re.sub(r"[^0-9ekEK.]", r"", amount)
-    amount = amount.replace(".0", "")
-    amount = amount.replace("k", "*1000")
-    amount = amount.replace("e", "*10**")
-    try:
-        return int(eval(amount))
-    except Exception:
-        raise commands.BadArgument("That is not a valid amount!")
 
 
 def event_check(func):

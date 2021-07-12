@@ -4,9 +4,8 @@ import discord
 import contextlib
 
 from datetime import datetime
-from itertools import chain
 from discord.ext import commands
-from utils.json_loader import read_json
+from utils.json import read_json
 from utils.useful import Cooldown, Embed
 
 

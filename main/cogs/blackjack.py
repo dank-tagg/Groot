@@ -6,43 +6,18 @@ import discord
 
 from discord.ext import commands
 from utils.chat_formatting import hyperlink as link
-from utils.useful import Embed, convert_to_int
+from utils.useful import Embed
 
 
 class Blackjack(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.data = bot.data
         self.faces = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
         self.values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
         self.suits = ["spades", "hearts", "diamonds", "clubs"]
 
-    @commands.command(name="play_blackjack")
-    async def play_blackjack(self, ctx: customContext, amount):
-        wallet = await self.data.get_data(ctx.author.id)
-        if wallet >= 10000000:
-            raise commands.BadArgument(
-                f"{ctx.author.mention} You are too rich to gamble!"
-            )
-        boost = round(self.bot.cache["users"][ctx.author.id]["boost"], 2)
-        if wallet == 0:
-            raise commands.BadArgument(
-                f"{ctx.author.mention} You have no coins to gamble with."
-            )
-        amount = await convert_to_int(amount, 500000)
-        if amount > 500000:
-            raise commands.BadArgument(
-                f"{ctx.author.mention} You can't slots more than ⛻500,000 coins"
-            )
-        if amount > wallet:
-            if amount != 500000:
-                raise commands.BadArgument(
-                    f"{ctx.author.mention} You don't have that much coins!"
-                )
-            else:
-                amount = wallet
-        ctx.amount = amount
-        ctx.wallet = wallet
+    @commands.command(name="blackjack")
+    async def play_blackjack(self, ctx: customContext):
         stood = False
         deck = [
             {"face": face, "suit": suit} for suit in self.suits for face in self.faces
@@ -66,11 +41,6 @@ class Blackjack(commands.Cog):
         while fail < 2:
             status = self.score(stood, cards["user_cards"], cards["bot_cards"])
             if not isinstance(status, int):
-                result = status["result"]
-                if result is True:
-                    await self.data.update_data(ctx.author.id, round(amount * boost))
-                elif result is False:
-                    await self.data.update_data(ctx.author.id, -amount)
                 em = await self.end(ctx, cards, status)
                 return await ctx.send(embed=em)
             else:
@@ -97,15 +67,13 @@ class Blackjack(commands.Cog):
                         stood = True
 
                     elif msg == "e":
-                        await self.data.update_data(ctx.author.id, -round(0.5 * amount))
                         return await ctx.maybe_reply(
-                            "You ended the game. Half of your bet was lost."
+                            "You ended the game."
                         )
                     else:
                         fail += 1
-        await self.data.update_data(ctx.author.id, -round(0.5 * amount))
         return await ctx.maybe_reply(
-            "You lost the game due to multiple invalid choices. Half of your bet was lost."
+            "You lost the game due to multiple invalid choices."
         )
 
     def deal(self, deck: list):
@@ -212,14 +180,6 @@ class Blackjack(commands.Cog):
         message = "**{}**".format(message)
         color = 0x3CA374 if result is True else 0xF04D4B
         color = 0xFFCC33 if result is None else color
-        ctx.amount = round(0.5 * ctx.amount) if result is None else ctx.amount
-        won_or_lost = (
-            f"won  **⛻{ctx.amount:,}**! "
-            if result is True
-            else f"lost **⛻{ctx.amount:,}**. "
-        )
-        ctx.amount = -ctx.amount if result is True else ctx.amount
-        message += f"\nYou {won_or_lost}You now have {await self.data.get_data(ctx.author.id):,}"
         user_cards_visual = "".join(
             [
                 link(
@@ -263,4 +223,4 @@ class Blackjack(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Blackjack(bot))
+    bot.add_cog(Blackjack(bot), cat_name='Fun')

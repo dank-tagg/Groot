@@ -1,8 +1,6 @@
 from utils._type import *
 
-import asyncio
 import discord
-
 
 from discord.ext import commands
 
@@ -89,59 +87,6 @@ class Moderator(commands.Cog):
 
         await ctx.send(msg)
 
-    @mod.command(name="edit")
-    async def _edit_(
-        self, ctx: customContext, action, user: Union[discord.Member, discord.User], amount: int
-    ):
-        self.bot.cache["users"][user.id][action] += amount
-        return await ctx.send(
-            f"{self.bot.icons['greenTick']} Successfully gave {user.mention} {amount:,} `{action}`."
-        )
-
-    @mod.command(name="create")
-    async def _create_item_for_shop(self, ctx: customContext):
-        q = [
-            "What should the item be called?",
-            "What should it's price be?",
-            "Write a brief description of the item.",
-            "Write a long and detailed description of the item.",
-            "Give it an ID.",
-        ]
-
-        a = []
-        for question in q:
-            question += "\nType `stop` to stop this process. Timeout is 300 seconds."
-            await ctx.send(question)
-            try:
-                response = await self.bot.wait_for(
-                    "message",
-                    timeout=300,
-                    check=lambda m: m.author == ctx.author and m.channel == ctx.channel,
-                )
-            except asyncio.TimeoutError:
-                await ctx.reply("Okay, I'm leaving. Bye.")
-            else:
-                if response.content.lower() == "stop":
-                    return await ctx.send("Terminated")
-                a.append(response.content)
-
-        query = """
-                INSERT INTO item_info
-                VALUES (?,?,?,?,?)
-                """
-        await self.bot.db.execute(query, (a[4], a[1], a[0], a[3], a[2]))
-        cmd = self.bot.get_command("shop")
-        return await ctx.invoke(cmd, item=a[0])
-
-    @mod.command(name="delete")
-    async def _delete_item_from_shop(self, ctx: customContext, *, item):
-        item = item.lower()
-        query = """
-                DELETE FROM item_info
-                WHERE lower(item_name) = ?
-                """
-        await self.bot.db.execute(query, (item,))
-        return await ctx.send(f"{self.bot.icons['greenTick']} Deleted item `{item}` from shop.")
 
 def setup(bot):
     bot.add_cog(Moderator(bot))
