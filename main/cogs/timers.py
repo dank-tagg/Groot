@@ -241,4 +241,4 @@ class Reminders(commands.Cog):
             return
 
 def setup(bot):
-    bot.add_cog(Reminders(bot))
+    bot.add_cog(Reminders(bot), cat_name='Utilities')

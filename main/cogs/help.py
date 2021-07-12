@@ -68,12 +68,14 @@ class GrootHelp(commands.HelpCommand):
         ctx = self.context
         bot = ctx.bot
 
+        prefix = await commands.clean_content().convert(ctx, ctx.prefix)
+
         em = Embed(description=
-            f"Prefix for **{ctx.guild.name}** is `{ctx.prefix or 'g.'}`\n"
+            f"Prefix for **{ctx.guild.name}** is `{prefix or 'g.'}`\n"
             f"Total commands: {len(list(bot.walk_commands()))} | Usable by you: {len(await self.filter_commands(list(bot.walk_commands()), sort=True))} \n"
             "```diff\n- [] = optional argument\n"
             "- <> = required argument\n"
-            f"+ Type {ctx.prefix}help [command | category] for "
+            f"+ Type {prefix}help [command | category] for "
             "more help on a specific category or command!```"
             "[Support](<https://discord.gg/nUUJPgemFE>) | "
             "[Vote](https://top.gg/bot/812395879146717214/vote) | "
@@ -89,10 +91,11 @@ class GrootHelp(commands.HelpCommand):
         categories = bot.categories.copy()
         if ctx.author != bot.owner:
             categories.pop("Unlisted")
+
         newline = '\n'
         em.add_field(
             name="Categories",
-            value=f'```{newline.join(categories.keys())}```'
+            value=f'```\n{newline.join(categories.keys())}```'
         )
 
         # News
@@ -100,13 +103,15 @@ class GrootHelp(commands.HelpCommand):
         news = config['updates']
         date = datetime.strptime(news['date'], "%Y-%m-%d %H:%M:%S.%f")
         date, link, message = date.strftime("%d %B, %Y"), news['link'], news['message']
-
+        
+        def shorten(message):
+            if len(message) > 275:
+                message = message[:275] + f'... [read more]({link})'
+            return message
+        
         em.add_field(
             name=f"📰 Latest News - {date}",
-            value="[Jump to the full message\n"
-            "Can't open? Click the support button to join the support server]"
-            f"({link})\n\n"
-            f"{message}"
+            value=f"{shorten(message)}"
         )
         channel = self.get_destination()
         await channel.send(embed=em)

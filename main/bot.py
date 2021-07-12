@@ -152,7 +152,7 @@ class GrootBot(commands.Bot):
         """Handles custom prefixes, this function is invoked every time process_command method is invoke thus returning
         the appropriate prefixes depending on the guild."""
         if message.author == self.owner:
-            return ["g.", "", self.cache["prefix"].get(getattr(message.guild, "id", message.author.id))]
+            return commands.when_mentioned_or(*["g.", "", self.cache["prefix"].get(getattr(message.guild, "id", message.author.id))])(self, message)
         query = "SELECT prefix FROM guild_config WHERE guild_id=?"
         snowflake_id = getattr(message.guild, "id", message.author.id)
         self.cache.setdefault("prefix", {})
@@ -166,7 +166,7 @@ class GrootBot(commands.Bot):
         match = comp.match(message.content)
         if match is not None:
             return match.group(1)
-        return prefix
+        return commands.when_mentioned_or(prefix)(self, message)
 
     def add_cog(self, cog: commands.Cog, cat_name: str = "Unlisted"):
         category = self.get_category(cat_name)
