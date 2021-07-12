@@ -2,16 +2,12 @@ aiohttp
 jishaku
 discord.py
 humanize
-wonderwords
 dblpy
-requests
 stringcase
 Unidecode
 tabulate
 discord
-Pillow
 discord.ext.menus
-discord.ext.flags
 mystbin.py
 discord_ext_ipc
 python-dotenv

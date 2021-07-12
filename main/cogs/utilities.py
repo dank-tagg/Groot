@@ -8,11 +8,8 @@ import json
 import unicodedata
 
 from discord.ext import commands
-from humanize.time import precisedelta
-from PIL import Image, ImageDraw, ImageFont
 from typing import Union
-from utils.useful import Embed, detect, get_grole
-from wonderwords import RandomSentence, RandomWord
+from utils.useful import Embed, detect
 
 
 class Utilities(commands.Cog, description="Handy dandy utils"):
