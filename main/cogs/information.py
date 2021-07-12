@@ -40,16 +40,10 @@ class Information(commands.Cog):
         msg = await ctx.send("<a:typing:826939777290076230> pinging...")
         end = time.perf_counter()
         typing_ping = (end - start) * 1000
-        query = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';"
 
-        async with self.bot.db.execute(query) as cur:
-            row = await cur.fetchall()
-        a = [i[0] for i in row]
         start = time.perf_counter()
-        for name in a:
-            query = f"SELECT * FROM {name}"
-            async with self.bot.db.execute(query):
-                end = time.perf_counter()
+        await self.bot.db.execute('SELECT 1')
+        end = time.perf_counter()
 
         sql_ping = (end - start) * 1000
         await msg.edit(

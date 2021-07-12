@@ -126,7 +126,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         await ctx.send(random.choice(choices))
 
     @commands.command(
-        name="ui", aliases=[, "whois"], brief="Displays an user's information"
+        name="ui", aliases=["whois"], brief="Displays an user's information"
     )
     async def ui(self, ctx: customContext, member: discord.Member = None):
         """
