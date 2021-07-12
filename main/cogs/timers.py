@@ -191,7 +191,7 @@ class Reminders(commands.Cog):
         await ctx.send(f'Alright {ctx.author.mention}, {timestamp}: {when.arg}')
 
     @reminder.command(name='list', ignore_extra=False)
-    async def _reminder_list(self, ctx):
+    async def _reminder_list(self, ctx: customContext):
         """Shows the 10 latest currently running reminders."""
         query = """SELECT id, expires, extra
                     FROM timers

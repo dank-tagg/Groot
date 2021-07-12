@@ -10,7 +10,7 @@ import unicodedata
 from discord.ext import commands
 from typing import Union
 from utils.useful import Embed, detect
-
+from cogs.image import get_bytes
 
 class Utilities(commands.Cog, description="Handy dandy utils"):
     def __init__(self, bot):
@@ -294,8 +294,9 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         self.bot.cache['afk_users'][ctx.author.id] = (reason, int(datetime.datetime.utcnow().timestamp()))
 
     @commands.command()
-    async def charinfo(self, ctx, *, characters: str):
-        """Shows you information about a number of characters.
+    async def charinfo(self, ctx: customContext, *, characters: str):
+        """
+        Shows you information about a number of characters.
         Only up to 25 characters at a time.
         """
 
@@ -308,5 +309,45 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             return await ctx.send('Output too long to display.')
         await ctx.send(msg)
 
+    @commands.group(invoke_without_command=True)
+    @commands.has_permissions(manage_emojis=True)
+    async def emoji(self, ctx: customContext):
+        """
+        Useful command to add, remove or edit an emoji.
+        You must have the `manage_emojis` permission to use this.
+        """
+        await ctx.send_help(ctx.command)
+    
+    @emoji.command(name='add', aliases=['create'])
+    async def emoji_add(self, ctx: customContext, name:str, *, image: Optional[Union[discord.Emoji, discord.PartialEmoji, discord.Member, str]]):
+        """
+        Takes an image link and makes an emoji with that image.
+        Emoji name must be unique and the name length must be in between 2 and 32.
+        """
+        try:
+            byt = await get_bytes(ctx, image, self.bot.session)
+            emoji = await ctx.guild.create_custom_emoji(name=name, image=byt, reason=f'Responsible user: {ctx.author}')
+        except (KeyError, discord.HTTPException):
+            await ctx.send_help(ctx.command)
+            return
+        
+        await ctx.send(f'Created {emoji} with name `{emoji.name}`')
+
+    @emoji.command(name='delete', aliases=['remove'])
+    async def emoji_delete(self, ctx: customContext, *, emoji: discord.Emoji):
+        """
+        Deletes the given emoji from the server.
+        """
+        await emoji.delete(reason=f'Responsible user: {ctx.author}')
+        await ctx.send(f'Deleted `{emoji.name}` from this server.')
+
+    @emoji.command(name='rename')
+    async def emoji_rename(self, ctx: customContext, emoji: discord.Emoji, *, name:str):
+        """
+        Renames the given emoji to the given name.
+        """
+        await emoji.edit(name=name)
+        await ctx.send(f'Renamed {emoji} from `{emoji.name}` to `{name}`.')
+    
 def setup(bot):
     bot.add_cog(Utilities(bot), cat_name="Utilities")

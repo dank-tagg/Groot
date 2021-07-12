@@ -83,7 +83,7 @@ class Developer(commands.Cog):
         
         stdout = f.getvalue()
         if stdout:
-            await ctx.send(f"```ps\n[stdout]\n{stdout}```")
+            await ctx.send(f"```ps\n[stdout] {stdout}```")
 
     @dev.command(name="inviteme")
     async def _inviteme(self, ctx: customContext, *, guildid: int):
@@ -155,13 +155,13 @@ class Developer(commands.Cog):
 
     @dev.command(name="reload")
     async def _reload_ext(self, ctx: customContext, *, ext: str):
-        async with ctx.processing(ctx, message="Reloading extension...", delete_after=True):
+        async with ctx.processing(ctx, message="Reloading extension...", delete_after=True) as process:
             try:
                 self.bot.reload_extension(f"cogs.{ext}")
             except commands.ExtensionNotLoaded:
                 await ctx.send(f'`cogs.{ext}` is not loaded.')
                 return
-        await ctx.send(f"{self.bot.icons['greenTick']} Reloaded `cogs.{ext}`")
+        await ctx.send(f"{self.bot.icons['greenTick']} Reloaded `cogs.{ext}` in {process.time * 1000:.2f} ms")
 
     @dev.command()
     async def sql(self, ctx: customContext, *, query: str):
