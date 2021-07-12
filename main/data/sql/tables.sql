@@ -58,13 +58,6 @@ CREATE TABLE "item_info" (
     item_brief TEXT
 )
 
-CREATE TABLE user_Inventory(
-    user_id BIGINT NOT NULL,
-    item_id INT NOT NULL,
-    amount INT, 
-    PRIMARY KEY (user_id, item_id)
-) 
-
 CREATE TABLE playlists (
     user_id BIGINT NOT NULL,
     playlist_name VARTEXT(32) NOT NULL,
@@ -83,5 +76,6 @@ CREATE TABLE timers (
     expires TIMESTAMP NOT NULL,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     event TEXT NOT NULL,
-    extra TEXT
+    extra TEXT,
+    author BIGINT
 )

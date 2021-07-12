@@ -1,8 +1,8 @@
 {
     "updates": {
-        "date": "2021-07-09 17:14:26.954803",
-        "message": "<:trashcan:822050746333003776> Deprecated `g.gstart` and `g.drop` and\n\\\ud83e\ude79 Simple fix for `g.prestige` and `g.about.`\nDeprecated `g.binary` aswell.",
-        "link": "https://discord.com/channels/707869808129081364/823585905167433729/863105156252827688"
+        "date": "2021-07-12 08:53:41.938766",
+        "message": "\ud83d\uddd1\ufe0fRemoved all currency commands but blackjack still stays inside the fun category.",
+        "link": "https://discord.com/channels/707869808129081364/823585905167433729/864058713446809600"
     },
     "messages": {
         "lastMessage": 864061737191866389,
