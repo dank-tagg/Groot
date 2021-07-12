@@ -24,13 +24,13 @@ You can find me at the [support server](https://discord.gg/nUUJPgemFE) for Groot
 ## Features
 ```css
 Fun               -> Want to have some fun? 😉
-Utilities         -> Handy utilities that make your life easier.
-Information       -> Information about the bot.
-Moderation        -> Powerful moderation commands.
-Music             -> Play music! Has playlist functionalities.
-Configuration     -> Configure your own settings.
-Image             -> Image manipulation commands.
-Support           -> Support commands to report bugs/suggest features.
+Utilities         -> Handy utilities that make your life easier
+Information       -> Information about the bot
+Moderation        -> Powerful moderation commands
+Music             -> Play music! Has playlist functionalities
+Configuration     -> Configure your own settings
+Image             -> Image manipulation commands
+Support           -> Support commands to report bugs/suggest features
 ```
 
 ## How do I contribute?
