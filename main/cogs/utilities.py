@@ -282,8 +282,12 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
                 return await message.channel.send(f"{self.bot.get_user(mention)} is **AFK** with message: {user_data[0]} (<t:{user_data[1]}:R>)")
 
 
-    @commands.command(name='afk', aliases=['setafk'])
+    @commands.command(name='afk', aliases=['setafk'], usage='[reason]')
     async def _set_afk(self, ctx: customContext, *, reason: str = "No reason provided."):
+        """
+        Marks you as AFK with given reason.
+        When you get pinged, the bot will respond with the reason.
+        """
         if self.is_afk(ctx.author.id):
             del self.bot.cache['afk_users'][ctx.author.id]
         
