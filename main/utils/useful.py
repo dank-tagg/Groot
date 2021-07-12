@@ -70,13 +70,6 @@ class BaseMenu(menus.MenuPages):
         kwargs = await self._get_kwargs_from_page(page)
         return await ctx.reply(**kwargs)
 
-class detect(aiohttp.ClientSession):
-    async def find(self, url):
-        source = str(await (await super().get(url)).content.read()).lower()
-        phrases = ["rickroll", "rick roll", "rick astley", "never gonna give you up"]
-        await super().close()
-        return bool(re.findall("|".join(phrases), source, re.MULTILINE))
-
 
 class ListCall(list):
     """Quick data structure for calling every element in the array regardless of awaitable or not"""

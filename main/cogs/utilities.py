@@ -219,22 +219,6 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         except discord.Forbidden:
             await ctx.send("Oops! I couldn't send you a message. Are you sure your DMs are on?")
 
-    @commands.command(name="rickroll", brief="Detects rickroll from given link")
-    async def _rickroll(self, ctx: customContext, *, link):
-        """
-        Detects if the given link is a rickroll.\n
-        The link must start with https://.\n
-        """
-        i = link.replace("<", "").replace(">", "")
-        if "https://" in link:
-            if await detect().find(i):
-                await ctx.message.reply("Rickroll detected :eyes:")
-            else:
-                await ctx.message.reply("That website is safe :>")
-        else:
-            await ctx.send(link + " is not a valid URL...")
-
-    
     @commands.command(name="id", usage="<channel | emoji | user>")
     async def _get_id(self, ctx: customContext, arg: Union[discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.CategoryChannel, discord.Emoji, discord.User]):
         """
