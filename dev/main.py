@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 environ["JISHAKU_NO_UNDERSCORE"] = "True"
 environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
 
-load_dotenv("../main/bot_config/secrets.env")
+load_dotenv("../main/config/secrets.env")
 
 async def get_prefix(bot, message):
     if message.author.id == 396805720353275924:

@@ -9,7 +9,7 @@ import unicodedata
 
 from discord.ext import commands
 from typing import Union
-from utils.useful import Embed, detect
+from utils.useful import Embed
 from cogs.image import get_bytes
 
 class Utilities(commands.Cog, description="Handy dandy utils"):

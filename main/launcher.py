@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 environ["JISHAKU_NO_UNDERSCORE"] = "True"
 environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
 
-dotenv_path = join(dirname(__file__), "bot_config/secrets.env")
+dotenv_path = join(dirname(__file__), "config/secrets.env")
 load_dotenv(dotenv_path)
 
 intent_data = {
@@ -35,7 +35,7 @@ bot_data = {
 bot = GrootBot(**bot_data)
 
 logging.basicConfig(
-    filename=f"{bot.cwd}/bot_config/logs/error.log",
+    filename=f"{bot.cwd}/config/logs/error.log",
     filemode="w",
     datefmt="%d-%b-%y %H:%M:%S",
     format="[{asctime}] {levelname:<10} | {name:<10}: {message}",
