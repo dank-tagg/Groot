@@ -120,10 +120,15 @@ class Core(commands.Cog):
                 f"{self.bot.icons['redTick']} You are missing the `{error.missing_perms[0]}` permission to do that!"
             )
 
+        elif isinstance(error, commands.NSFWChannelRequired):
+            await ctx.send('Oops! This command is marked NSFW. Use this in a NSFW channel.')
+            return
+
         elif isinstance(error, commands.CheckFailure):
             await ctx.send("You do not have permissions to use this command!")
             return
         
+
 
         # Catch uncaught errors
         exc_info = {

@@ -6,11 +6,14 @@ import random
 import discord
 import json
 import unicodedata
+import io
+import re
 
 from discord.ext import commands
 from typing import Union
 from utils.useful import Embed
 from cogs.image import get_bytes
+from discord.utils import _URL_REGEX
 
 class Utilities(commands.Cog, description="Handy dandy utils"):
     def __init__(self, bot):
@@ -333,5 +336,17 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         await emoji.edit(name=name)
         await ctx.send(f'Renamed {emoji} from `{emoji.name}` to `{name}`.')
     
+    @commands.command(aliases=['ss'])
+    @commands.is_nsfw()
+    async def screenshot(self, ctx: customContext, *, url):
+        if not re.match(_URL_REGEX, url):
+            raise commands.BadArgument('That is not a valid url. Try again with a valid one.')
+        res = await self.bot.session.get(f'https://image.thum.io/get/{url}')
+        byt = io.BytesIO(await res.read())
+
+        em = Embed(description=f'`URL`: {url}')
+        em.set_image(url=f'attachment://{ctx.command.name}.png')
+        await ctx.send(embed=em, file=discord.File(byt, filename=f'{ctx.command.name}.png'))
+
 def setup(bot):
     bot.add_cog(Utilities(bot), cat_name="Utilities")
