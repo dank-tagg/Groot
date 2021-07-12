@@ -77,75 +77,75 @@ class Fun(commands.Cog, description="Fun commands"):
                 )
                 return
 
-        @commands.command(name="gayrate", aliases=["howgay"], brief="Rates your gayness")
-        async def gayrate(self, ctx: customContext, member: discord.Member = None):
-            """Rate your gayness or another users gayness. 1-100% is returned"""
-            user = member.name + " is" if member else "You are"
+    @commands.command(name="gayrate", aliases=["howgay"], brief="Rates your gayness")
+    async def gayrate(self, ctx: customContext, member: discord.Member = None):
+        """Rate your gayness or another users gayness. 1-100% is returned"""
+        user = member.name + " is" if member else "You are"
 
+        emb = Embed(
+            title="gay r8 machine",
+            description=f"{user} {random.randint(0, 100)}% gay 🌈",
+            color=discord.Color.random(),
+        )
+        await ctx.send(embed=emb)
+
+    @gayrate.error
+    async def gayrate_error(self, ctx: customContext, error):
+        if isinstance(error, commands.MemberNotFound):
             emb = Embed(
                 title="gay r8 machine",
-                description=f"{user} {random.randint(0, 100)}% gay 🌈",
+                description=f"{error.argument} is {random.randint(0, 100)}% gay 🌈",
                 color=discord.Color.random(),
             )
             await ctx.send(embed=emb)
+        else:
+            raise error
 
-        @gayrate.error
-        async def gayrate_error(self, ctx: customContext, error):
-            if isinstance(error, commands.MemberNotFound):
-                emb = Embed(
-                    title="gay r8 machine",
-                    description=f"{error.argument} is {random.randint(0, 100)}% gay 🌈",
-                    color=discord.Color.random(),
-                )
-                await ctx.send(embed=emb)
-            else:
-                raise error
+    @commands.command(aliases=["memes"], brief="Shows a meme from reddit")
+    async def meme(self, ctx: customContext):
+        """Shows a meme from r/memes."""
+        res = await self.bot.session.get("https://www.reddit.com/r/memes/random/.json")
+        data = await res.json()
 
-        @commands.command(aliases=["memes"], brief="Shows a meme from reddit")
-        async def meme(self, ctx: customContext):
-            """Shows a meme from r/memes."""
-            res = await self.bot.session.get("https://www.reddit.com/r/memes/random/.json")
-            data = await res.json()
+        image = data[0]["data"]["children"][0]["data"]["url"]
+        permalink = data[0]["data"]["children"][0]["data"]["permalink"]
+        url = f"https://reddit.com{permalink}"
+        title = data[0]["data"]["children"][0]["data"]["title"]
+        ups = data[0]["data"]["children"][0]["data"]["ups"]
+        downs = data[0]["data"]["children"][0]["data"]["downs"]
+        comments = data[0]["data"]["children"][0]["data"]["num_comments"]
 
-            image = data[0]["data"]["children"][0]["data"]["url"]
-            permalink = data[0]["data"]["children"][0]["data"]["permalink"]
-            url = f"https://reddit.com{permalink}"
-            title = data[0]["data"]["children"][0]["data"]["title"]
-            ups = data[0]["data"]["children"][0]["data"]["ups"]
-            downs = data[0]["data"]["children"][0]["data"]["downs"]
-            comments = data[0]["data"]["children"][0]["data"]["num_comments"]
+        em = Embed(colour=discord.Color.blurple(), title=title, url=url)
+        em.set_image(url=image)
+        em.set_footer(text=f"👍 {ups} 👎 {downs} 💬 {comments}")
 
-            em = Embed(colour=discord.Color.blurple(), title=title, url=url)
-            em.set_image(url=image)
-            em.set_footer(text=f"👍 {ups} 👎 {downs} 💬 {comments}")
+        await ctx.send(embed=em)
 
-            await ctx.send(embed=em)
+    @commands.command(name="8ball", brief="Ask the 8-ball a question!")
+    async def eightball(self, ctx: customContext, *, question):
+        """The almighty eightball answers all your questions"""
+        answers = [
+            "It is certain.",
+            "It is decidedly so.",
+            "Without a doubt.",
+            "Is Trump's skin orange?",
+            "Definitely",
+            "Why don't you go ask your mom smh.",
+            "What? No!",
+            "Unscramble `esy`",
+            "Doubtful...",
+            "I'm lazy rn, don't want to answer it.",
+            "Ok, no",
+            "Possibly so!",
+            "Yes. Yes. Yes.",
+        ]
 
-        @commands.command(name="8ball", brief="Ask the 8-ball a question!")
-        async def eightball(self, ctx: customContext, *, question):
-            """The almighty eightball answers all your questions"""
-            answers = [
-                "It is certain.",
-                "It is decidedly so.",
-                "Without a doubt.",
-                "Is Trump's skin orange?",
-                "Definitely",
-                "Why don't you go ask your mom smh.",
-                "What? No!",
-                "Unscramble `esy`",
-                "Doubtful...",
-                "I'm lazy rn, don't want to answer it.",
-                "Ok, no",
-                "Possibly so!",
-                "Yes. Yes. Yes.",
-            ]
-
-            em = Embed(
-                title="Magic 8-ball",
-                description=f"You: {question}\n🎱: {random.choice(answers)}",
-                colour=discord.Color.random(),
-            )
-            await ctx.send(embed=em)
+        em = Embed(
+            title="Magic 8-ball",
+            description=f"You: {question}\n🎱: {random.choice(answers)}",
+            colour=discord.Color.random(),
+        )
+        await ctx.send(embed=em)
 
     @commands.command(name="fight")
     @commands.max_concurrency(1, BucketType.user, wait=False)

@@ -96,9 +96,6 @@ class Player(wavelink.Player):
         track = self.current
         if not track: return
 
-        channel = self.bot.get_channel(int(self.channel_id))
-        queue_size = self.queue.qsize()
-
         em = Embed(
             title = get_title(track),
             url = track.uri
