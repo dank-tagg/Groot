@@ -4,6 +4,11 @@ import random
 from typing import List
 import time
 import asyncio
+
+class PosixLikeFlags(commands.FlagConverter, prefix='--', delimiter=' '):
+    member: discord.Member
+
+
 class Timer:
     __slots__ = ("start_time", "end_time")
 
@@ -263,5 +268,11 @@ class Commands(commands.Cog):
                 cookie_embed.description = f"{user.mention} got the cookie in **{total_second}**"
                 await cd_cookie.remove_reaction("\U0001F36A", ctx.guild.me)
                 return await cd_cookie.edit(embed=cookie_embed)
+    
+
+    @commands.command(name='rps')
+    async def _eee_(self, ctx, *, flags: PosixLikeFlags):
+        await ctx.send(flags.member.name)
+        
 def setup(bot):
     bot.add_cog(Commands(bot))
