@@ -83,7 +83,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         em.set_footer(text=f"Sniped by: {ctx.author} | Index {index}/{len(cache)}")
         await ctx.send(embed=em)
 
-    @commands.command(name="editsnipe", brief="Retrieves a recently edited message")
+    @commands.command(name="editsnipe", brief="Retrieves a recently edited message", aliases=['esnipe'])
     async def editsnipe(self, ctx: customContext, index=1):
         """
         Same as `snipe`, but for edited messages.
@@ -126,7 +126,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         await ctx.send(random.choice(choices))
 
     @commands.command(
-        name="ui", aliases=["info", "whois"], brief="Displays an user's information"
+        name="ui", aliases=[, "whois"], brief="Displays an user's information"
     )
     async def ui(self, ctx: customContext, member: discord.Member = None):
         """

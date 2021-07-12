@@ -132,7 +132,7 @@ class Information(commands.Cog):
         final_url = f'<{source_url}/tree/{branch}/main/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>'
         await ctx.send(final_url)
 
-    @commands.command(name="about")
+    @commands.command(name="about", aliases=['info'])
     async def _about_me(self, ctx: customContext):
         revision = self.get_last_commits()
         em = Embed(
