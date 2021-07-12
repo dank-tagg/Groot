@@ -13,7 +13,7 @@ import tabulate
 
 from discord.ext import commands
 from jishaku.codeblocks import codeblock_converter
-from utils.useful import Embed, pages
+from utils.useful import Embed, pages, fuzzy
 from utils.json import read_json, write_json
 
 @pages()
@@ -154,7 +154,11 @@ class Developer(commands.Cog):
                 )
 
     @dev.command(name="reload")
-    async def _reload_ext(self, ctx: customContext, *, ext: str):
+    async def _reload_ext(self, ctx: customContext, *, to_search: str):
+        
+        all_cogs = [cog.lower() for cog in self.bot.cogs]
+        ext = fuzzy.finder(to_search, all_cogs, lazy=False)[0]
+
         async with ctx.processing(ctx, message="Reloading extension...", delete_after=True) as process:
             try:
                 self.bot.reload_extension(f"cogs.{ext}")
