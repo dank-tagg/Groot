@@ -23,11 +23,14 @@ You can find me at the [support server](https://discord.gg/nUUJPgemFE) for Groot
 
 ## Features
 ```css
-Fun               -> Funny commands
-Utilities         -> Handy utilities
-Information       -> Information about the bot
-Moderation        -> Powerful moderation commands
-Admin             -> Admin commands and not available for the public
+Fun               -> Want to have some fun? 😉
+Utilities         -> Handy utilities that make your life easier.
+Information       -> Information about the bot.
+Moderation        -> Powerful moderation commands.
+Music             -> Play music! Has playlist functionalities.
+Configuration     -> Configure your own settings.
+Image             -> Image manipulation commands.
+Support           -> Support commands to report bugs/suggest features.
 ```
 
 ## How do I contribute?
@@ -74,7 +77,7 @@ I would be more than happy to talk to you.
 
 ## Contact me
 **DISCORD:**<br>
-[dank tagg#6017](https://discord.com/users/396805720353275924) _or_ [support server](https://discord.gg/nUUJPgemFE)\
+[dank tagg#6017](https://discord.com/users/396805720353275924) or [support server](https://discord.gg/nUUJPgemFE)\
 **EMAIL:**<br>
 grootdiscordbot@gmail.com
 
@@ -85,26 +88,6 @@ grootdiscordbot@gmail.com
 
 
 ## Licensing Information
-```
-MIT License
+Groot is licensed under the [Mozilla Public License 2.0](https://github.com/dank-tagg/Groot/blob/main/LICENSE)
 
-Copyright (c) 2021 dank tagg
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+Permissions of this weak copyleft license are conditioned on making available source code of licensed files and modifications of those files under the same license (or in certain cases, one of the GNU licenses). Copyright and license notices must be preserved. Contributors provide an express grant of patent rights. However, a larger work using the licensed work may be distributed under different terms and without source code for files added in the larger work.
