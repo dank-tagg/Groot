@@ -93,4 +93,17 @@ class customContext(commands.Context):
                 return await super().reply(
                     content, mention_author=mention_author, **kwargs
                 )
-        return await super().send(content, **kwargs)
+        return await self.send(content, **kwargs)
+    
+    async def confirm(self, to_confirm: discord.Member, message='Do you want to continue?'):
+        msg = await self.send(message)
+        for r in (icons := [self.bot.icons['greenTick'], self.bot.icons['redTick']]):
+            await msg.add_reaction(r)
+        
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, user: user == to_confirm and str(r) in icons, timeout=15)
+        except asyncio.TimeoutError:
+            return False
+        if str(reaction) == icons[0]:
+            return True
+        return False

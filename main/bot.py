@@ -26,6 +26,7 @@ class GrootBot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(self.get_prefix, **kwargs)
         self.icons = {}
+        self.colors = {}
         self.non_sync = ["music", "core", "rtfm"]
         self.token = kwargs.pop("token", None)
         self.session = aiohttp.ClientSession()
@@ -88,6 +89,16 @@ class GrootBot(commands.Bot):
 
         self.icons = emojis
         return self.icons
+
+    @to_call.append
+    def loading_colors(self):
+        colors = {
+            'red': 0xF04D4B,
+            'green': 0x3CA374,
+            'invisible': 0x2F3136
+        }
+        self.colors = colors
+        return self.colors
 
     @to_call.append
     def loading_cogs(self):

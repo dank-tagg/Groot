@@ -146,7 +146,7 @@ class Reminders(commands.Cog):
         event = f'{timer.event}_timer_complete'
         self.bot.dispatch(event, timer)
     
-    async def create_timer(self, expires, event, author, *args, **kwargs):
+    async def create_timer(self, expires, event, author, *args, **kwargs) -> Timer:
         try:
             now = kwargs.pop('created')
         except KeyError:
@@ -222,7 +222,7 @@ class Reminders(commands.Cog):
         await ctx.send(embed=e)
 
     @commands.Cog.listener()
-    async def on_reminder_timer_complete(self, timer):
+    async def on_reminder_timer_complete(self, timer: Timer):
         channel_id, message = timer.args
         try:
             channel = self.bot.get_channel(channel_id) or (await self.bot.fetch_channel(channel_id))
