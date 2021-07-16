@@ -338,7 +338,12 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
     
     @commands.command(aliases=['ss'])
     @commands.is_nsfw()
-    async def screenshot(self, ctx: customContext, *, url):
+    async def screenshot(self, ctx: customContext, *, url: str):
+        """
+        Takes a screenshot of the given website.
+        """
+
+        url = url.strip('<>')
         if not re.match(_URL_REGEX, url):
             raise commands.BadArgument('That is not a valid url. Try again with a valid one.')
         res = await self.bot.session.get(f'https://image.thum.io/get/{url}')

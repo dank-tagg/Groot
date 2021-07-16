@@ -438,7 +438,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
         em = Embed(description=", ".join(f"`{perms}`" for perms in permlist))
         em.add_field(
             name="Recommended permissions missing",
-            value=", ".join(f"`{perms}`" for perms in required),
+            value=", ".join(f"`{perms}`" for perms in required) or "None!",
         )
         em.set_author(name="List of permissions the bot has in this server")
         await ctx.send(embed=em)

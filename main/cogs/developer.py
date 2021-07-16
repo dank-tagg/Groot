@@ -157,7 +157,11 @@ class Developer(commands.Cog):
     async def _reload_ext(self, ctx: customContext, *, to_search: str):
         
         all_cogs = [cog.lower() for cog in self.bot.cogs]
-        ext = fuzzy.finder(to_search, all_cogs, lazy=False)[0]
+        try:
+            ext = fuzzy.finder(to_search, all_cogs, lazy=False)[0]
+        except IndexError:
+            await ctx.send(f'Could not find `{to_search}` with the fuzzy algorithm. Try again with a more specific name.')
+            return
 
         async with ctx.processing(ctx, message="Reloading extension...", delete_after=True) as process:
             try:

@@ -57,12 +57,12 @@ class GrootHelp(commands.HelpCommand):
 
         return em
         
-    async def handle_help(self, command):
+    async def handle_help(self, command: commands):
         with contextlib.suppress(commands.CommandError):
             if not await command.can_run(self.context):
                 raise commands.CommandError
             return await self.context.send(embed=self.get_command_help(command))
-        raise commands.BadArgument("You do not have the permissions to view this command's help.")
+        raise commands.BadArgument("You do not have the permissions to view this command's help (or command is marked NSFW).")
 
     async def send_bot_help(self, mapping):
         ctx = self.context
