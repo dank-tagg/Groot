@@ -9,7 +9,21 @@ from utils.useful import Embed
 from utils.chat_formatting import hyperlink as link
 from itertools import chain
 
-class SimonGame:
+
+class GameExit(Exception):
+    def __init__(self, game, force=False, message='Game exited.'):
+        super().__init__(message)
+        self.game = game
+        self.force = force
+
+class Game:
+    def __init__(self, ctx: customContext, *args, **kwargs):
+        self.owner = ctx.author
+    
+    def end(self, force=False) -> GameExit:
+        raise GameExit(self, force)
+
+class SimonGame(Game):
     def __init__(self, ctx: customContext):
         self.ctx = ctx
         self.bot = ctx.bot
@@ -43,13 +57,16 @@ class SimonGame:
                     done, _ = await asyncio.wait(
                         [
                             self.bot.wait_for('reaction_remove', check=check, timeout=len(self.sequence) * 5),
-                            self.bot.wait_for('reaction_add', check=check, timeout=len(self.sequence) * 5)
+                            self.bot.wait_for('reaction_add', check=check, timeout=len(self.sequence) * 5),
+                            self.bot.wait_for('message', check=lambda m: m.author == self.player, timeout=len(self.sequence) * 5)
                         ],
                         return_when=asyncio.FIRST_COMPLETED
                     )
                     for future in _:
                         future.cancel()
-                    reaction = done.pop().result()[0].emoji
+                    reaction = done.pop().result()[0].emoji if not isinstance(done.copy().pop().result(), discord.Message) else done.pop().result().content
+                    if reaction == 'end':
+                        self.end()
                 except asyncio.TimeoutError:
                     await self.message.edit(embed=self.build_embed(-1))
                     return
@@ -87,7 +104,7 @@ class SimonGame:
         em.set_author(name=self.ctx.author, icon_url=self.ctx.author.avatar_url)
         return em
 
-class TicTacToe:
+class TicTacToe(Game):
     X = -1
     O = 1
     Tie = 2
@@ -101,32 +118,33 @@ class TicTacToe:
             [0, 0, 0]
         ]
 
-        self.rows = {'a': 0, 'b': 1, 'c': 2}
+        self.grid = {'a': 0, 'b': 1, 'c': 2}
         self.icons = {0: '⬜', 1: '🅾️', -1: '❌'}
 
         self.players = {-1: self.x, 1: self.o}
         self.current_player = (self.x, self.X)
 
     async def start(self):
-        fails = 0
-        while fails < 3:
+        self.fails = 0
+        while self.fails < 3:
             await self.send_board()
             try:
-                move = (await self.ctx.bot.wait_for('message', check=lambda m: m.author == self.current_player[0], timeout=15)).content
+                move = (await self.ctx.bot.wait_for('message', check=lambda m: m.author == self.current_player[0], timeout=15)).content.lower()
             except asyncio.TimeoutError:
                 await self.ctx.send('❕ Woops. The game ended due to inactivity. Next time please be quicker to answer.')
                 return
-            
+            if move == 'end':
+                self.end()
             if not move in [f'{x}{y}' for x in ['a', 'b', 'c'] for y in [1, 2, 3]]:
                 await self.ctx.send(f'⚠️ That is not a valid move {self.current_player[0].mention}! Please enter a valid move again.')
-                fails += 1
+                self.fails += 1
                 continue
             
-            if self.board[self.rows[move[0]]][int(move[1])-1]== 0:
-                self.board[self.rows[move[0]]][int(move[1])-1] = self.current_player[1]
+            if self.board[self.grid[move[0]]][int(move[1])-1]== 0:
+                self.board[self.grid[move[0]]][int(move[1])-1] = self.current_player[1]
             else:
                 await self.ctx.send('⚠️ There already is a marker on that spot. Choose another please.')
-                fails += 1
+                self.fails += 1
                 continue
             
             winner = self.check_winner()
@@ -195,65 +213,146 @@ class TicTacToe:
 
         return None
 
-class Battleship:
+class Battleship(Game):
     class Board:
         def __init__(self, bot, owner: discord.Member, hidden=False, board=None):
+            # If it is a hidden board it inherits the grid from the given board
             self.bot = bot
 
             self.owner = owner
             self.hidden = hidden
             if self.hidden:
                 self.board: self = board
-            self.ships = {'Carrier': 5, 'Battleship': 4, 'Cruiser': 3, 'Submarine': 3, 'Destroyer': 2}
+            self.ships: List[Battleship.Ship] = []
+            self.ship_blueprint = {'Battleship': 4, 'Cruiser': 3, 'Submarine': 2, 'Destroyer': 1}
 
             if not self.hidden:
-                self.rows = [[random.randint(0, 1) for _ in range(10)] for _ in range(10)]
+                self.grid = [[0 for _ in range(8)] for _ in range(8)]
             else:
-                self.rows = self.board.rows
+                self.grid = self.board.grid
 
-            self.icons = {0: '🟦', 1: '🟥', 2: '💥', -2: '⬛'}
+            self.icons = {0: '🟦', 1: '🔴', 2: '💥', -2: '⚫'}
 
-            self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+            self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+            self.setup()
         
         def mark(self, coordinate: str):
             coordinate = coordinate.lower()
-            possible_coords = [f'{letter}{number}' for letter in self.letters for number in [i for i in range(1, 11)]]
+            if coordinate == 'end':
+                raise GameExit(self)
+            possible_coords = [f'{letter}{number}' for letter in self.letters for number in [i for i in range(1, 9)]]
             if not coordinate in possible_coords:
                 return None
             
-            placement = self.rows[self.letters.index(coordinate[0])][int(coordinate[1:])-1]
+            placement = self.grid[self.letters.index(coordinate[0])][int(coordinate[1:])-1]
             if placement == 2 or placement == -2:
                 return None
             elif placement == 1:
-                self.rows[self.letters.index(coordinate[0])][int(coordinate[1:])-1] = 2
+                self.grid[self.letters.index(coordinate[0])][int(coordinate[1:])-1] = 2
+                for ship in self.ships:
+                    if ship.destroyed():
+                        self.ships.remove(ship)
+                        return ship
                 return True
             else:
-                self.rows[self.letters.index(coordinate[0])][int(coordinate[1:])-1] = -2
+                self.grid[self.letters.index(coordinate[0])][int(coordinate[1:])-1] = -2
                 return False
 
         
         def setup(self):
-            pass
-            
+            if self.hidden:
+                return
+            for name, size in self.ship_blueprint.items():
+                self.place_ship(name, size)
+        
+        def place_ship(self, name: str, size: int):
+            ship = self.generate_ship(name, size)
+            self.ships.append(ship)
+            ship.place()
+
+        def generate_ship(self, name: str, size: int):
+            orientation = random.choice(['horizontal', 'vertical'])
+
+            locations = self.get_available_location(size, orientation)
+            if locations is None:
+                return None
+            return Battleship.Ship(self, name, orientation, size, locations)
+
+        def get_available_location(self, size, orientation):
+            locations = []
+            if orientation == 'horizontal':
+                for row in range(8):
+                    for col in range(8 - size + 1):
+                        if 1 not in self.grid[row][col:col+size]:
+                            locations.append((row, col))
+    
+            elif orientation == 'vertical':
+                for col in range(8):
+                    for row in range(8 - size + 1):
+                        if 1 not in [self.grid[i][col] for i in range(row, row+size)]:
+                            locations.append((row, col))
+            return locations[random.randint(0, len(locations) - 1)] or None
+
         def get(self):
             if not self.hidden:
-                struc = [[self.icons[row] for row in self.rows[i]] for i in range(10)]
+                struc = [[self.icons[row] for row in self.grid[i]] for i in range(8)]
             else:
-                struc = [[self.icons[row] if row in [0, 2, -2] else self.icons[0] for row in self.rows[i]] for i in range(10)]
+                struc = [[self.icons[row] if row in [0, 2, -2] else self.icons[0] for row in self.grid[i]] for i in range(8)]
 
             for i, row in enumerate(struc):
-                alphabet = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯']
+                alphabet = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭']
                 row.insert(0, alphabet[i])
 
             board = [''.join(row) for row in struc]
-            board.insert(0, '\u200b'.join(['⬛', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']))
+            board.insert(0, '\u200b'.join(['⬛', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣']))
             return '\n'.join(board)
+
+    class Ship:
+        def __init__(self, board, name, orientation: str, size: int, locations: list):
+            self.board = board
+            self.size = size
+            self.name = name
+            self.locations = locations
+
+            if orientation in ['vertical', 'horizontal']:
+                self.orientation = orientation
+            else:
+                raise ValueError('Value for orientation must be either vertical or horizontal')
+            
+        def place(self):
+            if self.orientation == 'horizontal':
+                self.coordinates = []
+                for i in range(self.size):
+                    self.coordinates.append((self.locations[0], self.locations[1] + i))
+            elif self.orientation == 'vertical':
+                self.coordinates = []
+                for i in range(self.size):
+                    self.coordinates.append((self.locations[0] + i, self.locations[1]))
+            self.fill()
+
+        def contains(self, location: tuple):
+            for coords in self.coordinates:
+                if coords == location:
+                    return True
+            return False
+        
+        def destroyed(self):
+            for coords in self.coordinates:
+                if self.board.grid[coords[0]][coords[1]] == 1:
+                    return False
+            return True
+        
+        def fill(self):
+            for coords in self.coordinates:
+                self.board.grid[coords[0]][coords[1]] = 1
 
     def __init__(self, ctx: customContext, x: discord.Member, y: discord.Member):
         self.ctx = ctx
         self.bot = ctx.bot
         self.x = x
         self.y = y
+
+        self.players = [self.x, self.y]
 
         self.current_player = self.x
         self.messages = dict()
@@ -278,47 +377,75 @@ class Battleship:
         self.boards[self.y]['hidden'] = self.Board(self.bot, self.y, hidden=True, board=self.boards[self.y]['own'])
     
     async def send_initial_messages(self):
-        for player in [self.x, self.y]:
-            msg = await player.send(content=f'Link to go back to {self.ctx.channel.mention}', embed=self.build_embed(player))
+        await self.send_embeds()
+
+    async def send_embeds(self):
+        for message in self.messages.values():
+            await message.delete()
+        for player in self.players:
+            msg = await player.send(embed=self.build_embed(player))
             self.messages[player.id] = msg
 
     async def start(self):
-        fails = 0
-        while fails < 3:
+        self.fails = {self.x.id: 0, self.y.id: 0}
+        while self.fails[self.x.id] < 5 and self.fails[self.y.id] < 5:
+            msg = await self.current_player.send(f'It is your turn now {self.current_player.mention}')
             move = (await self.bot.wait_for('message', check=lambda m: m.author == self.current_player and not m.guild)).content
-            mark = self.boards[self.opponent(self.current_player)]['own'].mark(move)
+            board = self.boards[self.opponent(self.current_player)]['own']
+            try:
+                mark = board.mark(move)
+            except GameExit:
+                self.end()
+            await msg.delete()
             if mark is None:
-                fails += 1
-                await self.current_player.send(f'⚠️ That is not a valid coordinate (hit already or not on board). Try again. (Fails threshold `{fails}/3`)')
+                self.fails[self.current_player.id] += 1
+                await self.current_player.send(f'⚠️ That is not a valid coordinate (hit already or not on board). Try again. (Fails threshold `{self.fails[self.current_player.id]}/5`)')
                 continue
+            elif isinstance(mark, Battleship.Ship):
+                winner = self.check_winner()
+                if winner is not None:
+                    for player in self.players:
+                        await player.send(f'{winner.mention} has won the game. GG!')
+                    return
+                
+                await self.current_player.send(f'💣 You destroyed their {mark.name}! They have {len(board.ships)} other boats left.', delete_after=10)
+                self.current_player = self.opponent(self.current_player)
+                await self.send_embeds()
+                continue
+            elif mark is True:
+                await self.current_player.send('💥 You hit a boat! You get another shot.', delete_after=10)
+                await self.send_embeds()
+                continue
+
+
             self.current_player = self.opponent(self.current_player)
-            for player in [self.x, self.y]:
-                await self.messages[player.id].edit(embed=self.build_embed(player))
+            await self.send_embeds()
 
             winner = self.check_winner()
             if winner is not None:
-                for player in [self.x, self.y]:
+                for player in self.players:
                     await player.send(f'{winner.mention} has won the game. GG!')
                 return
-        for player in [self.x, self.y]:
-            await player.send('😢 Game ended due to reaching the fail threshold.')
+        
+        for player in self.players:
+            await player.send(f'Oops. {self.current_player.mention} has reached the fail threshold. {self.opponent(self.current_player).mention} won the game!')
             
         
     def check_winner(self):
         for board in [self.boards[self.x]['own'], self.boards[self.y]['own']]:
-            if 1 not in chain(*board.rows):
+            if 1 not in chain(*board.grid):
                 return self.opponent(board.owner)
         return None
     
     def build_embed(self, player: discord.Member):
         em = Embed(title=f'Battleship | {self.x.name} VS {self.y.name}')
-        em.add_field(name='Your board', value=self.boards[player]['own'].get())
-        em.add_field(name='Opponent\'s board', value=self.boards[self.opponent(player)]['hidden'].get())
-        em.add_field(name='Icons and what they mean', value='🟦 = Water\n🟥 = Boat\n💥 = Target Hit\n⬛ = Missed shot', inline=False)
         em.add_field(
             name='Instructions', 
-            value='Send a coordinate to mark (`a1`, `a2`, `b3`) etc. \nThe goal is to destroy all enemy ships before the enemy destroys yours. Good luck!'
+            value='Send a coordinate to mark (`a1`, `a2`, `b3` e.g.)  \nThe goal is to destroy all enemy ships before the enemy destroys yours. Good luck!'
         )
+        em.add_field(name='Icons and what they mean', value='🟦 = Water\n🟥 = Boat\n💥 = Target Hit\n⬛ = Missed shot', inline=False)
+        em.add_field(name='Your board', value=self.boards[player]['own'].get())
+        em.add_field(name='Opponent\'s board', value=self.boards[self.opponent(player)]['hidden'].get())
         em.set_footer(text=f'({self.current_player.name}\'s turn)')
         return em
 
@@ -331,6 +458,12 @@ class Battleship:
 class Games(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.active_games: List[Game] = []
+    
+    async def start_game(self, game: Union[SimonGame, TicTacToe, Battleship]):
+        self.active_games.append(game)
+        await game.start()
+        self.active_games.remove(game)
 
     @commands.command()
     async def simon(self, ctx: customContext):
@@ -339,7 +472,7 @@ class Games(commands.Cog):
         Try to get the highest score possible!
         """
         game = SimonGame(ctx)
-        await game.start()
+        await self.start_game(game)
 
     @commands.command(aliases=['ttt'])
     @commands.max_concurrency(1, commands.BucketType.channel)
@@ -356,13 +489,14 @@ class Games(commands.Cog):
             return
 
         game = TicTacToe(ctx, ctx.author, opponent)
-        await game.start()
+        await self.start_game(game)
     
     @commands.command(aliases=['ship'])
     @commands.max_concurrency(1, commands.BucketType.user)
     async def battleship(self, ctx: customContext, opponent: discord.Member):
         """
-        Play a game of battleship with a friend.
+        Play a game of battleship with a friend. 
+        Rules are listed here: https://www.cs.nmsu.edu/~bdu/TA/487/brules.htm
         """
         if opponent.bot or opponent == ctx.author:
             raise commands.BadArgument(f'Opponent can not be yourself or another bot.')
@@ -374,13 +508,14 @@ class Games(commands.Cog):
         
         game = Battleship(ctx, ctx.author, opponent)
         async with ctx.processing(ctx, message='Setting up the game...', delete_after=True):
-            await asyncio.sleep(2) # let it set up the game first
+            await asyncio.sleep(1) # let it set up the game first
             urls = [game.messages[ctx.author.id].jump_url, game.messages[opponent.id].jump_url]
             em = Embed()
             em.add_field(name='Game links for battleship game', value=f'**{ctx.author.name}**: {link("Click here", urls[0])} \n\n**{opponent.name}**: {link("Click here", urls[1])}')
 
         await ctx.send('Game started in DMs. Good luck both players, may the odds be ever in your favour.\n',embed=em)
-        await game.start()
+        await self.start_game(game)
+
 
 def setup(bot):
     bot.add_cog(Games(bot), cat_name='Fun')

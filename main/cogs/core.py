@@ -10,6 +10,7 @@ import logging
 from discord.ext import commands, tasks
 from utils.useful import Embed, Cooldown, send_traceback
 from utils.json import read_json
+from cogs.games import GameExit
 
 class Core(commands.Cog):
     def __init__(self, bot):
@@ -52,6 +53,7 @@ class Core(commands.Cog):
 
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
+            
             if isinstance(error, discord.errors.Forbidden):
                 try:
                     return await ctx.reply(
@@ -61,6 +63,10 @@ class Core(commands.Cog):
                     return await ctx.author.send(
                         f"{self.bot.icons['redTick']} I am missing permissions to do that!"
                     )
+
+            elif isinstance(error, GameExit):
+                await ctx.send(f'The game was ended {ctx.author.mention}.')
+                return
 
         # Cooldowns
         elif isinstance(error, commands.MaxConcurrencyReached):
@@ -144,7 +150,7 @@ class Core(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if re.fullmatch("<@(!)?812395879146717214>", message.content):
-            await message.channel.send(f"My prefix is `{await self.bot.get_prefix(message)}`")
+            await message.channel.send(f"My prefixes is `{await self.bot.get_prefix(message)}`")
             return
 
     @commands.Cog.listener()

@@ -26,6 +26,13 @@ class Developer(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # Rerun edited messages
+    @commands.Cog.listener()
+    async def on_message_edit(self, before, after):
+        if not after.author == self.bot.owner:
+            return
+        await self.bot.process_commands(after)
+
     @staticmethod
     async def run_shell(code: str) -> bytes:
         proc = await asyncio.create_subprocess_shell(
