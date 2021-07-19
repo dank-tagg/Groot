@@ -68,14 +68,13 @@ class GrootHelp(commands.HelpCommand):
         ctx = self.context
         bot = ctx.bot
 
-        prefix = await commands.clean_content().convert(ctx, ctx.prefix)
 
         em = Embed(description=
-            f"Prefix for **{ctx.guild.name}** is `{prefix or 'g.'}`\n"
+            f"My prefixes for **{ctx.guild.name}** are `{', '.join(await bot.get_prefix(ctx.message) or ['g.'])}`\n"
             f"Total commands: {len(list(bot.walk_commands()))} | Usable by you: {len(await self.filter_commands(list(bot.walk_commands()), sort=True))} \n"
             "```diff\n- [] = optional argument\n"
             "- <> = required argument\n"
-            f"+ Type {prefix}help [command | category] for "
+            f"+ Type {await bot.get_prefix(ctx.message)}help [command | category] for "
             "more help on a specific category or command!```"
             "[Support](<https://discord.gg/nUUJPgemFE>) | "
             "[Vote](https://top.gg/bot/812395879146717214/vote) | "

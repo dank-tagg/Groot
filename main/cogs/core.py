@@ -150,7 +150,10 @@ class Core(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if re.fullmatch("<@(!)?812395879146717214>", message.content):
-            await message.channel.send(f"My prefixes is `{await self.bot.get_prefix(message)}`")
+            await message.channel.send(f"My prefix(es) for **{message.guild.name}** are `{', '.join(await self.bot.get_prefix(message))}`")
+            return
+        elif re.fullmatch("<@(!)?812395879146717214> help", message.content):
+            await (await self.bot.get_context(message)).send_help()
             return
 
     @commands.Cog.listener()
