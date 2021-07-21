@@ -23,6 +23,7 @@ class Moderator(commands.Cog):
         *,
         mode: str = "add",
     ):
+        """Blacklists a user or a guild."""
 
         if mode != "remove" and mode != "add":
             return await ctx.send(
@@ -59,6 +60,7 @@ class Moderator(commands.Cog):
         *,
         mode: str = "add",
     ):
+        """Gives premium to a user or a guild."""
 
         if mode != "remove" and mode != "add":
             return await ctx.send(

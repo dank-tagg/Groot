@@ -13,6 +13,7 @@ class Tags(commands.Cog):
 
     @commands.group(invoke_without_command=True, case_insensitive=True)
     async def tag(self, ctx: customContext, *, tag):
+        """Sends a tag."""
         tag = tag.lower()
 
         query = "SELECT tag_content FROM tags WHERE tag_guild_id = ? AND tag_name = ?"
@@ -80,6 +81,7 @@ class Tags(commands.Cog):
 
     @tag.command()
     async def delete(self, ctx: customContext, *, tag):
+        """Deletes a tag."""
 
         tag = tag.lower()
         query = "SELECT tag_author FROM tags WHERE tag_name = ? AND tag_guild_id = ?"

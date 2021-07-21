@@ -161,6 +161,7 @@ class Configuration(commands.Cog):
 
     @commands.command(name="resetmydata")
     async def _reset_my_data(self, ctx):
+        """Resets a user's data."""
         await ctx.send(f"⚠️ Are you sure you want to remove all your data?\n_Respond with `yes` or `no`_")
         m = await self.bot.wait_for('message', check=lambda m: m.author == ctx.author)
         if m.content.lower() != 'yes':

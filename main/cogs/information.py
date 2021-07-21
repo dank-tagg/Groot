@@ -128,6 +128,7 @@ class Information(commands.Cog):
 
     @commands.command(name="about", aliases=['info'])
     async def _about_me(self, ctx: customContext):
+        """Sends some inforamtion about Groot."""
         revision = self.get_last_commits()
         em = Embed(
             title="Invite me to your server!",

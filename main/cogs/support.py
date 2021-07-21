@@ -13,6 +13,7 @@ class Support(commands.Cog):
 
     @commands.command(name="report")
     async def _report(self, ctx: customContext):
+        """Used to report something."""
         questions = [
             "What do you want to report?",
             "Write a descriptive overview of what you are reporting.\n"
@@ -69,6 +70,7 @@ class Support(commands.Cog):
     
     @commands.command(name="suggest")
     async def _suggest_feature(self, ctx: customContext, *, suggestion):
+        """Used to suggest a feature for Groot."""
         channel = self.bot.get_channel(857544734338449448)
         msg = await channel.send(f"{ctx.author}: {suggestion}")
         await msg.add_reaction("👍")
@@ -77,6 +79,7 @@ class Support(commands.Cog):
     
     @commands.command(name="supportserver")
     async def _support_server_invite(self, ctx: customContext):
+        """Sends an invite to the official support server of Groot."""
         await ctx.send("https://discord.gg/nUUJPgemFE")
 
 

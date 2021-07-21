@@ -178,6 +178,7 @@ class Reminders(commands.Cog):
 
     @commands.group(name='reminder', aliases=['remindme', 'remind'], usage='<when>', invoke_without_command=True)
     async def reminder(self, ctx: customContext, *, when: TimeConverter):
+        """Reminds you after a specific time."""
         timer = await self.create_timer(
             when.dt,
             'reminder',

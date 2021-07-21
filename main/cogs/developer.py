@@ -61,10 +61,12 @@ class Developer(commands.Cog):
 
     @commands.group(invoke_without_command=True, case_insensitive=True)
     async def dev(self, ctx: customContext):
+        """It literally returns and does nothing."""
         return
 
     @dev.command(name="update")
     async def _update(self, ctx: customContext, link: str, *, message: str):
+        """Updates the bot."""
         await ctx.send("Are you sure you want update me? `(y/n)`")
 
         msg = await self.bot.wait_for(
@@ -94,11 +96,13 @@ class Developer(commands.Cog):
 
     @dev.command(name="inviteme")
     async def _inviteme(self, ctx: customContext, *, guildid: int):
+        """Sends an invite to the channel the command was executed in."""
         guild = self.bot.get_guild(guildid)
         await ctx.author.send(f"{await guild.text_channels[0].create_invite()}")
 
     @dev.command(name="restart")
     async def _restart(self, ctx: customContext):
+        """Restarts the bot."""
         # Stuff to do first before start
         async with ctx.processing(ctx, message="Restarting bot...") as process:
             await self.git(arguments="pull")
@@ -112,6 +116,7 @@ class Developer(commands.Cog):
 
     @dev.command(name="sync")
     async def _sync(self, ctx: customContext):
+        '''"Syncs" the bot by reloading all the cogs.'''
 
         text = await self.git(arguments="pull")
         fail = ""
@@ -162,6 +167,7 @@ class Developer(commands.Cog):
 
     @dev.command(name="reload")
     async def _reload_ext(self, ctx: customContext, *, to_search: str):
+        """Reloads a cog."""
         
         all_cogs = [cog.lower() for cog in self.bot.cogs]
         try:
@@ -205,6 +211,7 @@ class Developer(commands.Cog):
 
     @commands.command(name="delete", aliases=["del", "d"])
     async def delete_bot_message(self, ctx: customContext):
+        """Deletes bot messages."""
         try:
             message = ctx.channel.get_partial_message(ctx.message.reference.message_id)
         except AttributeError:
