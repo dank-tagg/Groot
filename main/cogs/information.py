@@ -134,7 +134,8 @@ class Information(commands.Cog):
             title="Invite me to your server!",
             url="https://grootdiscordbot.xyz/invite",
             description="Groot is a simple yet feature-rich discord bot.\nFeaturing over 150 commands, the best discord bot you could ask for!\n" +
-                        f"Made by [`{self.bot.get_user(396805720353275924)}`](https://discord.com/users/396805720353275924) with \💖\n\n",
+                        f"Made by [`{self.bot.get_user(396805720353275924)}`](https://discord.com/users/396805720353275924) with \💖\n" + 
+                        f"{hyperlink('Website', 'https://grootdiscordbot.xyz')} | {hyperlink('Source', 'https://github.com/dank-tagg/Groot')} | {hyperlink('Vote', 'https://top.gg/bot/812395879146717214/vote')}",
             color=0x3CA374
         )
         # Recent changes
