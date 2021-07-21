@@ -513,7 +513,7 @@ class TypeRace(Game):
                 content = m.content.replace('\n', ' ')
                 if m.channel == ctx.channel and not m.author.bot and m.author not in map(lambda m: m["user"], participants):
                     sim = difflib.SequenceMatcher(None, content, text).ratio()
-                    return sim >= 0.9
+                    return sim >= 0.75
             
             try:
                 message = await ctx.bot.wait_for(
@@ -558,7 +558,7 @@ class Games(commands.Cog):
         self.bot = bot
         self.active_games: List[Game] = []
     
-    async def start_game(self, game: Union[SimonGame, TicTacToe, Battleship]):
+    async def start_game(self, game: Union[SimonGame, TicTacToe, Battleship, TypeRace]):
         self.active_games.append(game)
         await game.start()
         self.active_games.remove(game)
