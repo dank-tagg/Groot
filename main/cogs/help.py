@@ -38,7 +38,7 @@ class GrootHelp(commands.HelpCommand):
         #Aliases
         em.add_field(
             name="Aliases", 
-            value=f"```{','.join(command.aliases) or 'No aliases'}```", 
+            value=f"```{', '.join(command.aliases) or 'No aliases'}```", 
             inline=False
         )
 

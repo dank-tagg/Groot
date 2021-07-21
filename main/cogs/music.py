@@ -350,7 +350,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         else:
             await ctx.reply(f'{ctx.author.mention} has voted to stop the player. (`{votes}/{required}`)')
 
-    @commands.group(case_insensitive=True,invoke_without_command=True, aliases=['q', 'que'])
+    @commands.group(case_insensitive=True,invoke_without_command=True, aliases=['q'])
     async def queue(self, ctx: customContext):
         """Display the players queued songs."""
         player = self.get_player(ctx)
