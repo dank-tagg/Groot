@@ -459,6 +459,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
 
     @role.command(name="info", brief="Shows information about a role")
     async def _info(self, ctx: customContext, role: RoleConvert = None):
+        """Sends some inforamtion about a role."""
         if role == None:
             return await ctx.reply(
                 "You need to give me a role id!", mention_author=False

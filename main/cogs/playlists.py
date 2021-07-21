@@ -111,6 +111,7 @@ class Playlists(commands.Cog):
  
     @commands.group(invoke_without_command=True, case_insensitive=True)
     async def playlist(self, ctx: customContext):
+        """Shows the user's playlists."""
         query = """
                 SELECT playlist_name, playlist_id, 
                 (
@@ -134,6 +135,7 @@ class Playlists(commands.Cog):
     
     @playlist.command(name="info", usage="<id> [page]")
     async def _playlist_info(self, ctx: customContext, playlist_id: int):
+        """Shows information about a playlist."""
         playlist = await get_playlist(self.bot.db, playlist_id)
 
         if not playlist:
@@ -145,6 +147,7 @@ class Playlists(commands.Cog):
     
     @playlist.command(name="create", usage="<name>")
     async def _playlist_create(self, ctx: customContext, *, name):
+        """Creates a playlist."""
         query = "SELECT Count(*) FROM playlists WHERE user_id = ?"
         cur = await self.bot.db.execute(query, (ctx.author.id, ))
         number_of_playlists = await cur.fetchone()
@@ -160,6 +163,7 @@ class Playlists(commands.Cog):
 
     @playlist.command(name="delete", aliases=["del"], usage="<id>")
     async def _playlist_delete(self, ctx: customContext, playlist_id: int):
+        """Deletes a playlist."""
         if check := await self.is_playlistOwner(ctx.author.id, playlist_id) is False:
             return await ctx.reply(f"{self.bot.icons['redTick']} | You do not own this playlist.")
         elif check is None:
@@ -172,6 +176,7 @@ class Playlists(commands.Cog):
 
     @playlist.command(name="addsong", usage="<playlist ID> <song>")
     async def _playlist_addsong(self, ctx: customContext, playlist_id:int, *, query):
+        """Adds a song to a playlist."""
         if (check := await self.is_playlistOwner(ctx.author.id, playlist_id)) is False:
             return await ctx.reply(f"{self.bot.icons['redTick']} | You do not own this playlist.")
         elif check is None:
@@ -200,6 +205,7 @@ class Playlists(commands.Cog):
     
     @playlist.command(name="removesong", aliases=["rmsong", "rmsongs"], usage="<playlist ID> <song ID/song IDs>")
     async def _playlist_removesong(self, ctx: customContext, playlist_id:int, *songs):
+        """Removes a song from a playlist."""
         if not songs:
             raise commands.BadArgument(f"{self.bot.icons['redTick']} | Please supply a song id or a list of song ID's seperated by spaces.")
         if check := await self.is_playlistOwner(ctx.author.id, playlist_id) is False:
@@ -231,6 +237,7 @@ class Playlists(commands.Cog):
     
     @playlist.command(name="play", usage="<playlist ID>")
     async def _playlist_play(self, ctx: customContext, playlist_id: int):
+        """Plays the songs in a playlist."""
         if (check := await self.is_playlistOwner(ctx.author.id, playlist_id)) is False:
             return await ctx.reply(f"{self.bot.icons['redTick']} | You do not own this playlist.")
         elif check is None:

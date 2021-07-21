@@ -251,6 +251,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     
     @commands.command(name='disconnect')
     async def _disconnect(self, ctx: customContext):
+        """Disconnects from a voice channel if the bot was in one."""
         player = self.get_player(ctx)
         
         if self.is_privileged(ctx):
@@ -368,6 +369,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     
     @queue.command(name="remove")
     async def _remove(self, ctx: customContext, position: int):
+        """Removes a song from the queue by it's position."""
         player = self.get_player(ctx)
 
         if not player.is_connected:

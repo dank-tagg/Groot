@@ -18,6 +18,7 @@ class Blackjack(commands.Cog):
 
     @commands.command(name="blackjack")
     async def play_blackjack(self, ctx: customContext):
+        """Play blackjack."""
         stood = False
         deck = [
             {"face": face, "suit": suit} for suit in self.suits for face in self.faces
