@@ -3,11 +3,16 @@ from utils._type import *
 import asyncio
 import discord
 import random
+import io
+import textwrap
+import time
+import difflib
 
 from discord.ext import commands
-from utils.useful import Embed
+from utils.useful import Embed, run_in_executor
 from utils.chat_formatting import hyperlink as link
 from itertools import chain
+from cogs.image import get_bytes
 
 
 class GameExit(Exception):
@@ -454,6 +459,99 @@ class Battleship(Game):
             return self.y
         return self.x
 
+class TypeRace(Game):
+    def __init__(self, ctx):
+        self.ctx = ctx
+
+        self.to_type: str = None
+
+    @run_in_executor
+    def draw(self, image, text):
+        from PIL import Image, ImageDraw, ImageFont
+        im = Image.open(io.BytesIO(image))
+        draw = ImageDraw.Draw(im)
+        font = ImageFont.truetype(f'{self.ctx.bot.cwd}/data/assets/Milliard.otf', 50)
+
+        text = textwrap.fill(text, width=30)
+        draw.multiline_text((im.width/2-400,im.height/2-70), text, (255,255,255), align='left', font=font)
+        
+
+        buffer = io.BytesIO()
+        im.save(buffer, format='png')
+        return buffer.getvalue()
+
+    async def start(self):
+        bot = self.ctx.bot
+        image_url = random.choice(['https://i.imgur.com/Fwed3c2.png', 'https://imgur.com/PX8cjhG.png', 'https://i.imgur.com/rpSyUdI.png', 'https://i.imgur.com/Xx8rvbE.png'])
+        byt = await get_bytes(self.ctx, image_url, bot.session)
+        res = await bot.session.get('https://api.quotable.io/random', params={'minLength': 30, 'maxLength': 90})
+        data = await res.json()
+
+        
+        self.to_type = data['content']
+        buffer = await self.draw(byt, self.to_type)
+        em = Embed(title='Typerace!', description='Type the following sentence as fast as possible:')
+        em.set_image(url='attachment://TypeRace.png')
+        em.set_footer(text=f"Quote by {data['author']}")
+        self._message = await self.ctx.send(embed=em, file=discord.File(io.BytesIO(buffer), 'TypeRace.png'))
+
+        await self.wait_for_response(self.ctx, self.to_type, timeout=30)
+
+    
+    async def wait_for_response(self, ctx: commands.Context, text: str, *, timeout: int):
+        emoji_map = {1: '🥇', 2: '🥈', 3: '🥉'}
+
+        format_line = lambda i, x: f" {emoji_map[i]} {x['user'].mention} in {x['time']:.2f}s | **WPM:** {x['wpm']:.2f} | **ACC:** {x['acc']:.2f}%"
+
+        text = text.replace('\n', ' ')
+        participants = []
+
+        start = time.perf_counter()
+
+        while True:
+            def check(m):
+                content = m.content.replace('\n', ' ')
+                if m.channel == ctx.channel and not m.author.bot and m.author not in map(lambda m: m["user"], participants):
+                    sim = difflib.SequenceMatcher(None, content, text).ratio()
+                    return sim >= 0.9
+            
+            try:
+                message = await ctx.bot.wait_for(
+                    'message',
+                    timeout=timeout,
+                    check=check
+                )
+            except asyncio.TimeoutError:
+                if participants:
+                    break
+                else:
+                    return await ctx.reply('Oops. Seems like no one responded... sad.')
+            end = time.perf_counter()
+            content = message.content.replace('\n', ' ')
+            timeout -= round(end-start)
+
+            participants.append({
+                'user': message.author,
+                'time': end - start,
+                'wpm': len(text.split(' ')) / ((end-start) / 60),
+                'acc': difflib.SequenceMatcher(None, content, text).ratio() * 100
+            })
+
+            await message.add_reaction(emoji_map[len(participants)])
+            
+            if len(participants) >= 3:
+                break
+
+        desc = [format_line(i, x) for i, x in enumerate(participants, 1)]
+        em = Embed(
+            title='Typerace finished!',
+            description=f'This typerace has finished. You can start another game by running `{ctx.prefix}typerace`'
+        )
+        em.add_field(name='Participants', value='\n'.join(desc))
+        em.add_field(name='Prompt', value=text, inline=False)
+
+        await self._message.reply(embed=em)
+
 
 class Games(commands.Cog):
     def __init__(self, bot):
@@ -516,6 +614,16 @@ class Games(commands.Cog):
         await ctx.send('Game started in DMs. Good luck both players, may the odds be ever in your favour.\n',embed=em)
         await self.start_game(game)
 
+    @commands.command(aliases=['tr'])
+    @commands.max_concurrency(1, commands.BucketType.channel)
+    async def typerace(self, ctx: customContext):
+        """
+        Prepare for the best typerace ever! Compete with your friends and foes, who is the fastest?
+        """
+        async with ctx.processing(ctx, message='Starting... get ready!', delete_after=True):
+            await asyncio.sleep(2)
+            game = TypeRace(ctx)
+        await self.start_game(game)
 
 def setup(bot):
     bot.add_cog(Games(bot), cat_name='Fun')
