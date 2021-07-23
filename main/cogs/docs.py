@@ -121,6 +121,8 @@ class Docs(commands.Cog):
             'master': 'https://discordpy.readthedocs.io/en/master',
         }
 
+        if key not in page_types:
+            raise commands.BadArgument(f'{key} is not in supported page types.')
         if obj is None:
             await ctx.send(page_types[key])
             return
@@ -156,24 +158,21 @@ class Docs(commands.Cog):
         await ctx.reply(embed=e)
 
 
+    class RTFMFlags(commands.FlagConverter, prefix='--', delimiter=' '):
+        entity: str = commands.Flag(aliases='e', default='latest', max_args=1)
 
     @commands.group(aliases=['rtfd'], invoke_without_command=True)
-    async def rtfm(self, ctx, *, obj: str = None):
-        """Gives you a documentation link for a discord.py entity.
+    async def rtfm(self, ctx, obj, *, flags: RTFMFlags):
+        """
+        Gives you a documentation link for a discord.py entity.
         Events, objects, and functions are all supported through a
         a cruddy fuzzy algorithm.
+
+        Command flags:
+        `--entity|e <master|latest|python>`
         """
-        await self.do_rtfm(ctx, 'latest', obj)
+        await self.do_rtfm(ctx, flags.entity, obj)
 
-    @rtfm.command(name='python', aliases=['py'])
-    async def rtfm_python(self, ctx, *, obj: str = None):
-        """Gives you a documentation link for a Python entity."""
-        await self.do_rtfm(ctx, 'python', obj)
-
-    @rtfm.command(name='master', aliases=['2.0'])
-    async def rtfm_master(self, ctx, *, obj: str = None):
-        """Gives you a documentation link for a discord.py entity (master branch)"""
-        await self.do_rtfm(ctx, 'master', obj)
 
 def setup(bot):
     bot.add_cog(Docs(bot), cat_name="Information")

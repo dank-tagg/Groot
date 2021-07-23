@@ -11,7 +11,7 @@ import humanize
 import stringcase
 import unidecode
 
-
+from collections import Counter
 from discord.ext import commands
 from discord.ext.commands import BucketType, ColourConverter
 from dpymenus import Page, PaginatedMenu
@@ -52,73 +52,104 @@ class Moderation(commands.Cog, description="Moderation commands"):
 
     @commands.command(name="unban", brief="Unbans a user")
     @commands.has_permissions(ban_members=True)
-    async def unban(self, ctx: customContext, *, member: discord.User):
+    async def unban(self, ctx: customContext, *, user_id: int):
         """
-        Unbans an user from the server.
+        Unbans an user from the server. (param)
         Raises an error if the user is not a previously banned member.
         """
-        banList = await ctx.guild.bans()
-        for ban in banList:
-            user = ban.user
-            if user.id == member.id:
-                await ctx.guild.unban(user)
-                await ctx.send("unbanned **" + member.name + "**")
-                return
-        raise commands.BadArgument(
-            "**" + member.name + "** was not a previously banned member."
-        )
+        try:
+            await ctx.guild.unban(discord.Object(id=user_id))
+        except discord.NotFound:
+            raise commands.BadArgument(f"`{user_id}` was not a previously banned member.")
+        else:
+            await ctx.send(f'Successfully unbanned `{user_id}`.')
 
-    @commands.command(usage="<amount> [user] [match]")
-    @commands.max_concurrency(1, BucketType.channel, wait=False)
+    @commands.group()
+    @commands.max_concurrency(1, BucketType.channel)
     @commands.has_permissions(manage_messages=True)
-    async def purge(
-        self,
-        ctx,
-        amount: int,
-        user: Optional[discord.Member] = None,
-        *,
-        matches=None,
-    ):
+    async def purge(self, ctx: customContext):
+        """Removes messages that meet a criteria.
+        In order to use this command, you must have Manage Messages permissions.
+        Note that the bot needs Manage Messages as well.
+        When the command is done doing its work, you will get a message
+        detailing which users got removed and how many messages got removed.
         """
-        Purges messages, searches the channel with the limit of `amount`.\n
-        Optionally from `user` or contains `matches`.
-        """
-        await ctx.message.delete()
 
-        def check_msg(msg):
-            if msg.id == ctx.message.id:
-                return True
-            if user is not None:
-                if msg.author.id != user.id:
-                    return False
-            if matches is not None:
-                if matches not in msg.content:
-                    return False
-            return not msg.pinned
+        if ctx.invoked_subcommand is None:
+            await ctx.send_help(ctx.command)
 
-        if amount > 1000:
-            return await ctx.send(
-                "You can not purge more than 1000 messages each time!"
-            )
+    async def do_removal(self, ctx, limit, predicate, *, before=None, after=None):
+        if limit > 2000:
+            return await ctx.send(f'Too many messages to search given ({limit}/2000)')
 
-        amount = await ctx.channel.purge(limit=amount, check=check_msg)
-        if len(amount) == 0:
-            return await ctx.send("There are no messages that I can delete!")
+        if before is None:
+            before = ctx.message
+        else:
+            before = discord.Object(id=before)
 
-        await ctx.send(
-            f"{len(amount)} messages have been purged by {ctx.author.mention}",
-            delete_after=3,
-        )
+        if after is not None:
+            after = discord.Object(id=after)
+
+        try:
+            deleted = await ctx.channel.purge(limit=limit, before=before, after=after, check=predicate)
+        except discord.Forbidden as e:
+            return await ctx.send('I do not have permissions to delete messages.')
+        except discord.HTTPException as e:
+            return await ctx.send(f'Error: {e} (try a smaller search?)')
+
+        spammers = Counter(m.author.display_name for m in deleted)
+        deleted = len(deleted)
+        messages = [f'{deleted} message{" was" if deleted == 1 else "s were"} removed.']
+        if deleted:
+            messages.append('')
+            spammers = sorted(spammers.items(), key=lambda t: t[1], reverse=True)
+            messages.extend(f'**{name}**: {count}' for name, count in spammers)
+
+        to_send = '\n'.join(messages)
+
+        if len(to_send) > 2000:
+            await ctx.send(f'Successfully removed {deleted} messages.', delete_after=10)
+        else:
+            await ctx.send(to_send, delete_after=10)
+
+    @purge.command()
+    async def embeds(self, ctx: customContext, search=100):
+        """Removes messages that have embeds in them."""
+        await self.do_removal(ctx, search, lambda e: len(e.embeds))
+
+    @purge.command(aliases=['bot'])
+    async def bots(self, ctx: customContext, search=100):
+        """Removes messages that have embeds in them."""
+        await self.do_removal(ctx, search, lambda e: e.author.bot)
+
+    @purge.command()
+    async def files(self, ctx: customContext, search=100):
+        """Removes messages that have attachments in them."""
+        await self.do_removal(ctx, search, lambda e: len(e.attachments))
+
+    @purge.command()
+    async def images(self, ctx: customContext, search=100):
+        """Removes messages that have embeds or attachments."""
+        await self.do_removal(ctx, search, lambda e: len(e.embeds) or len(e.attachments))
+
+    @purge.command()
+    async def reactions(self, ctx: customContext, search=100):
+        """Removes messages that have a reaction"""
+        await self.do_removal(ctx, search, lambda e: len(e.reactions))
     
-    @commands.command(name="cleanup")
-    async def _self_cleanup(self, ctx):
+    @purge.command(name='all')
+    async def _remove_all(self, ctx: customContext, search=100):
+        """Removes all messages except for the pinned ones."""
+        await self.do_removal(ctx, search, lambda e: not e.pinned)
+
+    
+    @commands.command()
+    async def cleanup(self, ctx: customContext):
         """
         Cleanup the bot's messages
         """
-        after = discord.utils.utcnow() - datetime.timedelta(minutes=5)
-        deleted = await ctx.channel.purge(after=after, check=lambda m: m.author == self.bot.user, bulk=False)
-
-        await ctx.send(f"Deleted **{len(deleted)}** messages from me.")
+        after = discord.utils.utcnow() - datetime.timedelta(minutes=15)
+        await self.do_removal(ctx, 100, lambda e: e.author == ctx.me, after=int(after.timestamp()))
 
     @commands.command(name="lock", brief="Locks a channel")
     @commands.has_permissions(manage_channels=True)
@@ -147,6 +178,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
         await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
         await ctx.send(f"{self.bot.icons['greenTick']} Unlocked **{channel}**.")
 
+    # Decancer name
     def strip_accs(self, text):
         try:
             text = unicodedata.normalize("NFKC", text)
@@ -201,7 +233,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
                 new_cool_nick = "simp name"
         return new_cool_nick
 
-    @commands.max_concurrency(1, commands.BucketType.guild, wait=False)
+    @commands.max_concurrency(1, commands.BucketType.guild)
     @commands.has_permissions(manage_nicknames=True)
     @commands.guild_only()
     @commands.command(
@@ -458,56 +490,56 @@ class Moderation(commands.Cog, description="Moderation commands"):
         await ctx.send(f"Added **{role}** to **{member}**")
 
     @role.command(name="info", brief="Shows information about a role")
-    async def _info(self, ctx: customContext, role: RoleConvert = None):
-        """Sends some inforamtion about a role."""
-        if role == None:
+    async def _info(self, ctx: customContext, *, role: RoleConvert = None):
+        """Sends some information about a role."""
+        if not role:
             return await ctx.reply(
-                "You need to give me a role id!", mention_author=False
-            )
-        else:
-            member_preview = "\n".join(
-                [
-                    f"{member.display_name} - {member.id}"
-                    for index, member in enumerate(role.members, 1)
-                    if index <= 10
-                ]
-            ) + (
-                f"\nand {len(role.members) - 10} other members..."
-                if len(role.members) > 5
-                else ""
+                "You need to give me a role!", mention_author=False
             )
 
-            em = Page(
-                colour=role.color,
-                description=f"{role.mention}\nID - `{role.id}`\n"
-                f"Color: {role.color}\n"
-                "**Created at:** {}\n".format(
-                    role.created_at.strftime("%a, %b %d, %Y %H:%M %p")
-                )
-                + f"**Members**: {len(role.members)} | **Position**: {role.position}\n",
-            )
-            em.add_field(
-                name="Role mentionable", value="Yes" if role.mentionable else "No"
-            )
-            em.set_author(name=f"{role.name}")
-            em.set_footer(text="Basic Info -Page 1/3")
+        member_preview = "\n".join(
+            [
+                f"{member.display_name} - {member.id}"
+                for index, member in enumerate(role.members, 1)
+                if index <= 10
+            ]
+        ) + (
+            f"\nand {len(role.members) - 10} other members..."
+            if len(role.members) > 5
+            else ""
+        )
 
-            emb = Page(colour=role.color)
-            emb.add_field(
-                name=f"Members [{len(role.members)}]", value=box(member_preview, "py")
+        em = Page(
+            colour=role.color,
+            description=f"{role.mention}\nID - `{role.id}`\n"
+            f"Color: {role.color}\n"
+            "**Created at:** {}\n".format(
+                role.created_at.strftime("%a, %b %d, %Y %H:%M %p")
             )
-            emb.set_footer(text="Role Members - Page 2/3")
+            + f"**Members**: {len(role.members)} | **Position**: {role.position}\n",
+        )
+        em.add_field(
+            name="Role mentionable", value="Yes" if role.mentionable else "No"
+        )
+        em.set_author(name=f"{role.name}")
+        em.set_footer(text="Basic Info -Page 1/3")
 
-            permission_names = ", ".join(
-                f"`{perm}`" for perm, value in role.permissions if value
-            )
-            emb1 = Page(colour=role.color)
-            emb1.add_field(name=f"Role Permissions", value=f"{permission_names}")
-            emb1.set_footer(text="Role Permissions - Page 3/3")
+        emb = Page(colour=role.color)
+        emb.add_field(
+            name=f"Members [{len(role.members)}]", value=box(member_preview, "py")
+        )
+        emb.set_footer(text="Role Members - Page 2/3")
 
-            menu = PaginatedMenu(ctx)
-            menu.add_pages([em, emb, emb1])
-            await menu.open()
+        permission_names = ", ".join(
+            f"`{perm}`" for perm, value in role.permissions if value
+        )
+        emb1 = Page(colour=role.color)
+        emb1.add_field(name=f"Role Permissions", value=f"{permission_names}")
+        emb1.set_footer(text="Role Permissions - Page 3/3")
+
+        menu = PaginatedMenu(ctx)
+        menu.add_pages([em, emb, emb1])
+        await menu.open()
 
     @role.command(name="create", usage="<name> <color> [...]")
     @commands.has_permissions(manage_roles=True)

@@ -18,7 +18,7 @@ class Fun(commands.Cog, description="Fun commands"):
     @commands.command(
         name="guessthenumber", aliases=["gtn"], brief="Guess the number game!"
     )
-    @commands.max_concurrency(1, commands.BucketType.user, wait=False)
+    @commands.max_concurrency(1, commands.BucketType.user)
     async def gtn(self, ctx: customContext):
         """Play a guess the number game! You have three chances to guess the number 1-10"""
 
