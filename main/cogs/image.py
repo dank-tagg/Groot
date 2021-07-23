@@ -22,16 +22,16 @@ async def get_bytes(ctx: customContext, image: Union[discord.Emoji, discord.Part
         else:
             raise commands.BadArgument('Invalid image link provided. Try again with a different image.')    
     elif isinstance(image, discord.Member):
-        url = image.avatar_url_as(format="png", size=1024)
+        url = image.avatar.replace(format="png", size=1024).url
     
     elif isinstance(image, discord.Emoji) or isinstance(image, discord.PartialEmoji):
-        url = image.url_as(format="png")
+        url = image.url
     
     elif image is None:
         if attachments := ctx.message.attachments:
             url = attachments[0].url
         else:
-            url = ctx.author.avatar_url_as(format="png", size=1024)
+            url = ctx.author.avatar.replace(format="png", size=1024).url
 
     if not return_bytes:
         return url

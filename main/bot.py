@@ -244,7 +244,7 @@ class GrootBot(commands.Bot):
             print_exception("Could not connect to database:", e)
 
         else:
-            self.launch_time = datetime.datetime.utcnow()
+            self.launch_time = discord.utils.utcnow()
             self.db = db
             self.loop.run_until_complete(self.after_db())
             try:

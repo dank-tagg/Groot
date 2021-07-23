@@ -72,13 +72,13 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         em = Embed(
             title=f"Last deleted message in #{ctx.channel.name}",
             description=message.content,
-            timestamp=datetime.datetime.utcnow(),
+            timestamp=discord.utils.utcnow(),
             colour=discord.Color.random(),
             url=message.jump_url
         )
         em.set_author(
             name=message.author,
-            icon_url=message.author.avatar_url
+            icon_url=message.author.avatar.url
         )
         em.set_footer(text=f"Sniped by: {ctx.author} | Index {index}/{len(cache)}")
         await ctx.send(embed=em)
@@ -104,13 +104,13 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             description="**Before:**\n"
             f"+ {message['before_content']}\n"
             f"\n**After:**\n- {message['after_content']}",
-            timestamp=datetime.datetime.utcnow(),
+            timestamp=discord.utils.utcnow(),
             colour=discord.Color.random(),
             url=message['message_obj'].jump_url
         )
         em.set_author(
             name=message['author'],
-            icon_url=message['author'].avatar_url
+            icon_url=message['author'].avatar.url
         )
 
         em.set_footer(text=f"Sniped by: {ctx.author} | Index {index}/{len(cache)}")
@@ -144,7 +144,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         em = Embed(
             title="",
             description=f"{member.mention}",
-            timestamp=datetime.datetime.utcnow(),
+            timestamp=discord.utils.utcnow(),
         )
         em.add_field(
             name="Joined at", value=f"{format_dt(member.joined_at)} ({format_dt(member.joined_at, 'R')})"
@@ -177,8 +177,8 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             em.add_field(name="Activity:", value=activity.name, inline=False)
         else:
             em.add_field(name="Activity:", value="No activity currently", inline=False)
-        em.set_thumbnail(url=member.avatar_url)
-        em.set_author(name=f"{member}", icon_url=member.avatar_url)
+        em.set_thumbnail(url=member.avatar.url)
+        em.set_author(name=f"{member}", icon_url=member.avatar.url)
         em.set_footer(text=f"User ID: {member.id}")
         await ctx.send(embed=em)
 
@@ -192,10 +192,10 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         if member:
             em = Embed(
                 title=f"Avatar for {member}",
-                description=f'Link as\n[png]({member.avatar_url_as(format="png",size=1024)}) | [jpg]({member.avatar_url_as(format="jpg",size=1024)}) | [webp]({member.avatar_url_as(format="webp",size=1024)})',
+                description=f'Link as\n[png]({member.avatar.replace(format="png",size=1024).url}) | [jpg]({member.avatar.replace(format="jpg",size=1024).url}) | [webp]({member.avatar.replace(format="webp",size=1024).url})',
                 colour=discord.Color.blurple(),
             )
-            em.set_image(url=member.avatar_url)
+            em.set_image(url=member.avatar.url)
             await ctx.send(embed=em)
 
     @commands.command(name="archive", aliases=['save', 'arch'])
@@ -213,8 +213,8 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
 
         # Resort message
         content = message.content or "_No content_"
-        em = Embed(title="You archived a message!", url=message.jump_url, description=content, timestamp=datetime.datetime.utcnow())
-        em.set_author(name=message.author, icon_url=message.author.avatar_url)
+        em = Embed(title="You archived a message!", url=message.jump_url, description=content, timestamp=discord.utils.utcnow())
+        em.set_author(name=message.author, icon_url=message.author.avatar.url)
         try:
             msg = await ctx.author.send(embed=em)
             await msg.pin()
@@ -278,7 +278,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         await ctx.reply(f"{self.bot.icons['greenTick']} **{ctx.author.name}** is now AFK: {reason}")
 
         await asyncio.sleep(3)
-        self.bot.cache['afk_users'][ctx.author.id] = (reason, int(datetime.datetime.utcnow().timestamp()))
+        self.bot.cache['afk_users'][ctx.author.id] = (reason, int(discord.utils.utcnow().timestamp()))
 
     @commands.command()
     async def charinfo(self, ctx: customContext, *, characters: str):

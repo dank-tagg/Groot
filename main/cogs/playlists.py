@@ -129,7 +129,7 @@ class Playlists(commands.Cog):
         em = Embed(
             description="\n".join(formatted)
         )
-        em.set_author(name=f"{ctx.author.name}'s playlists [{len(formatted)}/5]", icon_url=ctx.author.avatar_url)
+        em.set_author(name=f"{ctx.author.name}'s playlists [{len(formatted)}/5]", icon_url=ctx.author.avatar.url)
 
         await ctx.reply(embed=em)
     

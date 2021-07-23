@@ -41,7 +41,7 @@ class Support(commands.Cog):
             raise commands.BadArgument("Sorry, your answer must be a little longer.")
         if answers:
             em = Embed(title=answers[0], description=answers[1], timestamp=dt.utcnow())
-            em.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+            em.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
             em.set_footer(text="ID: " + str(ctx.author.id))
             msg = await ctx.send(
                 content="Are you sure you want to submit your report?", embed=em

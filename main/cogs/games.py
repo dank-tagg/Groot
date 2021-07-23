@@ -106,7 +106,7 @@ class SimonGame(Game):
 
         em.description = val[res]
         em.set_footer(text=f'Current score: {len(self.sequence) - 1}')
-        em.set_author(name=self.ctx.author, icon_url=self.ctx.author.avatar_url)
+        em.set_author(name=self.ctx.author, icon_url=self.ctx.author.avatar.url)
         return em
 
 class TicTacToe(Game):

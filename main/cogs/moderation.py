@@ -115,7 +115,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
         """
         Cleanup the bot's messages
         """
-        after = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+        after = discord.utils.utcnow() - datetime.timedelta(minutes=5)
         deleted = await ctx.channel.purge(after=after, check=lambda m: m.author == self.bot.user, bulk=False)
 
         await ctx.send(f"Deleted **{len(deleted)}** messages from me.")

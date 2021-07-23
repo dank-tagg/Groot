@@ -171,7 +171,7 @@ class Blackjack(commands.Cog):
             name=self.bot.user.display_name,
             value=f"Cards - {bot_cards_visual[0]} `?`\nValue - ` ? `",
         )
-        em.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+        em.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar.url)
         em.set_footer(text="K, Q, J = 10  |  A = 1 or 11")
         return em
 
@@ -208,7 +208,7 @@ class Blackjack(commands.Cog):
             name=self.bot.user.display_name,
             value=f"Cards - {bot_cards_visual}\nValue - `{self.total_value(cards['bot_cards'])}`",
         )
-        em.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+        em.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar.url)
         em.set_footer(text="K, Q, J = 10  |  A = 1 or 11")
         return em
 

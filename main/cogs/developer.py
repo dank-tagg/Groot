@@ -75,7 +75,7 @@ class Developer(commands.Cog):
         if msg.content.lower() == "y":
             async with ctx.typing():
                 data = read_json("config")
-                data["updates"]["date"] = str(datetime.datetime.utcnow())
+                data["updates"]["date"] = str(discord.utils.utcnow())
                 data["updates"]["message"] = message
                 data["updates"]["link"] = link
                 write_json(data, "config")

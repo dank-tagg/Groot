@@ -113,7 +113,7 @@ class Player(wavelink.Player):
             em.add_field(name=k, value=v[0], inline=True)
         
         em.set_thumbnail(url=track.thumb)
-        em.set_footer(text=f"Queue index: 1/{self.queue.qsize()+1}", icon_url=track.requester.avatar_url)
+        em.set_footer(text=f"Queue index: 1/{self.queue.qsize()+1}", icon_url=track.requester.avatar.url)
         await self.ctx.reply(content=f"Now playing: **{track.title}**", embed=em)
         self.updating = False
 

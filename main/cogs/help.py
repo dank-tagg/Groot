@@ -84,7 +84,7 @@ class GrootHelp(commands.HelpCommand):
 
         em.set_author(
             name=ctx.author, 
-            icon_url=ctx.author.avatar_url
+            icon_url=ctx.author.avatar.url
         )
         # Categories
         categories = bot.categories.copy()

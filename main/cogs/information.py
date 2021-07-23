@@ -61,7 +61,7 @@ class Information(commands.Cog):
             description=f'{hyperlink("**top.gg**", "https://top.gg/bot/812395879146717214/vote")}\n\n'
             f'{hyperlink("**discordbotlist.com**", "https://discordbotlist.com/bots/groot/upvote")}',
         )
-        em.set_thumbnail(url=self.bot.user.avatar_url)
+        em.set_thumbnail(url=self.bot.user.avatar.url)
         await ctx.send(embed=em)
 
     @commands.command(name="invite", brief="Sends an invite for the bot.")
@@ -83,7 +83,7 @@ class Information(commands.Cog):
             value=f"{hyperlink('**Click Here**','https://discord.gg/nUUJPgemFE')}",
             inline=False,
         )
-        em.set_thumbnail(url=self.bot.user.avatar_url)
+        em.set_thumbnail(url=self.bot.user.avatar.url)
         await ctx.send(embed=em)
 
 
@@ -93,11 +93,11 @@ class Information(commands.Cog):
         Shows the bot's uptime in days | hours | minutes | seconds
         """
         em = Embed(
-            description=f"{humanize.precisedelta(datetime.datetime.utcnow() - self.bot.launch_time, format='%.0f')}",
+            description=f"{humanize.precisedelta(discord.utils.utcnow() - self.bot.launch_time, format='%.0f')}",
             colour=0x2F3136,
         )
         em.set_author(name="Uptime")
-        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar.url)
         await ctx.send(embed=em)
 
     @commands.command()
@@ -140,7 +140,7 @@ class Information(commands.Cog):
         )
         # Recent changes
         em.add_field(name="Latest changes:", value=revision, inline=False)
-        em.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
+        em.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar.url)
 
         # Contributors
         contributors = [
@@ -155,7 +155,7 @@ class Information(commands.Cog):
         ]
         em.add_field(name="Contributors:\n", value=" ".join(f"[`{self.bot.get_user(m)}`](https://discord.com/users/{m})" for m in contributors))
 
-        em.add_field(name="Uptime:", value=humanize.precisedelta(datetime.datetime.utcnow() - self.bot.launch_time, format='%.0f'))
+        em.add_field(name="Uptime:", value=humanize.precisedelta(discord.utils.utcnow() - self.bot.launch_time, format='%.0f'))
         await ctx.send(embed=em)
 
 def setup(bot):
