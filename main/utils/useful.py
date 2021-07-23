@@ -111,7 +111,7 @@ class Cooldown:
             ctx.bucket = self.default_mapping.get_bucket(ctx.message)
         retry_after = ctx.bucket.update_rate_limit()
         if retry_after:
-            raise commands.CommandOnCooldown(ctx.bucket, retry_after)
+            raise commands.CommandOnCooldown(self, retry_after, ctx.bucket)
         return True
 
 class fuzzy:
