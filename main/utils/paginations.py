@@ -49,7 +49,7 @@ class UrbanSource(menus.ListPageSource):
         hyperlinks = re.findall(r'((?<=\[)[^\]]+(?=\]))', em.description)
 
         for link in hyperlinks:
-            em.description = em.description.replace(link, f'[{link}](http://{link.lower().replace(" ", "-")}.urbanup.com)')
+            em.description = em.description.replace(link, f'[__{link}__](http://{link.lower().replace(" ", "-")}.urbanup.com)')
         
         em.set_footer(text=f"👍 {thumbs_up} • 👤 {author} • Page {menu.current_page + 1}/{self.get_max_pages()}")
         return em
