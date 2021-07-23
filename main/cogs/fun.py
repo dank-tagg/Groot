@@ -3,10 +3,13 @@ from utils._type import *
 import asyncio
 import random
 import discord
+import re
+import textwrap
 
-from discord.ext import commands
+from discord.ext import commands, menus
 from discord.ext.commands import BucketType
 from utils.useful import Embed
+from utils.paginations import UrbanSource
 
 
 class Fun(commands.Cog, description="Fun commands"):
@@ -334,7 +337,34 @@ class Fun(commands.Cog, description="Fun commands"):
         data = await res.json()
         await ctx.send(f'{data["setup"]}\n||{data["punchline"]}||')
 
+    @commands.command()
+    async def quote(self, ctx: customContext):
+        """
+        Sends a random quote that will truly inspire you.
+        """
+        res = await self.bot.session.get('https://api.quotable.io/random')
+        data = await res.json()
 
+        content = textwrap.fill(data['content'], width=75)
+        await ctx.send(f"**{content}**\n\n—{data['author']}")
+    
+    @commands.command()
+    async def urban(self, ctx: customContext, *, term: str):
+        """
+        Searches a term on urban dictionary and sends the result.
+        """
+        res = await self.bot.session.get('http://api.urbandictionary.com/v0/define', params={'term': term})
+        if not res.ok:
+            await ctx.send(f'An error occured at the API. Try again with a different word or wait a bit.')
+            return
+
+        data = await res.json()
+        if not data['list']:
+            await ctx.send(f'No results were found for term `{term}`. Try again with a different word.')
+            return
+        
+        menu = menus.MenuPages(source=UrbanSource(data['list']), timeout=30, delete_message_after=True)
+        await menu.start(ctx)
 
 def setup(bot):
     bot.add_cog(Fun(bot), cat_name="Fun")
