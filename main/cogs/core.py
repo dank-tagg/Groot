@@ -5,11 +5,9 @@ import traceback
 import discord
 import humanize
 import re
-import logging
 
 from discord.ext import commands, tasks
-from utils.useful import Embed, Cooldown, send_traceback
-from utils.json import read_json
+from utils.useful import Embed, Cooldown
 from cogs.games import GameExit
 
 class Core(commands.Cog):
@@ -19,29 +17,34 @@ class Core(commands.Cog):
         self.cache_usage = {}
         self.loops.start()
 
-    async def expand_tb(self, ctx: customContext, error, msg):
-        await msg.add_reaction(self.bot.icons['plus'])
-        await msg.add_reaction(self.bot.icons['minus'])
-        await msg.add_reaction(self.bot.icons['save'])
-
-        while True:
-            reaction, user = await self.bot.wait_for('reaction_add', check=lambda reaction, m: m == self.bot.owner and reaction.message == msg)
-            if str(reaction) == self.bot.icons['plus']:
-                await send_traceback(self.bot.log_channel, ctx, (True, msg), 3, type(error), error, error.__traceback__)
-            elif str(reaction) == self.bot.icons['minus']:
-                await send_traceback(self.bot.log_channel, ctx, (True, msg), 0, type(error), error, error.__traceback__)
-            elif str(reaction) == self.bot.icons['save']:
-                log = self.bot.get_channel(850439592352022528)
-                await send_traceback(log, ctx, (False, None), 3, type(error), error, error.__traceback__)
-                await msg.channel.send(f"Saved traceback to {log.mention}")
-
     async def send_error(self, ctx: customContext, exc_info: dict):
         em = Embed(
             title=f"{self.bot.icons['redTick']} Error while running command {exc_info['command']}",
-            description=f"```py\n{exc_info['error']}```[Report error](https://discord.gg/nUUJPgemFE)"
+            description=f"```py\n{exc_info['short']}```[Report error](https://discord.gg/nUUJPgemFE)"
         )
         em.set_footer(text="Please report this error in our support server if it persists.")
         await ctx.send(embed=em)
+    
+    async def handle_error(self, ctx: customContext, exc_info: dict):
+        traceback = exc_info['error'].replace('``', '`\u200b`')
+
+        paginator = commands.Paginator(prefix='```py')
+        for line in traceback.split('\n'):
+            paginator.add_line(line)
+        
+        await self.bot.log_channel.send(f"**Command:** {ctx.message.content}\n" \
+                                        f"**Message ID:** `{ctx.message.id}`\n" \
+                                        f"**Author:** `{ctx.author}`\n" \
+                                        f"**Guild:** `{ctx.guild}`\n" \
+                                        f"**Channel:** `{ctx.channel}`\n" \
+                                        f"**Jump:** {ctx.message.jump_url}"
+        )
+        for page in paginator.pages:
+            await self.bot.log_channel.send(page)
+        
+        await self.send_error(ctx, exc_info)
+
+
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: customContext, error):
@@ -139,13 +142,11 @@ class Core(commands.Cog):
         # Catch uncaught errors
         exc_info = {
             "command": ctx.command,
-            "error": "".join(traceback.format_exception(type(error), error, error.__traceback__, 0)).replace("``", "`\u200b`")
+            "error": "".join(traceback.format_exception(type(error), error, error.__traceback__, 2)).replace("``", "`\u200b`"),
+            "short": "".join(traceback.format_exception(type(error), error, error.__traceback__, 0)).replace("``", "`\u200b`"),
         }
 
-        await self.send_error(ctx, exc_info)
-        msg = await send_traceback(self.bot.log_channel, ctx, (False, None), 0, type(error), error, error.__traceback__)
-        await self.expand_tb(ctx, error, msg)
-        logging.error(error)
+        await self.handle_error(ctx, exc_info)
     
     @commands.Cog.listener()
     async def on_message(self, message):
