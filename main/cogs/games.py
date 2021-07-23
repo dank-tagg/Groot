@@ -9,7 +9,7 @@ import time
 import difflib
 
 from discord.ext import commands
-from utils.useful import Embed, run_in_executor
+from utils.useful import Cooldown, Embed, run_in_executor
 from utils.chat_formatting import hyperlink as link
 from itertools import chain
 from cogs.image import get_bytes
@@ -564,6 +564,7 @@ class Games(commands.Cog):
         self.active_games.remove(game)
 
     @commands.command()
+    @commands.check(Cooldown(1, 20, 1, 10, commands.BucketType.user))
     async def simon(self, ctx: customContext):
         """
         A single player memory game. Memorize the sequence and answer accordingly.
@@ -573,6 +574,7 @@ class Games(commands.Cog):
         await self.start_game(game)
 
     @commands.command(aliases=['ttt'])
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def tictactoe(self, ctx: customContext, opponent: discord.Member):
         """
@@ -590,6 +592,7 @@ class Games(commands.Cog):
         await self.start_game(game)
     
     @commands.command(aliases=['ship'])
+    @commands.check(Cooldown(1, 60, 1, 30, commands.BucketType.user))
     @commands.max_concurrency(1, commands.BucketType.user)
     async def battleship(self, ctx: customContext, opponent: discord.Member):
         """
@@ -615,6 +618,7 @@ class Games(commands.Cog):
         await self.start_game(game)
 
     @commands.command(aliases=['tr'])
+    @commands.check(Cooldown(1, 10, 1, 5, commands.BucketType.user))
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def typerace(self, ctx: customContext):
         """

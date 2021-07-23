@@ -9,7 +9,7 @@ import math
 import random
 
 from discord.ext import commands, menus
-from utils.useful import Embed, get_title
+from utils.useful import Cooldown, Embed, get_title
 from utils import paginations
 
 
@@ -262,6 +262,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await ctx.reply("You aren't allowed to do that. Please ask the DJ or an admin to run this command.")
 
     @commands.command(name='play')
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def _play(self, ctx: customContext, *, query: str):
         """Searches YouTube for the query, plays the song found."""
         player = self.get_player(ctx)
@@ -292,6 +293,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await player.play_next()
     
     @commands.command(name="loop")
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def _loop(self, ctx: customContext):
         """Loops the current song or turns the loop off"""
         player = self.get_player(ctx)
@@ -351,6 +353,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await ctx.reply(f'{ctx.author.mention} has voted to stop the player. (`{votes}/{required}`)')
 
     @commands.group(case_insensitive=True,invoke_without_command=True, aliases=['q'])
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def queue(self, ctx: customContext):
         """Display the players queued songs."""
         player = self.get_player(ctx)

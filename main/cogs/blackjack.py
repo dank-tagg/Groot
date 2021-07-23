@@ -6,7 +6,7 @@ import discord
 
 from discord.ext import commands
 from utils.chat_formatting import hyperlink as link
-from utils.useful import Embed
+from utils.useful import Cooldown, Embed
 
 
 class Blackjack(commands.Cog):
@@ -17,6 +17,7 @@ class Blackjack(commands.Cog):
         self.suits = ["spades", "hearts", "diamonds", "clubs"]
 
     @commands.command(name="blackjack")
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def play_blackjack(self, ctx: customContext):
         """Play blackjack."""
         stood = False

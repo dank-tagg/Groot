@@ -6,7 +6,7 @@ import wavelink
 import random
 
 from discord.ext import commands, menus
-from utils.useful import Embed, get_title
+from utils.useful import Cooldown, Embed, get_title
 from utils import paginations
 from cogs.music import Track
 
@@ -146,6 +146,7 @@ class Playlists(commands.Cog):
         await menu.start(ctx)
     
     @playlist.command(name="create", usage="<name>")
+    @commands.check(Cooldown(1, 60, 1, 30, commands.BucketType.user))
     async def _playlist_create(self, ctx: customContext, *, name):
         """Creates a playlist."""
         query = "SELECT Count(*) FROM playlists WHERE user_id = ?"
@@ -236,6 +237,7 @@ class Playlists(commands.Cog):
             await ctx.reply(f"{self.bot.icons['minus']} | Deleted **{affected_rows}** songs in total.")
     
     @playlist.command(name="play", usage="<playlist ID>")
+    @commands.check(Cooldown(1, 60, 1, 30, commands.BucketType.user))
     async def _playlist_play(self, ctx: customContext, playlist_id: int):
         """Plays the songs in a playlist."""
         if (check := await self.is_playlistOwner(ctx.author.id, playlist_id)) is False:

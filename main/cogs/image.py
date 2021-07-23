@@ -6,7 +6,7 @@ import io
 import re
 
 from discord.ext import commands
-from utils.useful import Embed, run_in_executor
+from utils.useful import Cooldown, Embed, run_in_executor
 
 
 IMAGE_REG = re.compile(r'(http)?s?:?(\/\/[^"\']*\.(?:png|jpg|jpeg|gif|png|svg))')
@@ -56,6 +56,7 @@ class Image(commands.Cog):
         self.bot = bot
 
     @commands.command(name='flip', help = "Flips a member's profile picture.")
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def _flip(self, ctx: customContext, obj: ImageConvert):
         async with ctx.processing(ctx, delete_after=True) as process:
             byt = await get_bytes(ctx, obj, self.bot.session)
@@ -66,6 +67,7 @@ class Image(commands.Cog):
         await ctx.send(embed=em, file=discord.File(res, filename=f'{ctx.command.name}.png'))
 
     @commands.command(name='rainbow', help = "Applies rainbow effect to a member's profile picture.")
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def _rainbow(self, ctx: customContext, obj: ImageConvert):
         async with ctx.processing(ctx, delete_after=True) as process:
             byt = await get_bytes(ctx, obj, self.bot.session)
@@ -76,6 +78,7 @@ class Image(commands.Cog):
         await ctx.send(embed=em, file=discord.File(res, filename=f'{ctx.command.name}.png'))
 
     @commands.command(name='mirror', help = "Applies mirror effect to a member's profile picture.")
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def _mirror(self, ctx: customContext, obj: ImageConvert):
         async with ctx.processing(ctx, delete_after=True) as process:
             byt = await get_bytes(ctx, obj, self.bot.session)
@@ -86,6 +89,7 @@ class Image(commands.Cog):
         await ctx.send(embed=em, file=discord.File(res, filename=f'{ctx.command.name}.png'))
 
     @commands.command(name='blur', help = "Applies blur effect to a member's profile picture.")
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def _blur(self, ctx: customContext, obj: ImageConvert):
         async with ctx.processing(ctx, delete_after=True) as process:
             byt = await get_bytes(ctx, obj, self.bot.session)
@@ -96,6 +100,7 @@ class Image(commands.Cog):
         await ctx.send(embed=em, file=discord.File(res, filename=f'{ctx.command.name}.png'))
 
     @commands.command(name='invert', help = "Inverts the colors of a member's profile picture.")
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def _invert(self, ctx: customContext, obj: ImageConvert):
         async with ctx.processing(ctx, delete_after=True) as process:
             byt = await get_bytes(ctx, obj, self.bot.session)
@@ -106,6 +111,7 @@ class Image(commands.Cog):
         await ctx.send(embed=em, file=discord.File(res, filename=f'{ctx.command.name}.png'))
 
     @commands.command(name='resize', help = "Resizes a member's profile picture.")
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def _resize(self, ctx: customContext, height: int, width: int, obj: ImageConvert):
         if width > 1000 or height > 1000:
             return await ctx.send("The dimensions can't be over 1000 pixels", mention_author=False)

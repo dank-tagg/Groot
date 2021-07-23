@@ -7,7 +7,6 @@ import re
 import textwrap
 
 from discord.ext import commands, menus
-from discord.ext.commands import BucketType
 from utils.useful import Embed
 from utils.paginations import UrbanSource
 
@@ -19,7 +18,7 @@ class Fun(commands.Cog, description="Fun commands"):
     @commands.command(
         name="guessthenumber", aliases=["gtn"], brief="Guess the number game!"
     )
-    @commands.max_concurrency(1, BucketType.user, wait=False)
+    @commands.max_concurrency(1, commands.BucketType.user, wait=False)
     async def gtn(self, ctx: customContext):
         """Play a guess the number game! You have three chances to guess the number 1-10"""
 
@@ -151,7 +150,7 @@ class Fun(commands.Cog, description="Fun commands"):
         await ctx.send(embed=em)
 
     @commands.command(name="fight")
-    @commands.max_concurrency(1, BucketType.user, wait=False)
+    @commands.max_concurrency(1, commands.BucketType.user)
     async def fight(self, ctx: customContext, member: discord.Member):
         """
         Challenge an user to a duel!

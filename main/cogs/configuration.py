@@ -4,7 +4,7 @@ import discord
 
 from discord.ext import commands
 from discord.ext.commands import guild_only, has_guild_permissions
-from utils.useful import RoleConvert
+from utils.useful import RoleConvert, Cooldown
 
 
 class Configuration(commands.Cog):
@@ -12,6 +12,7 @@ class Configuration(commands.Cog):
         self.bot = bot
 
     @commands.command(name="tips", usage="<on|off>", brief="Toggles tips on or off")
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def _tips(self, ctx: customContext, *, mode: str):
         """
         Toggles tip to on or off, specified by the invoking user.
