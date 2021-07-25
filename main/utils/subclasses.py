@@ -62,8 +62,6 @@ class customContext(commands.Context):
         super().__init__(**kwargs)
         self.processing = Processing
 
-
-
     async def send(self, content=None, **kwargs):
         if self.author.id in self.bot.cache["tips_are_on"]:
             tip = random.choice(
@@ -94,16 +92,29 @@ class customContext(commands.Context):
                     content, mention_author=mention_author, **kwargs
                 )
         return await self.send(content, **kwargs)
-    
-    async def confirm(self, to_confirm: discord.Member, message='Do you want to continue?'):
-        msg = await self.send(message)
-        for r in (icons := [self.bot.icons['greenTick'], self.bot.icons['redTick']]):
-            await msg.add_reaction(r)
+
+    class Confirm(discord.ui.View):
+        def __init__(self, to_confirm: discord.Member):
+            super().__init__()
+
+            self.to_confirm = to_confirm
+            self.value = None
         
-        try:
-            reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, user: user == to_confirm and str(r) in icons, timeout=15)
-        except asyncio.TimeoutError:
-            return False
-        if str(reaction) == icons[0]:
-            return True
-        return False
+        
+        @discord.ui.button(label='Confirm', style=discord.ButtonStyle.green)
+        async def confirm(self, button: discord.ui.Button, interaction: discord.Interaction):
+            if interaction.user != self.to_confirm:
+                return
+            self.value = True
+            button.disabled = True
+            self.stop()
+
+        # This one is similar to the confirmation button except sets the inner value to `False`
+        @discord.ui.button(label='Cancel', style=discord.ButtonStyle.danger)
+        async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
+            if interaction.user != self.to_confirm:
+                return
+            self.value = False
+            button.disabled = True
+            self.stop()
+        

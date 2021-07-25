@@ -119,6 +119,8 @@ class Docs(commands.Cog):
             'latest': 'https://discordpy.readthedocs.io/en/latest',
             'python': 'https://docs.python.org/3',
             'master': 'https://discordpy.readthedocs.io/en/master',
+            'wavelink': 'https://wavelink.readthedocs.io/en/latest/',
+            'jishaku': 'https://jishaku.readthedocs.io/en/latest/'
         }
 
         if key not in page_types:
@@ -164,12 +166,12 @@ class Docs(commands.Cog):
     @commands.group(aliases=['rtfd'], invoke_without_command=True)
     async def rtfm(self, ctx, obj, *, flags: RTFMFlags):
         """
-        Gives you a documentation link for a discord.py entity.
+        Gives you a documentation link for a given entity.
         Events, objects, and functions are all supported through a
         a cruddy fuzzy algorithm.
 
         Command flags:
-        `--entity|e <master|latest|python>`
+        `--entity|e <master|latest|python> (defaults to latest)`
         """
         await self.do_rtfm(ctx, flags.entity, obj)
 

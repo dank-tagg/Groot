@@ -583,9 +583,15 @@ class Games(commands.Cog):
         if opponent.bot or opponent == ctx.author:
             raise commands.BadArgument(f'Opponent can not be yourself or another bot.')
 
-        confirmation = await ctx.confirm(opponent, message=f'**{opponent.name}**, do you want to play TicTacToe with {ctx.author.name}?')
-        if confirmation is False:
+        view = ctx.Confirm(opponent)
+        await ctx.send(f'**{opponent.name}**, do you want to play TicTacToe with {ctx.author.name}?', view=view)
+        await view.wait()
+
+        if view.value is False:
             await ctx.send(f'{ctx.author.mention} The opponent declined... try again later.')
+            return
+        elif view.value is None:
+            await ctx.send(f'{ctx.author.mention} The opponent did not react... try again later.')
             return
 
         game = TicTacToe(ctx, ctx.author, opponent)
@@ -602,9 +608,16 @@ class Games(commands.Cog):
         if opponent.bot or opponent == ctx.author:
             raise commands.BadArgument(f'Opponent can not be yourself or another bot.')
         
-        confirmation = await ctx.confirm(opponent, message=f'**{opponent.name}**, do you want to play Battleship with {ctx.author.name}?')
-        if confirmation is False:
+        view = ctx.Confirm(opponent)
+        await ctx.send(f'**{opponent.name}**, do you want to play Battleship with {ctx.author.name}?', view=view)
+        await view.wait()
+
+        if view.value is False:
             await ctx.send(f'{ctx.author.mention} The opponent declined... try again later.')
+            return
+
+        elif view.value is None:
+            await ctx.send(f'{ctx.author.mention} The opponent did not react... try again later.')
             return
         
         game = Battleship(ctx, ctx.author, opponent)

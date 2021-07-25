@@ -6,8 +6,11 @@ import discord
 import humanize
 import inspect
 import os
+import io
 import pygit2
 import itertools
+import textwrap
+import contextlib
 
 from discord.ext import commands
 from utils.chat_formatting import hyperlink
@@ -58,11 +61,17 @@ class Information(commands.Cog):
         """
         em = Embed(
             title="Vote for Groot!",
-            description=f'{hyperlink("**top.gg**", "https://top.gg/bot/812395879146717214/vote")}\n\n'
-            f'{hyperlink("**discordbotlist.com**", "https://discordbotlist.com/bots/groot/upvote")}',
+            description='With your votes, we can grow faster\nsupporting the development of Groot.'
         )
         em.set_thumbnail(url=self.bot.user.avatar.url)
-        await ctx.send(embed=em)
+
+        class VoteView(discord.ui.View):
+            def __init__(self):
+                super().__init__()
+                self.add_item(discord.ui.Button(label='top.gg', url='https://top.gg/bot/812395879146717214/vote'))
+                self.add_item(discord.ui.Button(label='discordbotlist.com', url='https://discordbotlist.com/bots/groot/upvote'))
+        
+        await ctx.send(embed=em, view=VoteView())
 
     @commands.command(name="invite", brief="Sends an invite for the bot.")
     async def invite(self, ctx: customContext):
@@ -71,20 +80,21 @@ class Information(commands.Cog):
         Note that a few permissions are required to let the bot run smoothly,\n
         as shown in `perms`
         """
-        em = Embed(title=f"Invite {self.bot.user.name} to your server!", color=0x2F3136)
-        em.add_field(
-            name=f"Invite the bot",
-            value=f"{hyperlink('**Click Here**', f'{discord.utils.oauth_url(812395879146717214)}')}",
-            inline=False,
-        )
+        em = Embed(title=f"Invite {self.bot.user.name} to your server!")
+        em.description = f'You like me huh? Invite me to your server with the link below. \n \
+                          Run into any problems? Join the support server where we can help you out.\n\n\
+                          Thank you for using me! \n\n \
+                          {hyperlink("Vote", "https://top.gg/bot/812395879146717214/vote")} | \
+                          {hyperlink("Website", "https://grootdiscordbot.xyz")} | \
+                          {hyperlink("Source", "https://github.com/dank-tagg/Groot")}'
 
-        em.add_field(
-            name="Support server",
-            value=f"{hyperlink('**Click Here**','https://discord.gg/nUUJPgemFE')}",
-            inline=False,
-        )
-        em.set_thumbnail(url=self.bot.user.avatar.url)
-        await ctx.send(embed=em)
+        class InviteView(discord.ui.View):
+            def __init__(self):
+                super().__init__()
+                self.add_item(discord.ui.Button(label='Invite Groot!', url=discord.utils.oauth_url(812395879146717214)))
+                self.add_item(discord.ui.Button(label='Support Server', url='https://discord.gg/nUUJPgemFE'))
+        
+        await ctx.send(embed=em, view=InviteView())
 
 
     @commands.command(name="uptime", brief="Shows the bot's uptime")
@@ -117,14 +127,43 @@ class Information(commands.Cog):
             return await ctx.send('Could not find command.')
 
         src = obj.callback.__code__
-        module = obj.callback.__module__
         filename = src.co_filename
 
         lines, firstlineno = inspect.getsourcelines(src)
         location = os.path.relpath(filename).replace('\\', '/')
 
-        final_url = f'<{source_url}/tree/{branch}/main/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>'
-        await ctx.send(final_url)
+        final_url = f'{source_url}/tree/{branch}/main/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}'
+
+        class SourceView(discord.ui.View):
+            def __init__(self, ctx: customContext):
+                super().__init__()
+                self.ctx = ctx
+                self.add_item(discord.ui.Button(label='Source URL', url=final_url))
+            
+            @discord.ui.button(emoji='<:trashcan:822050746333003776>')
+            async def delete(self, button: discord.ui.Button, interaction: discord.Interaction):
+                with contextlib.suppress(discord.HTTPException):
+                    await self.ctx.message.delete()
+                await interaction.message.delete()
+
+            @discord.ui.button(label='Source File')
+            async def send_file(self, button: discord.ui.Button, interaction: discord.Interaction):
+                if interaction.user != self.ctx.author:
+                    await interaction.response.r('Oops. This is not your interaction.', ephemeral=True)
+                    return
+                
+                await interaction.channel.send(file=discord.File(io.BytesIO(textwrap.dedent(''.join(lines)).encode('ascii')), 'source.py'))
+                button.disabled = True
+                await interaction.response.edit_message(view=self)
+
+        em = Embed(title=f'Here is the source for {obj.name}')
+
+        if len("".join(lines)) < 2000:
+            zwsp = '\u200b'
+            em.description = f'```py\n{textwrap.dedent("".join(lines).replace("``", f"`{zwsp}`"))}\n```'
+        else:
+            em.description = '```\nSource was too long to be shown here. Click Source File/Source URL below to see it.```'
+        await ctx.send(embed=em, view=SourceView(ctx))
 
     @commands.command(name="about", aliases=['info'])
     async def _about_me(self, ctx: customContext):

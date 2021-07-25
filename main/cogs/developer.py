@@ -186,17 +186,17 @@ class Developer(commands.Cog):
 
     @dev.command()
     async def sql(self, ctx: customContext, *, query: str):
-            cur = await self.bot.db.execute(query)
-            if cur.description:
-                columns = [tuple[0] for tuple in cur.description]
-            else:
-                columns = "keys"
-            thing = await cur.fetchall()
-            if len(thing) == 0:
-                return await ctx.message.add_reaction(f"{self.bot.icons['greenTick']}")
-            thing = tabulate.tabulate(thing, headers=columns, tablefmt="psql")
-            byte = io.BytesIO(str(thing).encode("utf-8"))
-            return await ctx.send(file=discord.File(fp=byte, filename="table.txt"))
+        cur = await self.bot.db.execute(query)
+        if cur.description:
+            columns = [tuple[0] for tuple in cur.description]
+        else:
+            columns = "keys"
+        thing = await cur.fetchall()
+        if len(thing) == 0:
+            return await ctx.message.add_reaction(f"{self.bot.icons['greenTick']}")
+        thing = tabulate.tabulate(thing, headers=columns, tablefmt="psql")
+        byte = io.BytesIO(str(thing).encode("utf-8"))
+        return await ctx.send(file=discord.File(fp=byte, filename="table.txt"))
 
     @sql.error
     async def sql_error(self, ctx: customContext, error):
