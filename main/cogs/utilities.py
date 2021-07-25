@@ -353,5 +353,23 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         em.set_image(url=f'attachment://{ctx.command.name}.png')
         await ctx.send(embed=em, file=discord.File(byt, filename=f'{ctx.command.name}.png'))
 
+    @commands.command(aliases=['rawmsg', 'rawm'])
+    async def raw(self, ctx, *, message: Optional[discord.Message]):
+        """
+        Shows the raw json of a message object.
+        """
+
+        if not message:
+            message = getattr(ctx.message.reference, "resolved", None)
+        
+        if not message:
+            raise commands.BadArgument(f"{self.bot.icons['redTick']} | You must either reply to a message, or pass in a message ID/jump url")
+
+        data = await self.bot.http.get_message(message.channel.id, message.id)
+        raw = json.dumps(data, indent=4)
+        
+        byt = io.BytesIO(raw.encode('utf-8'))
+        await ctx.reply(file=discord.File(byt, 'raw.json'))
+
 def setup(bot):
     bot.add_cog(Utilities(bot), cat_name="Utilities")
