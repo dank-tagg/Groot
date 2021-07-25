@@ -74,6 +74,10 @@ async def vote():
 async def server():
     return redirect("https://discord.gg/nUUJPgemFE")
 
+@app.route("/source")
+async def source():
+    return redirect("https://github.com/dank-tagg/Groot")
+
 # API (discord etc)
 
 
