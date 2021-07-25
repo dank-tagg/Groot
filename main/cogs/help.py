@@ -20,7 +20,7 @@ class GrootHelp(commands.HelpCommand):
     def get_command_help(self, command) -> Embed:
         # Base
         em = Embed(
-            title=f"{command.name} {command.signature}",
+            title=f"{command.qualified_name} {command.signature}",
             description=self.get_doc(command)
         )
 

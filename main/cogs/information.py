@@ -156,7 +156,7 @@ class Information(commands.Cog):
                 button.disabled = True
                 await interaction.response.edit_message(view=self)
 
-        em = Embed(title=f'Here is the source for {obj.name}')
+        em = Embed(title=f'Here is the source for {obj.qualified_name}')
 
         if len("".join(lines)) < 2000:
             zwsp = '\u200b'
