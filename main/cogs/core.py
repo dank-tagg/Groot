@@ -126,7 +126,7 @@ class Core(commands.Cog):
         # Permissions (whether author can run this command or not)
         elif isinstance(error, commands.MissingPermissions):
             return await ctx.send(
-                f"{self.bot.icons['redTick']} You are missing the `{error.missing_perms[0]}` permission to do that!"
+                f"{self.bot.icons['redTick']} You are missing the `{error.missing_permissions[0]}` permission to do that!"
             )
 
         elif isinstance(error, commands.NSFWChannelRequired):
