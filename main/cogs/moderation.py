@@ -493,9 +493,7 @@ class Moderation(commands.Cog, description="Moderation commands"):
     async def _info(self, ctx: customContext, *, role: RoleConvert = None):
         """Sends some information about a role."""
         if not role:
-            return await ctx.reply(
-                "You need to give me a role!", mention_author=False
-            )
+            return await ctx.reply("You need to give me a role!")
 
         member_preview = "\n".join(
             [

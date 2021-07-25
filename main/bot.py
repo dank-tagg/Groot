@@ -122,40 +122,36 @@ class GrootBot(commands.Bot):
         query = 'SELECT * FROM (SELECT guild_id AS snowflake_id, blacklisted  FROM guild_config  UNION ALL SELECT user_id AS snowflake_id, blacklisted  FROM users_data) WHERE blacklisted="TRUE"'
         cur = await self.db.execute(query)
         data = await cur.fetchall()
-        ## BETA
         self.cache["blacklisted_users"] = {r[0] for r in data} or set()
-        # self.blacklist = {r[0] for r in data} or set()
 
         """Loading up premium users."""
         query = 'SELECT * FROM (SELECT guild_id AS snowflake_id, premium  FROM guild_config  UNION ALL SELECT user_id AS snowflake_id, premium  FROM users_data) WHERE premium="TRUE"'
         cur = await self.db.execute(query)
         data = await cur.fetchall()
-        ## BETA
         self.cache["premium_users"] = {r[0] for r in data} or set()
-        # self.premiums = {r[0] for r in data} or set()
 
         """Loading up users that have tips enabled"""
-
         query = 'SELECT user_id FROM users_data WHERE tips = "TRUE"'
         cur = await self.db.execute(query)
         data = await cur.fetchall()
-        ## BETA
         self.cache["tips_are_on"] = {r[0] for r in data} or set()
-        # self.tips_on_cache = {r[0] for r in data} or set()
+
+        """Loading up users that have mentions enabled"""
+        query = 'SELECT user_id FROM users_data WHERE mentions = "TRUE"'
+        cur = await self.db.execute(query)
+        data = await cur.fetchall()
+        self.cache["mentions_are_on"] = {r[0] for r in data} or set()
 
         """Loads up all disabled_commands"""
         query = "SELECT command_name, snowflake_id FROM disabled_commands ORDER BY command_name"
         cur = await self.db.execute(query)
         data = await cur.fetchall()
-        ## BETA
         self.cache["disabled_commands"] = {
             cmd: [r[1] for r in _group]
             for cmd, _group in itertools.groupby(data, key=operator.itemgetter(0))
         }
-        # self.cached_disabled = {
-        #   cmd: [r[1] for r in _group]
-        #   for cmd, _group in itertools.groupby(data, key=operator.itemgetter(0))
-        #}
+
+
         self.cache["users"] = {}
         self.cache['afk_users'] = {}
 

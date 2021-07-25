@@ -114,7 +114,7 @@ class Image(commands.Cog):
     @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def _resize(self, ctx: customContext, height: int, width: int, obj: ImageConvert):
         if width > 1000 or height > 1000:
-            return await ctx.send("The dimensions can't be over 1000 pixels", mention_author=False)
+            return await ctx.send("The dimensions can't be over 1000 pixels")
         
         async with ctx.processing(ctx, delete_after=True) as process:
             byt = await get_bytes(ctx, obj, self.bot.session)

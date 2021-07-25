@@ -147,7 +147,7 @@ class Developer(commands.Cog):
                 value="```diff\n+ All cogs were reloaded successfully```",
             )
 
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.reply(embed=em)
         else:
             em = Embed(color=0xFFCC33)
             em.add_field(name=f"{self.bot.icons['online']} Pulling from GitHub", value=text, inline=False)
@@ -156,7 +156,7 @@ class Developer(commands.Cog):
                 value=fail,
             )
             try:
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.reply(embed=em)
             except Exception:
                 mystbin_client = mystbin.Client()
                 paste = await mystbin_client.post(fail, syntax="python")

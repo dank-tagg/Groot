@@ -34,6 +34,30 @@ class Configuration(commands.Cog):
         return await ctx.send(
             f"{self.bot.icons['greenTick']} Toggled your tips to `{mode.upper()}`"
         )
+    
+    @commands.command(usage='<on|off>')
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
+    async def mentions(self, ctx: customContext, *, mode: str):
+        """
+        Toggles mentions to on or off, specified by the invoking user.
+        If mentions are on every reply of the bot you'll get mentioned.
+        """
+        modus = mode.lower()
+        if modus != "on" and modus != "off":
+            await ctx.send_help(ctx.command)
+            return
+
+        modus = "TRUE" if modus == "on" else "FALSE"
+        if modus == "TRUE":
+            self.bot.cache["mentions_are_on"].add(ctx.author.id)
+        else:
+            self.bot.cache["mentions_are_on"].discard(ctx.author.id)
+
+        query = "UPDATE users_data SET mentions = ? WHERE user_id = ?"
+        await self.bot.db.execute(query, (modus, ctx.author.id))
+        return await ctx.send(
+            f"{self.bot.icons['greenTick']} Toggled your mentions to `{mode.upper()}`"
+        )
 
     @commands.group(
         invoke_without_command=False,
@@ -58,7 +82,7 @@ class Configuration(commands.Cog):
                 f"Seems like you are new! I added this server ({ctx.guild.name}), to our database. Enjoy!"
             )
 
-    @config.command(name="giveawaymanager", aliases=["gRole"])
+    @config.command(name="giveawayrole", aliases=["grole"])
     async def _grole(self, ctx: customContext, role: RoleConvert):
         """
         Sets the required role for starting giveaways to `role`
