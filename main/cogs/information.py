@@ -36,7 +36,7 @@ class Information(commands.Cog):
     @commands.command(name="ping", brief="Shows the bots latency")
     async def ping(self, ctx: customContext):
         """
-        Shows the bot's latency in miliseconds.\n
+        Shows the bot's latency in miliseconds.
         Useful if you want to know if the bot is lagging or not
         """
         start = time.perf_counter()
@@ -56,7 +56,7 @@ class Information(commands.Cog):
     @commands.command(name="vote", brief="The links where you can vote for the bot.")
     async def _vote(self, ctx: customContext):
         """
-        Sends an embed containing two hyperlinks,\n
+        Sends an embed containing two hyperlinks,
         one for Top.gg and one for discordbotlist.com
         """
         em = Embed(
@@ -73,11 +73,11 @@ class Information(commands.Cog):
         
         await ctx.send(embed=em, view=VoteView())
 
-    @commands.command(name="invite", brief="Sends an invite for the bot.")
+    @commands.command(name="invite", aliases=["support"], brief="Sends an invite for the bot.")
     async def invite(self, ctx: customContext):
         """
-        Sends an invite for the bot with no permissions.\n
-        Note that a few permissions are required to let the bot run smoothly,\n
+        Sends an invite for the bot with no permissions.
+        Note that a few permissions are required to let the bot run smoothly,
         as shown in `perms`
         """
         em = Embed(title=f"Invite {self.bot.user.name} to your server!")
@@ -149,7 +149,7 @@ class Information(commands.Cog):
             @discord.ui.button(label='Source File')
             async def send_file(self, button: discord.ui.Button, interaction: discord.Interaction):
                 if interaction.user != self.ctx.author:
-                    await interaction.response.r('Oops. This is not your interaction.', ephemeral=True)
+                    await interaction.response.send_message('Oops. This is not your interaction.', ephemeral=True)
                     return
                 
                 await interaction.channel.send(file=discord.File(io.BytesIO(textwrap.dedent(''.join(lines)).encode('ascii')), 'source.py'))
