@@ -3,8 +3,9 @@ from utils._type import *
 import asyncio
 import random
 import discord
-import re
+import string
 import textwrap
+import base64
 
 from discord.ext import commands, menus
 from utils.useful import Embed
@@ -364,6 +365,28 @@ class Fun(commands.Cog, description="Fun commands"):
         
         menu = menus.MenuPages(source=UrbanSource(data['list']), timeout=30, delete_message_after=True)
         await menu.start(ctx)
+    
+    @commands.command()
+    async def echo(self, ctx: customContext, *, to_say: str):
+        """Repeat something you give it to say."""
+        await ctx.send(to_say, allowed_mentions=discord.AllowedMentions.none())
+
+    @commands.command()
+    async def gentoken(self, ctx: customContext, member: discord.Member = None):
+        """Generates a fake token for yourself or someone else"""
+
+        member = member or ctx.author
+        token = []
+        # Numeric string b64 encoded user ID
+        token.append(base64.b64encode(str(member.id).encode('ascii')).decode('ascii').rstrip('='))
+        # Timestamp at which token was generated
+        bytes_int = int(discord.utils.utcnow().timestamp()).to_bytes(10, "big")
+        clean = bytes_int.lstrip(b'\x00')
+        token.append(base64.standard_b64encode(clean).decode('utf-8').rstrip('=='))
+        # HMAC (random)
+        token.append(''.join(random.choices(string.ascii_letters + string.digits, k=27)))
+
+        await ctx.send(f"**{member.name}'s** generated token:\n{'.'.join(token)}")
 
 def setup(bot):
     bot.add_cog(Fun(bot), cat_name="Fun")
