@@ -6,14 +6,18 @@ from discord.ext import commands
 
 
 class Moderator(commands.Cog):
-    
+
     def __init__(self, bot):
         self.bot = bot
-    
+
     @commands.group(name="mod", invoke_without_command=True, case_insensitive=True)
     @commands.is_owner()
     async def mod(self, ctx: customContext):
-        await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
+        if ctx.invoked_subcommand is None:
+            await ctx.send_help(ctx.command)
+
+    class ModFlags(commands.FlagConverter, prefix='--', delimeter=' '):
+        mode: str = commands.Flag(default='add')
 
     @mod.command(name="blacklist", hidden=True, aliases=["bl", "poo"])
     async def _blacklist(
@@ -21,18 +25,18 @@ class Moderator(commands.Cog):
         ctx,
         target: Union[discord.User, discord.Guild],
         *,
-        mode: str = "add",
+        flags: ModFlags,
     ):
         """Blacklists a user or a guild."""
 
-        if mode != "remove" and mode != "add":
+        if flags.mode != "remove" and flags.mode != "add":
             return await ctx.send(
                 f"{self.bot.icons['redTick']} Accepted values are `add/remove` for `mode`"
             )
 
         target_type = "user" if isinstance(target, discord.User) else "guild"
 
-        blacklist = "TRUE" if mode == "add" else "FALSE"
+        blacklist = "TRUE" if flags.mode == "add" else "FALSE"
         query = (
             "UPDATE users_data SET blacklisted = ? WHERE user_id = ?"
             if target_type == "user"
@@ -40,7 +44,7 @@ class Moderator(commands.Cog):
         )
 
         cur = await self.bot.db.execute(query, (blacklist, target.id))
-        if mode == "add":
+        if flags.mode == "add":
             msg = f"**{target.name}** now got blacklisted! bad bad bad"
             self.bot.cache["blacklisted_users"].add(target.id)
         else:
@@ -52,24 +56,24 @@ class Moderator(commands.Cog):
 
         await ctx.send(msg)
 
-    @mod.command(name="givepremium", hidden=True, aliases=["givep"])
+    @mod.command(name="premium", hidden=True, aliases=["givep"])
     async def _givepremium(
         self,
         ctx,
         target: Union[discord.User, discord.Guild],
         *,
-        mode: str = "add",
+        flags: ModFlags,
     ):
         """Gives premium to a user or a guild."""
 
-        if mode != "remove" and mode != "add":
+        if flags.mode != "remove" and flags.mode != "add":
             return await ctx.send(
                 f"{self.bot.icons['redTick']} Accepted values are `add/remove` for `mode`"
             )
 
         target_type = "user" if isinstance(target, discord.User) else "guild"
 
-        premium = "TRUE" if mode == "add" else "FALSE"
+        premium = "TRUE" if flags.mode == "add" else "FALSE"
         query = (
             "UPDATE users_data SET premium = ? WHERE user_id = ?"
             if target_type == "user"
@@ -77,7 +81,7 @@ class Moderator(commands.Cog):
         )
 
         cur = await self.bot.db.execute(query, (premium, target.id))
-        if mode == "add":
+        if flags.mode == "add":
             msg = f"<:Boosters:814930829461553152> **{target.name}** now got premium perks!"
             self.bot.cache["premium_users"].add(target.id)
         else:
