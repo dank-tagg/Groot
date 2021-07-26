@@ -22,7 +22,7 @@ class Processing:
     # Timer utilities
     def start(self):
         self._start = time.perf_counter()
-    
+
     def stop(self):
         self._end = time.perf_counter()
 
@@ -50,7 +50,7 @@ class Processing:
             except discord.HTTPException:
                 pass
         self.task.__exit__(None, None, None)
-    
+
     @property
     def time(self):
         if self._end is None:
@@ -92,7 +92,7 @@ class customContext(commands.Context):
                     content, mention_author=mention_author, **kwargs
                 )
         return await self.send(content, **kwargs)
-    
+
     async def reply(self, content=None, mention_author=False, **kwargs):
         mention = self.author.id in self.bot.cache['mentions_are_on']
         await super().reply(content, mention_author=mention, **kwargs)
@@ -103,8 +103,8 @@ class customContext(commands.Context):
 
             self.to_confirm = to_confirm
             self.value = None
-        
-        
+
+
         @discord.ui.button(label='Confirm', style=discord.ButtonStyle.green)
         async def confirm(self, button: discord.ui.Button, interaction: discord.Interaction):
             if interaction.user != self.to_confirm:
@@ -121,4 +121,11 @@ class customContext(commands.Context):
             self.value = False
             button.disabled = True
             self.stop()
-        
+
+    async def confirm(self, message, target, *, delete_after=True):
+        view = self.Confirm(target)
+        await self.send(message, view=view)
+        await view.wait()
+        return view.value
+
+

@@ -94,5 +94,15 @@ class Text(commands.Cog):
         transform = lambda e: [e.lower(), e.upper()][e.islower()]
         await ctx.send(''.join(transform(char) for char in text))
 
+    @commands.command()
+    async def charcount(self, ctx: customContext, *, text: str):
+        await ctx.reply(f'Your text is `{len(text)}` characters long.')
+    
+    @commands.command()
+    async def wordcount(self, ctx: customContext, *, text: str):
+        await ctx.reply(f'Your text is `{len(text.split(" "))}` words long.')
+    
+    
+
 def setup(bot):
     bot.add_cog(Text(bot))

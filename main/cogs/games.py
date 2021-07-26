@@ -24,7 +24,7 @@ class GameExit(Exception):
 class Game:
     def __init__(self, ctx: customContext, *args, **kwargs):
         self.owner = ctx.author
-    
+
     def end(self, force=False) -> GameExit:
         raise GameExit(self, force)
 
@@ -40,7 +40,7 @@ class SimonGame(Game):
         self.answer = []
 
         self.message = None
-    
+
     async def start(self):
         # Prepare
         self.sequence.append(random.choice(self.tiles))
@@ -48,7 +48,7 @@ class SimonGame(Game):
         msg = self.message = await self.ctx.send(embed=em)
         for tile in self.tiles:
             await msg.add_reaction(tile)
-        
+
         # Start the game
         def check(reaction, user):
             return user == self.player and str(reaction) in self.tiles
@@ -82,11 +82,11 @@ class SimonGame(Game):
             else:
                 await self.message.edit(embed=self.next(1))
                 await asyncio.sleep(len(self.sequence) * 1)
-    
+
     def next(self, res: int):
         self.sequence.append(random.choice(self.tiles))
         return self.build_embed(res)
-    
+
     def build_embed(self, res: int) -> Embed:
         color = {
             1: 'invisible',
@@ -96,7 +96,7 @@ class SimonGame(Game):
         }
 
         em = Embed(title=f"{self.ctx.author}'s Simon Game", color=self.bot.colors[color[res]])
-        
+
         val = {
             1: 'Memorize this sequence: ' + ' '.join(self.sequence) + "\n\n **⚠️ Do not click now, it won't register**",
             2: "Now react with the correct emojis \n\n **⚠️ Click slowly otherwise it may not register**",
@@ -144,14 +144,14 @@ class TicTacToe(Game):
                 await self.ctx.send(f'⚠️ That is not a valid move {self.current_player[0].mention}! Please enter a valid move again.')
                 self.fails += 1
                 continue
-            
+
             if self.board[self.grid[move[0]]][int(move[1])-1]== 0:
                 self.board[self.grid[move[0]]][int(move[1])-1] = self.current_player[1]
             else:
                 await self.ctx.send('⚠️ There already is a marker on that spot. Choose another please.')
                 self.fails += 1
                 continue
-            
+
             winner = self.check_winner()
             if winner is not None:
                 await self.send_board(end=True)
@@ -163,7 +163,7 @@ class TicTacToe(Game):
                 return
             else:
                 self.current_player = (self.o, self.O) if self.current_player[1] == self.X else (self.x, self.X)
-                
+
         await self.ctx.send('😫 Game ended due to too many failures to answer.')
 
     async def send_board(self, end=False):
@@ -182,7 +182,7 @@ class TicTacToe(Game):
            f"🇨{''.join(self.icons[c] for c in self.board[2])}"
         ]
         await self.ctx.send('\n'.join(message if not end else end_message))
-    
+
     def check_winner(self):
         for across in self.board:
             value = sum(across)
@@ -240,7 +240,7 @@ class Battleship(Game):
 
             self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
             self.setup()
-        
+
         def mark(self, coordinate: str):
             coordinate = coordinate.lower()
             if coordinate == 'end':
@@ -248,7 +248,7 @@ class Battleship(Game):
             possible_coords = [f'{letter}{number}' for letter in self.letters for number in [i for i in range(1, 9)]]
             if not coordinate in possible_coords:
                 return None
-            
+
             placement = self.grid[self.letters.index(coordinate[0])][int(coordinate[1:])-1]
             if placement == 2 or placement == -2:
                 return None
@@ -263,13 +263,13 @@ class Battleship(Game):
                 self.grid[self.letters.index(coordinate[0])][int(coordinate[1:])-1] = -2
                 return False
 
-        
+
         def setup(self):
             if self.hidden:
                 return
             for name, size in self.ship_blueprint.items():
                 self.place_ship(name, size)
-        
+
         def place_ship(self, name: str, size: int):
             ship = self.generate_ship(name, size)
             self.ships.append(ship)
@@ -290,7 +290,7 @@ class Battleship(Game):
                     for col in range(8 - size + 1):
                         if 1 not in self.grid[row][col:col+size]:
                             locations.append((row, col))
-    
+
             elif orientation == 'vertical':
                 for col in range(8):
                     for row in range(8 - size + 1):
@@ -323,7 +323,7 @@ class Battleship(Game):
                 self.orientation = orientation
             else:
                 raise ValueError('Value for orientation must be either vertical or horizontal')
-            
+
         def place(self):
             if self.orientation == 'horizontal':
                 self.coordinates = []
@@ -340,13 +340,13 @@ class Battleship(Game):
                 if coords == location:
                     return True
             return False
-        
+
         def destroyed(self):
             for coords in self.coordinates:
                 if self.board.grid[coords[0]][coords[1]] == 1:
                     return False
             return True
-        
+
         def fill(self):
             for coords in self.coordinates:
                 self.board.grid[coords[0]][coords[1]] = 1
@@ -362,25 +362,25 @@ class Battleship(Game):
         self.current_player = self.x
         self.messages = dict()
         self.boards = dict()
-        
+
         self.setup()
         self.bot.loop.create_task(self.send_initial_messages())
 
     def setup(self):
         self.boards = {
             self.x: {
-                'hidden': None, 
+                'hidden': None,
                 'own': self.Board(self.bot, self.x)
             },
             self.y: {
-                'hidden': None, 
+                'hidden': None,
                 'own': self.Board(self.bot, self.y)
             }
         }
 
         self.boards[self.x]['hidden'] = self.Board(self.bot, self.x, hidden=True, board=self.boards[self.x]['own'])
         self.boards[self.y]['hidden'] = self.Board(self.bot, self.y, hidden=True, board=self.boards[self.y]['own'])
-    
+
     async def send_initial_messages(self):
         await self.send_embeds()
 
@@ -412,7 +412,7 @@ class Battleship(Game):
                     for player in self.players:
                         await player.send(f'{winner.mention} has won the game. GG!')
                     return
-                
+
                 await self.current_player.send(f'💣 You destroyed their {mark.name}! They have {len(board.ships)} other boats left.', delete_after=10)
                 self.current_player = self.opponent(self.current_player)
                 await self.send_embeds()
@@ -431,21 +431,21 @@ class Battleship(Game):
                 for player in self.players:
                     await player.send(f'{winner.mention} has won the game. GG!')
                 return
-        
+
         for player in self.players:
             await player.send(f'Oops. {self.current_player.mention} has reached the fail threshold. {self.opponent(self.current_player).mention} won the game!')
-            
-        
+
+
     def check_winner(self):
         for board in [self.boards[self.x]['own'], self.boards[self.y]['own']]:
             if 1 not in chain(*board.grid):
                 return self.opponent(board.owner)
         return None
-    
+
     def build_embed(self, player: discord.Member):
         em = Embed(title=f'Battleship | {self.x.name} VS {self.y.name}')
         em.add_field(
-            name='Instructions', 
+            name='Instructions',
             value='Send a coordinate to mark (`a1`, `a2`, `b3` e.g.)  \nThe goal is to destroy all enemy ships before the enemy destroys yours. Good luck!'
         )
         em.add_field(name='Icons and what they mean', value='🟦 = Water\n🟥 = Boat\n💥 = Target Hit\n⬛ = Missed shot', inline=False)
@@ -474,7 +474,7 @@ class TypeRace(Game):
 
         text = textwrap.fill(text, width=30)
         draw.multiline_text((im.width/2-400,im.height/2-70), text, (255,255,255), align='left', font=font)
-        
+
 
         buffer = io.BytesIO()
         im.save(buffer, format='png')
@@ -487,7 +487,7 @@ class TypeRace(Game):
         res = await bot.session.get('https://api.quotable.io/random', params={'minLength': 30, 'maxLength': 90})
         data = await res.json()
 
-        
+
         self.to_type = data['content']
         buffer = await self.draw(byt, self.to_type)
         em = Embed(title='Typerace!', description='Type the following sentence as fast as possible:')
@@ -497,7 +497,7 @@ class TypeRace(Game):
 
         await self.wait_for_response(self.ctx, self.to_type, timeout=30)
 
-    
+
     async def wait_for_response(self, ctx: commands.Context, text: str, *, timeout: int):
         emoji_map = {1: '🥇', 2: '🥈', 3: '🥉'}
 
@@ -514,7 +514,7 @@ class TypeRace(Game):
                 if m.channel == ctx.channel and not m.author.bot and m.author not in map(lambda m: m["user"], participants):
                     sim = difflib.SequenceMatcher(None, content, text).ratio()
                     return sim >= 0.75
-            
+
             try:
                 message = await ctx.bot.wait_for(
                     'message',
@@ -538,7 +538,7 @@ class TypeRace(Game):
             })
 
             await message.add_reaction(emoji_map[len(participants)])
-            
+
             if len(participants) >= 3:
                 break
 
@@ -552,13 +552,108 @@ class TypeRace(Game):
 
         await self._message.reply(embed=em)
 
+class RockPaperSciccors(Game):
+    class RPSView(discord.ui.View):
+        def __init__(self, x: discord.Member, y: discord.Member, mode):
+            super().__init__(timeout=None)
+            self.x, self.y = x, y
+            self.values = {x.id: None, y.id: None}
+
+            self.mode = mode
+            self.winner = None
+
+        async def interaction_check(self, interaction: discord.Interaction) -> bool:
+            return interaction.user.id in self.values.keys()
+
+        def check_winner(self, values: dict):
+            # Check for tie
+            if values[self.x.id] == values[self.y.id]:
+                return None
+
+            if values[self.x.id] == 'rock':
+                if values[self.y.id] == 'paper':
+                    return self.y
+                else:
+                    return self.x
+
+            if values[self.x.id] == 'paper':
+                if values[self.y.id] == 'scissors':
+                    return self.y
+                else:
+                    return self.x
+
+            if values[self.x.id] == 'scissors':
+                if values[self.y.id] == 'rock':
+                    return self.y
+                else:
+                    return self.x
+
+        def stop(self):
+            self.winner = self.check_winner(self.values)
+            super().stop()
+
+        def place(self, user_id, move: str):
+            self.values[user_id] = move
+            if self.mode == 'single':
+                self.values[self.y.id] = random.choice(['rock', 'paper', 'scissors'])
+            if all(self.values.values()):
+                self.stop()
+
+        @discord.ui.button(emoji='🪨')
+        async def rock(self, button: discord.Button, interaction: discord.Interaction):
+            if self.values[interaction.user.id] is not None:
+                await interaction.response.send_message('You have already responded! Please wait for your opponent.', ephemeral=True)
+                return
+
+            self.place(interaction.user.id, 'rock')
+
+        @discord.ui.button(emoji='📰')
+        async def paper(self, button: discord.Button, interaction: discord.Interaction):
+            if self.values[interaction.user.id] is not None:
+                await interaction.response.send_message('You have already responded! Please wait for your opponent.', ephemeral=True)
+                return
+
+            self.place(interaction.user.id, 'paper')
+
+        @discord.ui.button(emoji='✂️')
+        async def scissor(self, button: discord.Button, interaction: discord.Interaction):
+            if self.values[interaction.user.id] is not None:
+                await interaction.response.send_message('You have already responded! Please wait for your opponent.', ephemeral=True)
+                return
+
+            self.place(interaction.user.id, 'scissor')
+
+
+    def __init__(self, ctx: customContext, opponent: discord.Member, mode):
+        self.ctx = ctx
+
+        self.mode = mode
+
+        self.author = ctx.author
+        self.opponent = opponent
+
+    async def start(self):
+        view = self.RPSView(self.author, self.opponent, self.mode)
+
+        em = Embed(title='Rock Paper Scissors')
+        em.description = f'{self.author.mention} vs {self.opponent.mention}\n\n \
+                          **Click one of the buttons below to place your move**'
+
+        await self.ctx.send(embed=em, view=view)
+        await view.wait()
+
+        if view.winner:
+            await self.ctx.send(f'{view.winner.mention} has won the Rock Paper Scissor match!')
+        else:
+            await self.ctx.send('It was a tie! Well played :>')
+
 
 class Games(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.active_games: List[Game] = []
-    
-    async def start_game(self, game: Union[SimonGame, TicTacToe, Battleship, TypeRace]):
+
+    async def start_game(self, game: Union[SimonGame, TicTacToe, Battleship, TypeRace, RockPaperSciccors]):
         self.active_games.append(game)
         await game.start()
         self.active_games.remove(game)
@@ -583,43 +678,39 @@ class Games(commands.Cog):
         if opponent.bot or opponent == ctx.author:
             raise commands.BadArgument(f'Opponent can not be yourself or another bot.')
 
-        view = ctx.Confirm(opponent)
-        await ctx.send(f'**{opponent.name}**, do you want to play TicTacToe with {ctx.author.name}?', view=view)
-        await view.wait()
+        confirmation = await ctx.confirm(f'**{opponent.name}**, do you want to play TicTacToe with {ctx.author.name}?', opponent)
 
-        if view.value is False:
+        if confirmation is False:
             await ctx.send(f'{ctx.author.mention} The opponent declined... try again later.')
             return
-        elif view.value is None:
+        elif confirmation is None:
             await ctx.send(f'{ctx.author.mention} The opponent did not react... try again later.')
             return
 
         game = TicTacToe(ctx, ctx.author, opponent)
         await self.start_game(game)
-    
+
     @commands.command(aliases=['ship'])
     @commands.check(Cooldown(1, 60, 1, 30, commands.BucketType.user))
     @commands.max_concurrency(1, commands.BucketType.user)
     async def battleship(self, ctx: customContext, opponent: discord.Member):
         """
-        Play a game of battleship with a friend. 
+        Play a game of battleship with a friend.
         Rules are listed here: https://www.cs.nmsu.edu/~bdu/TA/487/brules.htm
         """
         if opponent.bot or opponent == ctx.author:
             raise commands.BadArgument(f'Opponent can not be yourself or another bot.')
-        
-        view = ctx.Confirm(opponent)
-        await ctx.send(f'**{opponent.name}**, do you want to play Battleship with {ctx.author.name}?', view=view)
-        await view.wait()
 
-        if view.value is False:
+        confirmation = await ctx.confirm(f'**{opponent.name}**, do you want to play Battleship with {ctx.author.name}?', opponent=opponent)
+
+        if confirmation is False:
             await ctx.send(f'{ctx.author.mention} The opponent declined... try again later.')
             return
 
-        elif view.value is None:
+        elif confirmation is None:
             await ctx.send(f'{ctx.author.mention} The opponent did not react... try again later.')
             return
-        
+
         game = Battleship(ctx, ctx.author, opponent)
         async with ctx.processing(ctx, message='Setting up the game...', delete_after=True):
             await asyncio.sleep(1) # let it set up the game first
@@ -640,6 +731,32 @@ class Games(commands.Cog):
         async with ctx.processing(ctx, message='Starting... get ready!', delete_after=True):
             await asyncio.sleep(2)
             game = TypeRace(ctx)
+        await self.start_game(game)
+
+
+    class RPSFlags(commands.FlagConverter, prefix='--', delimiter=' '):
+        mode: str = commands.Flag(aliases='m', default='single', max_args=1)
+
+    @commands.command(aliases=['rps'])
+    @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
+    @commands.max_concurrency(1, commands.BucketType.channel)
+    async def rockpaperscissors(self, ctx: customContext, opponent: Optional[discord.Member], *, flags: RPSFlags):
+        opponent = opponent or self.bot.user
+        if opponent == ctx.author:
+            raise commands.BadArgument(f'Opponent can not be yourself. If you want to play with the bot, use the flag\n`--mode single`')
+
+        if not opponent.bot:
+            confirmation = await ctx.confirm(f'**{opponent.name}**, do you want to play Rock Paper Scissors with {ctx.author.name}?', opponent)
+
+            if confirmation is False:
+                await ctx.send(f'{ctx.author.mention} The opponent declined... try again later.')
+                return
+
+            elif confirmation is None:
+                await ctx.send(f'{ctx.author.mention} The opponent did not react... try again later.')
+                return
+
+        game = RockPaperSciccors(ctx, opponent, flags.mode)
         await self.start_game(game)
 
 def setup(bot):
