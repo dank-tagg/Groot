@@ -14,7 +14,7 @@ from ext.category import Category
 from discord.ext import commands, ipc
 
 from utils.cache import CacheManager
-from utils.subclasses import customContext
+from utils.context import customContext
 from utils.useful import (Cooldown, ListCall, call,
                           print_exception)
 from utils.json import read_json
@@ -76,8 +76,8 @@ class GrootBot(commands.Bot):
             "plus": "<:plus:854044237556351006>",
             "minus": "<:minus:854046724497604649>",
             "save": "<:save:854038370735882260>",
-            'online': '<:online:808613541774360576>', 
-            'offline': '<:offline:817034738014879845>', 
+            'online': '<:online:808613541774360576>',
+            'offline': '<:offline:817034738014879845>',
             'idle': '<:idle:817035319165059102>',
             'dnd': '<:dnd:817035352925536307>',
             'boosters': '<:Boosters:814930829461553152>',
@@ -224,7 +224,7 @@ class GrootBot(commands.Bot):
                 and message.guild.id in self.cache["disabled_commands"][ctx.command.name]
             ):
                 return
-        
+
         # Trigger typing every invoke
         if ctx.valid and getattr(ctx.cog, "qualified_name", None) != "Jishaku":
             await ctx.trigger_typing()
@@ -263,4 +263,3 @@ class GrootBot(commands.Bot):
 
     async def on_ipc_error(self, endpoint, error):
         logging.warning(f"{endpoint} raised {error}")
-        
