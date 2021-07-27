@@ -52,7 +52,7 @@ class TimeConverter(commands.Converter):
         if reason[0:5] == 'after': # Checking if the argument starts with after
             reason = reason[5:] # Strip it.
 
-        return ParsedTime(date_obj.replace(tzinfo=timezone.utc, reason.strip())
+        return ParsedTime(date_obj.replace(tzinfo=timezone.utc), reason.strip())
 
 class Timer:
     def __init__(self, record):
