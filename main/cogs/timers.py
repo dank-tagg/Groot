@@ -64,8 +64,8 @@ class Timer:
         self.kwargs = extra.get('kwargs', {})
         self.event = record['event']
 
-        self.created_at = datetime.strptime(record['created'], '%Y-%m-%d %H:%M:%S.%f%z')
-        self.expires = datetime.strptime(record['expires'], '%Y-%m-%d %H:%M:%S.%f%z')
+        self.created_at = datetime.strptime(record['created'], '%Y-%m-%d %H:%M:%S.%f')
+        self.expires = datetime.strptime(record['expires'], '%Y-%m-%d %H:%M:%S.%f')
     
     def __hash__(self):
         return hash(self.id)
