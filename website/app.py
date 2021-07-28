@@ -42,7 +42,7 @@ async def about():
     if await discord.authorized:
         user = await discord.fetch_user()
     return await render_template("about.html", user=user)
-    
+
 @app.route("/support")
 async def support():
     user = None
@@ -52,13 +52,17 @@ async def support():
 
 @app.route("/stats")
 async def stats():
+    user = None
+    if await discord.authorized:
+        user = await discord.fetch_user()
     stats = await ipc_client.request("get_stats")
     return await render_template(
-        "stats.html", 
-        users=f"{stats['users']:,}", 
-        guilds=f"{stats['guilds']:,}", 
+        "stats.html",
+        users=f"{stats['users']:,}",
+        guilds=f"{stats['guilds']:,}",
         commands=f"{stats['commands']:,}",
-        uptime=f"{stats['uptime']}"
+        uptime=f"{stats['uptime']}",
+        user=user
     )
 
 # Shortcuts
