@@ -16,3 +16,10 @@ dpymenus
 pygit2
 polaroid
 dateparser
+pillow
+psutil
+quart_auth
+quart_discord
+quart
+wavelink
+topggpy
