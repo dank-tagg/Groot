@@ -19,8 +19,8 @@ class TimeConverter(commands.Converter):
     async def convert(self, ctx, argument) -> ParsedTime:
         parsed = search_dates(
             argument, settings={
-                'TIMEZONE': 'UTC', 
-                'PREFER_DATES_FROM': 'future', 
+                'TIMEZONE': 'UTC',
+                'PREFER_DATES_FROM': 'future',
                 'FUZZY': True
             }
         )
@@ -66,16 +66,16 @@ class Timer:
 
         self.created_at = datetime.strptime(record['created'], '%Y-%m-%d %H:%M:%S.%f%z')
         self.expires = datetime.strptime(record['expires'], '%Y-%m-%d %H:%M:%S.%f%z')
-    
+
     def __hash__(self):
         return hash(self.id)
-    
+
     def __eq__(self, obj):
         try:
             return self.id == obj.id
         except AttributeError:
             return False
-    
+
     def __repr__(self):
         return f'<Timer created={self.created_at} expires={self.expires} event={self.event}>'
 
@@ -97,10 +97,10 @@ class Reminders(commands.Cog):
         self._have_data = asyncio.Event(loop=bot.loop)
         self._current_timer = None
         self._task = bot.loop.create_task(self.dispatch_timers())
-    
+
     def cog_unload(self):
         self._task.cancel()
-    
+
     async def get_current_timer(self, days=7):
         query = query = "SELECT * FROM timers WHERE expires < (date(CURRENT_TIMESTAMP, ?)) ORDER BY expires LIMIT 1"
         self.bot.db.row_factory = aiosqlite.Row
@@ -109,7 +109,7 @@ class Reminders(commands.Cog):
         self.bot.db.row_factory = None
         # TODO: type: str in self._current_timer
         return Timer(record=record) if record else None
-    
+
     async def wait_for_timers(self, days=7):
         timer = await self.get_current_timer(days=days)
         if timer is not None:
@@ -119,11 +119,11 @@ class Reminders(commands.Cog):
         self._current_timer = None
         await self._have_data.wait()
         return await self.get_current_timer(days=days)
-    
+
     async def call_timer(self, timer: Timer):
         query = "DELETE FROM timers WHERE id = ?"
         await self.bot.db.execute(query, (timer.id,))
-    
+
         event = f'{timer.event}_timer_complete'
         self.bot.dispatch(event, timer)
     async def dispatch_timers(self):
@@ -140,30 +140,30 @@ class Reminders(commands.Cog):
         except (OSError, discord.ConnectionClosed):
             self._task.cancel()
             self._task = self.bot.loop.create_task(self.dispatch_timers())
-    
+
     async def short_timer(self, seconds, timer):
         await asyncio.sleep(seconds)
         event = f'{timer.event}_timer_complete'
         self.bot.dispatch(event, timer)
-    
+
     async def create_timer(self, expires, event, author, *args, **kwargs) -> Timer:
         try:
             now = kwargs.pop('created')
         except KeyError:
             now = datetime.utcnow()
-        
+
         timer = Timer.temporary(event=event, author=author, args=args, kwargs=kwargs, expires=str(expires), created=str(now))
         delta = (expires - now).total_seconds()
         if delta <= 60:
             self.bot.loop.create_task(self.short_timer(delta, timer))
             return timer
-        
+
         query = """
                 INSERT INTO timers (event, author, extra, expires, created)
                 VALUES (?, ?, ?, ?, ?)
                 RETURNING id
                 """
-        
+
         cur = await self.bot.db.execute(query, (event, author, str({ "args": args, "kwargs": kwargs }), expires, now))
         row = await cur.fetchone()
         timer.id = row[0]
@@ -217,7 +217,7 @@ class Reminders(commands.Cog):
         for _id, expires, extra in records:
             message = eval(extra)['args'][1]
             shorten = textwrap.shorten(message, width=512)
-            date = datetime.strptime(expires, '%Y-%m-%d %H:%M:%S.%f')
+            date = datetime.strptime(expires, '%Y-%m-%d %H:%M:%S.%f%z')
             e.add_field(name=f'{_id}: <t:{int(date.timestamp())}:R>', value=shorten, inline=False)
 
         await ctx.send(embed=e)
@@ -229,13 +229,13 @@ class Reminders(commands.Cog):
             channel = self.bot.get_channel(channel_id) or (await self.bot.fetch_channel(channel_id))
         except discord.HTTPException:
             return
-        
+
         guild_id = channel.guild.id if isinstance(channel, discord.TextChannel) else '@me'
         message_id = timer.kwargs.get('message_id')
         msg = f'<@{timer.author}>, <t:{int(timer.created_at.timestamp())}:R>: {message}'
         if message_id:
             msg = f'{msg}\n\n<https://discord.com/channels/{guild_id}/{channel.id}/{message_id}>'
-        
+
         try:
             await channel.send(msg)
         except discord.HTTPException:

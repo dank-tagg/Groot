@@ -3,8 +3,11 @@ import contextlib
 import random
 import time
 import discord
+
+from typing import Optional
 from discord.ext import commands
 
+__all__ = ('customContext')
 
 class Processing:
 
@@ -61,6 +64,15 @@ class customContext(commands.Context):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.processing = Processing
+
+    @property
+    def reference(self) -> Optional[discord.Message]:
+        return getattr(self.message.reference, 'resolved', None)
+
+    @property
+    def now(self):
+        return discord.utils.utcnow()
+
 
     async def send(self, content=None, **kwargs):
         if self.author.id in self.bot.cache["tips_are_on"]:
@@ -124,8 +136,10 @@ class customContext(commands.Context):
 
     async def confirm(self, message, target, *, delete_after=True):
         view = self.Confirm(target)
-        await self.send(message, view=view)
+        msg = await self.send(message, view=view)
         await view.wait()
+        if delete_after:
+            await msg.delete()
         return view.value
 
 
