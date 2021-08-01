@@ -71,7 +71,7 @@ I would be more than happy to talk to you.
 
 ### Requirements to contribute
 - [ ] It must be written in Python
-- [ ] It must be able to run on `python 3.9.5` and `discord.py 1.7.3`
+- [ ] It must be able to run on `python 3.9.5` and `discord.py 2.0.0-alpha`
 
 
 
