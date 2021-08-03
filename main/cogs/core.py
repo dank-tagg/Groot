@@ -24,14 +24,14 @@ class Core(commands.Cog):
         )
         em.set_footer(text="Please report this error in our support server if it persists.")
         await ctx.send(embed=em)
-    
+
     async def handle_error(self, ctx: customContext, exc_info: dict):
         traceback = exc_info['error'].replace('``', '`\u200b`')
 
         paginator = commands.Paginator(prefix='```py')
         for line in traceback.split('\n'):
             paginator.add_line(line)
-        
+
         await self.bot.log_channel.send(f"**Command:** {ctx.message.content}\n" \
                                         f"**Message ID:** `{ctx.message.id}`\n" \
                                         f"**Author:** `{ctx.author}`\n" \
@@ -41,7 +41,7 @@ class Core(commands.Cog):
         )
         for page in paginator.pages:
             await self.bot.log_channel.send(page)
-        
+
         await self.send_error(ctx, exc_info)
 
 
@@ -56,7 +56,7 @@ class Core(commands.Cog):
 
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
-            
+
             if isinstance(error, discord.errors.Forbidden):
                 try:
                     return await ctx.reply(
@@ -102,6 +102,15 @@ class Core(commands.Cog):
             return
 
         elif isinstance(error, commands.BadArgument):
+            # If it is flag related
+            if isinstance(error, commands.TooManyFlags):
+                await ctx.reply(f'The flag `{error.flag.name}` has received {len(error.values)} arguments, but expected {error.flag.max_args}.')
+                return
+            # Everything else (MissingRequiredFlag ...)
+            elif isinstance(error, commands.FlagError):
+                await ctx.send_help(ctx.command)
+                return
+
             await ctx.reply(str(error))
             return
 
@@ -136,7 +145,7 @@ class Core(commands.Cog):
         elif isinstance(error, commands.CheckFailure):
             await ctx.send("You do not have permissions to use this command!")
             return
-        
+
 
 
         # Catch uncaught errors
@@ -147,7 +156,7 @@ class Core(commands.Cog):
         }
 
         await self.handle_error(ctx, exc_info)
-    
+
     @commands.Cog.listener()
     async def on_message(self, message):
         if re.fullmatch("<@(!)?812395879146717214>", message.content):
@@ -190,7 +199,7 @@ class Core(commands.Cog):
 
         for item in self.cache:
             query_user_data = """
-                              INSERT INTO users_data (user_id, commands_ran) 
+                              INSERT INTO users_data (user_id, commands_ran)
                               VALUES ((?), ?)
                               ON CONFLICT(user_id) DO UPDATE SET commands_ran = commands_ran+?
                               """
@@ -201,8 +210,8 @@ class Core(commands.Cog):
 
         for item in self.cache_usage:
             query = """
-                    INSERT INTO usage (command, counter) 
-                    VALUES ((?), ?) 
+                    INSERT INTO usage (command, counter)
+                    VALUES ((?), ?)
                     ON CONFLICT(command) DO UPDATE SET counter = counter+?
                     """
 

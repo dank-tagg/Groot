@@ -37,7 +37,7 @@ class Viewer(discord.ui.View):
     def __init__(self, embed):
         super().__init__(timeout=None)
         self.em = embed
-    
+
     @discord.ui.button(label='⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ACCEPT⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀', style=discord.ButtonStyle.green)
     async def confirm(self, button: discord.ui.Button, interaction: discord.Interaction):
         await interaction.response.send_message('https://i.giphy.com/media/Ju7l5y9osyymQ/giphy.webp', ephemeral=True)
@@ -45,13 +45,13 @@ class Viewer(discord.ui.View):
         button.style = discord.ButtonStyle.grey
         button.disabled = True
         button.label = "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Claimed⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
-        
+
         await interaction.message.edit(embed=self.em, view=self)
 
 class buttonforrickroll(discord.ui.Button):
     def __init__(self):
         super().__init__(label="\u200b", style=discord.ButtonStyle.grey)
-    
+
     async def callback(self, interaction):
         assert self.view is not None
         view = self.view
@@ -170,28 +170,28 @@ class TicTacToe(discord.ui.View):
             return self.Tie
 
         return None
-                
+
 class Commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+
     @commands.command()
     async def reload(self, ctx):
         self.bot.reload_extension("commands")
         await ctx.send("yo done. im cool.")
-    
+
     @commands.command()
     async def nitro(self, ctx):
-        
+
         em = discord.Embed(title="A WILD GIFT APPEARS!", color=0x2F3136).set_thumbnail(url="https://i.imgur.com/w9aiD6F.png")
         em.description = "**Nitro**\nExpires in 48 hours."
         view = Viewer(em)
         await ctx.send(embed=em, view=view)
-    
+
     @commands.command()
     async def test(self, ctx):
         await ctx.send("Only you can see it nab", ephemeral=True)
-    
+
     @commands.command()
     async def ttt(self, ctx):
         await ctx.send('Tic Tac Toe: X goes first', view=TicTacToe())
@@ -268,11 +268,12 @@ class Commands(commands.Cog):
                 cookie_embed.description = f"{user.mention} got the cookie in **{total_second}**"
                 await cd_cookie.remove_reaction("\U0001F36A", ctx.guild.me)
                 return await cd_cookie.edit(embed=cookie_embed)
-    
+
 
     @commands.command(name='rps')
     async def _eee_(self, ctx, *, flags: PosixLikeFlags):
         await ctx.send(flags.member.name)
-        
+
 def setup(bot):
     bot.add_cog(Commands(bot))
+

@@ -16,7 +16,7 @@ class GrootHelp(commands.HelpCommand):
     def get_doc(command):
         _help = command.help or "This command has no description"
         return _help
-    
+
     def get_command_help(self, command) -> Embed:
         # Base
         em = Embed(
@@ -29,7 +29,7 @@ class GrootHelp(commands.HelpCommand):
 
         default_cooldown = cooldown.default_mapping._cooldown.per
         altered_cooldown = cooldown.altered_mapping._cooldown.per
-        
+
         em.add_field(
             name="Cooldowns",
             value=f"Default: `{default_cooldown}s`\nPremium: `{altered_cooldown}s`",
@@ -37,8 +37,8 @@ class GrootHelp(commands.HelpCommand):
 
         #Aliases
         em.add_field(
-            name="Aliases", 
-            value=f"```{', '.join(command.aliases) or 'No aliases'}```", 
+            name="Aliases",
+            value=f"```{', '.join(command.aliases) or 'No aliases'}```",
             inline=False
         )
 
@@ -49,14 +49,14 @@ class GrootHelp(commands.HelpCommand):
         all_subs = [
             f"{sub.name}{f' {sub.signature}' or ''}" for sub in command.walk_commands()
         ]
-        
+
         em.add_field(
-            name="Subcommands", 
+            name="Subcommands",
             value='```\n' + '\n'.join(all_subs) + '```'
         )
 
         return em
-        
+
     async def handle_help(self, command: commands):
         return await self.context.send(embed=self.get_command_help(command))
 
@@ -66,7 +66,7 @@ class GrootHelp(commands.HelpCommand):
 
 
         em = Embed(description=
-            f"My prefixes for **{ctx.guild.name}** are `{', '.join(await bot.get_prefix(ctx.message) or ['g.'])}`\n"
+            f"My prefixes for **{ctx.guild.name}** are `{await bot.get_prefix(ctx.message)}`\n"
             f"Total commands: {len(list(bot.walk_commands()))} | Usable by you: {len(await self.filter_commands(list(bot.walk_commands()), sort=True))} \n"
             "```diff\n- [] = optional argument\n"
             "- <> = required argument\n"
@@ -79,7 +79,7 @@ class GrootHelp(commands.HelpCommand):
         )
 
         em.set_author(
-            name=ctx.author, 
+            name=ctx.author,
             icon_url=ctx.author.avatar.url
         )
         # Categories
@@ -98,12 +98,12 @@ class GrootHelp(commands.HelpCommand):
         news = config['updates']
         date = datetime.strptime(news['date'], "%Y-%m-%d %H:%M:%S.%f")
         date, link, message = date.strftime("%d %B, %Y"), news['link'], news['message']
-        
+
         def shorten(message):
             if len(message) > 275:
                 message = message[:275] + f'... [read more]({link})'
             return message
-        
+
         em.add_field(
             name=f"📰 Latest News - {date}",
             value=f"{shorten(message)}"
@@ -125,7 +125,7 @@ class GrootHelp(commands.HelpCommand):
         em.set_author(name=cog.__cog_name__)
         channel = self.get_destination()
         await channel.send(embed=em)
-    
+
     async def send_category_help(self, category):
         to_find = category.lower().title()
         categories = self.context.bot.categories.copy()
@@ -134,16 +134,16 @@ class GrootHelp(commands.HelpCommand):
             categories.pop("Unlisted")
 
         if to_find not in categories: return None
-        
+
         category = self.context.bot.get_category(to_find)
         commands = [f"`{command.name}`" for command in category.get_commands()]
-        
+
         em = Embed(description=' '.join(commands))
         em.set_author(name=f"{to_find} [{len(commands)}]")
         channel = self.get_destination()
         msg = await channel.send(embed=em)
         return msg
-    
+
     # Error handlers
     async def command_not_found(self, command):
         if command.lower() == "all":
@@ -157,16 +157,16 @@ class GrootHelp(commands.HelpCommand):
 
         if res:
             return None
-            
+
         return f"No command/category called `{command}` found."
-            
-    
+
+
     async def send_error_message(self, error):
         if error is None:
             return
         channel = self.get_destination()
         await channel.send(error)
-            
+
 
 class Help(commands.Cog):
     def __init__(self, bot):
@@ -174,6 +174,6 @@ class Help(commands.Cog):
         help_command = GrootHelp()
         help_command.cog = self
         bot.help_command = help_command
-    
+
 def setup(bot):
     bot.add_cog(Help(bot), cat_name="Information")

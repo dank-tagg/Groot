@@ -160,7 +160,7 @@ class Docs(commands.Cog):
         await ctx.reply(embed=e)
 
 
-    class RTFMFlags(commands.FlagConverter, prefix='--', delimiter=' '):
+    class RTFMFlags(commands.FlagConverter, prefix='-', delimiter=' '):
         entity: str = commands.Flag(aliases='e', default='latest', max_args=1)
 
     @commands.group(aliases=['rtfd'], invoke_without_command=True)
@@ -171,7 +171,7 @@ class Docs(commands.Cog):
         a cruddy fuzzy algorithm.
 
         Command flags:
-        `--entity|e <master|latest|python> (defaults to latest)`
+        `-entity|e <master|latest|python> (defaults to latest)`
         """
         await self.do_rtfm(ctx, flags.entity, obj)
 

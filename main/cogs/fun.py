@@ -40,7 +40,7 @@ class Fun(commands.Cog, description="Fun commands"):
                     "You got to give me a number... game ended due to inactivity"
                 )
                 return
-            
+
             if not response.content.isdigit():
                 if 2 - i == 0:
                     await ctx.send(
@@ -58,7 +58,7 @@ class Fun(commands.Cog, description="Fun commands"):
                     "That is not a valid number! It costed you one attempt..."
                 )
                 continue
-            
+
             if guess != no and 2 - i == 0:
                 await ctx.send(
                     f"Unlucky, you ran out of attempts. The number was **{no}**"
@@ -347,7 +347,7 @@ class Fun(commands.Cog, description="Fun commands"):
 
         content = textwrap.fill(data['content'], width=75)
         await ctx.send(f"**{content}**\n\n—{data['author']}")
-    
+
     @commands.command()
     async def urban(self, ctx: customContext, *, term: str):
         """
@@ -362,10 +362,10 @@ class Fun(commands.Cog, description="Fun commands"):
         if not data['list']:
             await ctx.send(f'No results were found for term `{term}`. Try again with a different word.')
             return
-        
+
         menu = menus.MenuPages(source=UrbanSource(data['list']), timeout=30, delete_message_after=True)
         await menu.start(ctx)
-    
+
     @commands.command()
     async def echo(self, ctx: customContext, *, to_say: str):
         """Repeat something you give it to say."""

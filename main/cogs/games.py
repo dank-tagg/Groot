@@ -734,7 +734,7 @@ class Games(commands.Cog):
         await self.start_game(game)
 
 
-    class RPSFlags(commands.FlagConverter, prefix='--', delimiter=' '):
+    class RPSFlags(commands.FlagConverter, prefix='-', delimiter=' '):
         mode: str = commands.Flag(aliases='m', default='single', max_args=1)
 
     @commands.command(aliases=['rps'])
@@ -743,7 +743,7 @@ class Games(commands.Cog):
     async def rockpaperscissors(self, ctx: customContext, opponent: Optional[discord.Member], *, flags: RPSFlags):
         opponent = opponent or self.bot.user
         if opponent == ctx.author:
-            raise commands.BadArgument(f'Opponent can not be yourself. If you want to play with the bot, use the flag\n`--mode single`')
+            raise commands.BadArgument(f'Opponent can not be yourself. If you want to play with the bot, use the flag\n`-mode single`')
 
         if not opponent.bot:
             confirmation = await ctx.confirm(f'**{opponent.name}**, do you want to play Rock Paper Scissors with {ctx.author.name}?', opponent)

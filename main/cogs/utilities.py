@@ -5,15 +5,19 @@ import datetime
 import random
 import discord
 import json
-import unicodedata
 import io
 import re
+import unicodedata
+import matplotlib
+matplotlib.use('Agg')
 
 from discord.ext import commands
 from typing import Union
-from utils.useful import Embed
+from utils.chat_formatting import hyperlink
+from utils.useful import Embed, run_in_executor
 from cogs.image import get_bytes
 from discord.utils import _URL_REGEX
+from matplotlib import pyplot as plt
 
 class Utilities(commands.Cog, description="Handy dandy utils"):
     def __init__(self, bot):
@@ -27,12 +31,12 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         message = after
         if message.author.bot:
             return
-        
+
         try:
             cache = self.esnipe_cache[message.channel.id]
         except KeyError:
             cache = self.esnipe_cache[message.channel.id] = []
-        
+
         data = {"author": before.author, "before_content": before.content, "after_content": message.content, "message_obj": message}
         cache.append(data)
         await asyncio.sleep(300)
@@ -46,7 +50,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             cache = self.snipe_cache[message.channel.id]
         except KeyError:
             cache = self.snipe_cache[message.channel.id] = []
-        
+
         cache.append(message)
 
         await asyncio.sleep(300)
@@ -136,7 +140,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         member = member if member else ctx.author
         guild = ctx.guild
         status = member.raw_status
-        
+
         def format_dt(dt: datetime.datetime, style=None):
             if style is None:
                 return f'<t:{int(dt.timestamp())}>'
@@ -207,7 +211,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
 
         if not message:
             message = getattr(ctx.message.reference, "resolved", None)
-        
+
         if not message:
             raise commands.BadArgument(f"{self.bot.icons['redTick']} | You must either reply to a message, or pass in a message ID/jump url")
 
@@ -232,7 +236,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             await ctx.send(f"\\{arg.mention}", allowed_mentions=discord.AllowedMentions(users=False))
         else:
             await ctx.send(f"\\<:{arg.name}:{arg.id}>")
-    
+
     @commands.command(name="embed")
     async def _send_embed(self, ctx: customContext, *, embed: str):
         """
@@ -241,12 +245,12 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         """
         em = discord.Embed.from_dict(json.loads(embed))
         await ctx.send(embed=em)
-    
+
 
     # AFK command related things.
     def is_afk(self, user_id) -> bool:
         return user_id in self.bot.cache['afk_users']
-    
+
     def get_afk(self, user_id) -> dict:
         return self.bot.cache['afk_users'][user_id]
 
@@ -258,7 +262,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         if self.is_afk(message.author.id):
             del self.bot.cache['afk_users'][message.author.id]
             return await message.channel.send(f"Welcome back {message.author.name}! I've removed your **AFK** status.")
-        
+
         mentions = [member.id for member in message.mentions]
         for mention in mentions:
             if self.is_afk(mention):
@@ -274,7 +278,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         """
         if self.is_afk(ctx.author.id):
             del self.bot.cache['afk_users'][ctx.author.id]
-        
+
         await ctx.reply(f"{self.bot.icons['greenTick']} **{ctx.author.name}** is now AFK: {reason}")
 
         await asyncio.sleep(3)
@@ -304,7 +308,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         You must have the `manage_emojis` permission to use this.
         """
         await ctx.send_help(ctx.command)
-    
+
     @emoji.command(name='add', aliases=['create'])
     async def emoji_add(self, ctx: customContext, name:str, *, image: Optional[Union[discord.Emoji, discord.PartialEmoji, discord.Member, str]]):
         """
@@ -317,7 +321,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         except (KeyError, discord.HTTPException):
             await ctx.send_help(ctx.command)
             return
-        
+
         await ctx.send(f'Created {emoji} with name `{emoji.name}`')
 
     @emoji.command(name='delete', aliases=['remove'])
@@ -335,7 +339,7 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         """
         await emoji.edit(name=name)
         await ctx.send(f'Renamed {emoji} from `{emoji.name}` to `{name}`.')
-    
+
     @commands.command(aliases=['ss'])
     @commands.is_nsfw()
     async def screenshot(self, ctx: customContext, *, url: str):
@@ -361,15 +365,116 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
 
         if not message:
             message = getattr(ctx.message.reference, "resolved", None)
-        
+
         if not message:
             raise commands.BadArgument(f"{self.bot.icons['redTick']} | You must either reply to a message, or pass in a message ID/jump url")
 
         data = await self.bot.http.get_message(message.channel.id, message.id)
         raw = json.dumps(data, indent=4)
-        
+
         byt = io.BytesIO(raw.encode('utf-8'))
         await ctx.reply(file=discord.File(byt, 'raw.json'))
+
+    # Poll related things
+    class PollFlags(commands.FlagConverter, prefix='-', delimiter=''):
+        title: str = commands.Flag(aliases=['question', 't'], max_args=1)
+        option: str = commands.Flag(aliases=['op'], max_args=25)
+
+    class PollSelect(discord.ui.Select):
+        def __init__(self, title: str, options: List[str]):
+            self.title = title
+
+            self.answers = {}
+            super().__init__(placeholder='Choose one of the following', min_values=1, max_values=1, options=[discord.SelectOption(label=option) for option in options])
+
+
+        async def callback(self, interaction: discord.Interaction):
+            self.answers[interaction.user.id] = self.values[0]
+
+    class PollView(discord.ui.View):
+        def __init__(self, title: str, options: List[str]):
+            super().__init__()
+            self.add_item(Utilities.PollSelect(title, options))
+
+        def get_answers(self) -> dict:
+            return self.children[0].answers
+
+    class PollFinishView(discord.ui.View):
+        def __init__(self, results: List[tuple]):
+            self.results = results # (percentage, option)
+            super().__init__(timeout=30)
+
+        @run_in_executor
+        def make_pie(self):
+            labels = [tup[1] for tup in self.results]
+            sizes = [tup[0] for tup in self.results]
+
+            _, ax = plt.subplots()
+            colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
+            patches, *_ = ax.pie(sizes, colors=colors, startangle=90)
+            plt.legend(patches, labels, loc="best")
+            ax.axis('equal')
+            plt.tight_layout()
+
+            buffer = io.BytesIO()
+            plt.savefig(buffer, format='png', transparent=True)
+            buffer.seek(0)
+            plt.close()
+            return discord.File(buffer, 'piechart.png')
+
+        @discord.ui.button(emoji='<:trashcan:822050746333003776>')
+        async def delete(self, button: discord.Button, interaction: discord.Interaction):
+            await interaction.message.delete()
+
+        @discord.ui.button(label='Pie Chart')
+        async def send_pie(self, button: discord.Button, interaction: discord.Interaction):
+            file = await self.make_pie()
+            em = Embed(title='Here\'s the pie chart')
+            em.set_image(url='attachment://piechart.png')
+            await interaction.channel.send(embed=em, file=file)
+
+
+    @commands.command()
+    async def poll(self, ctx: customContext, *, flags: PollFlags):
+        """
+        Sends a poll with the title given and options given by the command flags.
+        Options are limited to 25, and title to 1.
+        Click the stop button to end the poll. The user must be the poll author.
+
+        Command flags:
+        `-title|question|t <title>`
+        `-option|op <option>`
+        """
+        view = self.PollView(flags.title, flags.option)
+        msg = await ctx.send(f'{ctx.author.mention}: {flags.title}', view=view)
+        await msg.add_reaction('⏹️')
+        await asyncio.sleep(1)
+
+        def check(reaction, user):
+            checks = [
+                reaction.message.id == msg.id,
+                str(reaction) == '⏹️',
+                user == ctx.author
+            ]
+            return all(checks)
+
+        _, _ = await self.bot.wait_for('reaction_add', check=check)
+        view.stop()
+
+        em = Embed(title='Poll results', description=f'The {hyperlink("poll", msg.jump_url)} has ended! Here are the results.')
+        em.add_field(
+            name='Answers',
+            value='\n'.join([f'User {self.bot.get_user(user).mention} answered with **{answer}**' for user, answer in view.get_answers().items()])
+        )
+
+        percentage = lambda option: len([x for x in view.get_answers().values() if x == option])/len(view.get_answers().values()) * 100
+        em.add_field(
+            name='Statistics',
+            value=f'Question: {flags.title}\n\n' + '\n'.join([f'`{percentage(option):.2f}%` answered with **{option}**' for option in flags.option if int(percentage(option)) != 0]),
+            inline=False
+        )
+        await ctx.send(embed=em, view=self.PollFinishView(results=[(percentage(option), option) for option in flags.option if int(percentage(option)) != 0]))
+
 
 def setup(bot):
     bot.add_cog(Utilities(bot), cat_name="Utilities")

@@ -1,6 +1,7 @@
 from utils._type import *
 
 import asyncio
+import ast
 import aiosqlite
 import discord
 import textwrap
@@ -59,7 +60,7 @@ class Timer:
         self.id = record['id']
         self.author = record['author']
 
-        extra = eval(record['extra'])
+        extra = ast.literal_eval(record['extra'])
         self.args = extra.get('args', [])
         self.kwargs = extra.get('kwargs', {})
         self.event = record['event']
@@ -215,7 +216,7 @@ class Reminders(commands.Cog):
             e.set_footer(text=f'{len(records)} reminder{"s" if len(records) > 1 else ""}')
 
         for _id, expires, extra in records:
-            message = eval(extra)['args'][1]
+            message = ast.literal_eval(extra)['args'][1]
             shorten = textwrap.shorten(message, width=512)
             date = datetime.strptime(expires, '%Y-%m-%d %H:%M:%S.%f%z')
             e.add_field(name=f'{_id}: <t:{int(date.timestamp())}:R>', value=shorten, inline=False)
