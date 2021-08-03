@@ -46,11 +46,11 @@ from discord.ext import commands
 class aNewCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+
     @commands.command(name="Thank", aliases=["You"])
     async def hello(self, ctx):
         await ctx.send(f"Hello {ctx.author.mention}")
-    
+
 def setup(bot):
     bot.add_cog(aNewCog(bot))
 
@@ -71,7 +71,7 @@ I would be more than happy to talk to you.
 
 ### Requirements to contribute
 - [ ] It must be written in Python
-- [ ] It must be able to run on `python 3.9.5` and `discord.py 2.0.0-alpha`
+- [ ] It must be able to run on `python 3.9.6` and `discord.py 2.0.0-alpha`
 
 
 
