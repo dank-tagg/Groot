@@ -107,7 +107,7 @@ class customContext(commands.Context):
 
     async def reply(self, content=None, mention_author=False, **kwargs):
         mention = self.author.id in self.bot.cache['mentions_are_on']
-        await super().reply(content, mention_author=mention, **kwargs)
+        return await super().reply(content, mention_author=mention, **kwargs)
 
     class Confirm(discord.ui.View):
         def __init__(self, to_confirm: discord.Member):
