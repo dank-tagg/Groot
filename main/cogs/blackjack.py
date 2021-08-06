@@ -151,7 +151,7 @@ class Blackjack(commands.Cog):
             [
                 link(
                     f"**`{self.get_icon(card['suit'])} {card['face']}`** ",
-                    discord.utils.oauth_url(812395879146717214),
+                    'https://grootdiscordbot.xyz/invite',
                 )
                 for card in cards["user_cards"]
             ]
@@ -159,7 +159,7 @@ class Blackjack(commands.Cog):
         bot_cards_visual = [
             link(
                 f"**`{self.get_icon(card['suit'])} {card['face']}`** ",
-                discord.utils.oauth_url(812395879146717214),
+                'https://grootdiscordbot.xyz/invite',
             )
             for card in cards["bot_cards"]
         ]
@@ -186,7 +186,7 @@ class Blackjack(commands.Cog):
             [
                 link(
                     f"**`{self.get_icon(card['suit'])} {card['face']}`** ",
-                    discord.utils.oauth_url(812395879146717214),
+                    'https://grootdiscordbot.xyz/invite',
                 )
                 for card in cards["user_cards"]
             ]
@@ -195,7 +195,7 @@ class Blackjack(commands.Cog):
             [
                 link(
                     f"**`{self.get_icon(card['suit'])} {card['face']}`** ",
-                    discord.utils.oauth_url(812395879146717214),
+                    'https://grootdiscordbot.xyz/invite',
                 )
                 for card in cards["bot_cards"]
             ]

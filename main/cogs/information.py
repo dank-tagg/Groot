@@ -1,6 +1,5 @@
 from utils._type import *
 
-import datetime
 import time
 import discord
 import humanize
@@ -24,7 +23,7 @@ class Information(commands.Cog):
     def format_commit(self, commit):
         short, _, _ = commit.message.partition('\n')
         short_sha2 = commit.hex[0:6]
-        
+
         # [`hash`](url) message (offset)
         return f'[`{short_sha2}`](https://github.com/dank-tagg/Groot/commit/{commit.hex}) \\{short} (<t:{commit.commit_time}:R>)'
 
@@ -70,7 +69,7 @@ class Information(commands.Cog):
                 super().__init__()
                 self.add_item(discord.ui.Button(label='top.gg', url='https://top.gg/bot/812395879146717214/vote'))
                 self.add_item(discord.ui.Button(label='discordbotlist.com', url='https://discordbotlist.com/bots/groot/upvote'))
-        
+
         await ctx.send(embed=em, view=VoteView())
 
     @commands.command(name="invite", aliases=["support"], brief="Sends an invite for the bot.")
@@ -91,9 +90,9 @@ class Information(commands.Cog):
         class InviteView(discord.ui.View):
             def __init__(self):
                 super().__init__()
-                self.add_item(discord.ui.Button(label='Invite Groot!', url=discord.utils.oauth_url(812395879146717214)))
+                self.add_item(discord.ui.Button(label='Invite Groot!', url='https://grootdiscordbot.xyz/invite'))
                 self.add_item(discord.ui.Button(label='Support Server', url='https://discord.gg/nUUJPgemFE'))
-        
+
         await ctx.send(embed=em, view=InviteView())
 
 
@@ -139,7 +138,7 @@ class Information(commands.Cog):
                 super().__init__()
                 self.ctx = ctx
                 self.add_item(discord.ui.Button(label='Source URL', url=final_url))
-            
+
             @discord.ui.button(emoji='<:trashcan:822050746333003776>')
             async def delete(self, button: discord.ui.Button, interaction: discord.Interaction):
                 with contextlib.suppress(discord.HTTPException):
@@ -151,7 +150,7 @@ class Information(commands.Cog):
                 if interaction.user != self.ctx.author:
                     await interaction.response.send_message('Oops. This is not your interaction.', ephemeral=True)
                     return
-                
+
                 await interaction.channel.send(file=discord.File(io.BytesIO(textwrap.dedent(''.join(lines)).encode('ascii')), 'source.py'))
                 button.disabled = True
                 await interaction.response.edit_message(view=self)
@@ -173,7 +172,7 @@ class Information(commands.Cog):
             title="Invite me to your server!",
             url="https://grootdiscordbot.xyz/invite",
             description="Groot is a simple yet feature-rich discord bot.\nFeaturing over 150 commands, the best discord bot you could ask for!\n" +
-                        f"Made by [`{self.bot.get_user(396805720353275924)}`](https://discord.com/users/396805720353275924) with \💖\n" + 
+                        f"Made by [`{self.bot.get_user(396805720353275924)}`](https://discord.com/users/396805720353275924) with \💖\n" +
                         f"{hyperlink('Website', 'https://grootdiscordbot.xyz')} | {hyperlink('Source', 'https://github.com/dank-tagg/Groot')} | {hyperlink('Vote', 'https://top.gg/bot/812395879146717214/vote')}",
             color=0x3CA374
         )

@@ -68,7 +68,7 @@ async def stats():
 # Shortcuts
 @app.route("/invite")
 async def invite():
-    return redirect("https://discord.com/oauth2/authorize?client_id=812395879146717214&scope=bot")
+    return redirect("https://discord.com/api/oauth2/authorize?client_id=812395879146717214&permissions=0&redirect_uri=https%3A%2F%2Fwww.grootdiscordbot.xyz%2F&scope=applications.commands%20bot")
 
 @app.route("/vote")
 async def vote():

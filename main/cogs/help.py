@@ -74,7 +74,7 @@ class GrootHelp(commands.HelpCommand):
             "more help on a specific category or command!```"
             "[Support](<https://discord.gg/nUUJPgemFE>) | "
             "[Vote](https://top.gg/bot/812395879146717214/vote) | "
-            f"[Invite]({discord.utils.oauth_url(812395879146717214)}) | "
+            f"[Invite](https://grootdiscordbot.xyz/invite) | "
             "[Website](https://grootdiscordbot.xyz)"
         )
 
