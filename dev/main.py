@@ -1,16 +1,16 @@
 import sys
 sys.dont_write_bytecode = True
-
+import configparser
 import os
 import discord
 from discord.ext import commands
 from os import environ
-from dotenv import load_dotenv
 
 environ["JISHAKU_NO_UNDERSCORE"] = "True"
 environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
 
-load_dotenv("../main/config/secrets.env")
+config = configparser.ConfigParser()
+config.read(f'/home/dank-tagg/Groot/main/config/config.ini')
 
 async def get_prefix(bot, message):
     if message.author.id == 396805720353275924:
@@ -40,4 +40,4 @@ for cog in cogs:
     ext = "cogs." if cog != "jishaku" else ""
     bot.load_extension(f"{ext}{cog}")
 
-bot.run(environ["main"])
+bot.run(config.get('Groot', 'token'))

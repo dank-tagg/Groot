@@ -7,6 +7,7 @@ import logging
 import aiohttp
 import aiosqlite
 import discord
+import configparser
 
 from pathlib import Path
 from ext.category import Category
@@ -25,7 +26,7 @@ class GrootBot(commands.Bot):
         self.icons = {}
         self.colors = {}
         self.non_sync = ["music", "core", "rtfm"]
-        self.token = kwargs.pop("token", None)
+        self.token = self.config.get('Groot', 'token')
         self.session = aiohttp.ClientSession()
         self.maintenance = False
         self.cache = CacheManager()
@@ -33,7 +34,6 @@ class GrootBot(commands.Bot):
             self, host="0.0.0.0", secret_key="GrootBotAdmin"
         )
         self.categories = {}
-        self.config = dict(os.environ)
         self.testers = [396805720353275924]
 
     async def after_db(self):
@@ -67,6 +67,12 @@ class GrootBot(commands.Bot):
     def log_channel(self):
         """Gets the error channel for the bot to log."""
         return self.owner
+
+    @property
+    def config(self):
+        config = configparser.ConfigParser()
+        config.read(f'{self.cwd}/config/config.ini')
+        return config
 
     @to_call.append
     def loading_emojis(self):
