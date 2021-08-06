@@ -20,7 +20,7 @@ from utils.useful import Embed, MemberConvert, RoleConvert, get_frozen
 
 
 class Moderation(commands.Cog, description="Moderation commands"):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @commands.command(name="kick", brief="Kicks a member")
@@ -136,13 +136,13 @@ class Moderation(commands.Cog, description="Moderation commands"):
     async def reactions(self, ctx: customContext, search=100):
         """Removes messages that have a reaction"""
         await self.do_removal(ctx, search, lambda e: len(e.reactions))
-    
+
     @purge.command(name='all')
     async def _remove_all(self, ctx: customContext, search=100):
         """Removes all messages except for the pinned ones."""
         await self.do_removal(ctx, search, lambda e: not e.pinned)
 
-    
+
     @commands.command()
     async def cleanup(self, ctx: customContext):
         """

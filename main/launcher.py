@@ -3,7 +3,7 @@ import discord
 sys.dont_write_bytecode = True
 
 from os import environ
-from bot import GrootBot
+from utils._type import *
 
 environ["JISHAKU_NO_UNDERSCORE"] = "True"
 environ["JISHAKU_NO_DM_TRACEBACK"] = "True"

@@ -1,5 +1,3 @@
-from utils._type import *
-
 import wavelink
 import textwrap
 import asyncio
@@ -7,9 +5,10 @@ import functools
 import re
 import sys
 import traceback
-import aiohttp
 import discord
 
+from utils._type import customContext
+from typing import *
 from datetime import datetime
 from discord.ext import commands, menus
 from discord.ext.menus import First, Last
@@ -81,7 +80,6 @@ class ListCall(list):
         return asyncio.gather(
             *(maybe_coroutine(func, *args, **kwargs) for func in self)
         )
-
 
 class Embed(discord.Embed):
     def __init__(self, color=0x2F3136, fields=(), field_inline=False, **kwargs):
@@ -184,14 +182,14 @@ def event_check(func):
     return check
 
 def run_in_executor(func: Callable):
-    
+
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
         """Asynchrous function that wraps a sync function with an executor"""
         loop = asyncio.get_event_loop()
         to_run = functools.partial(func, *args, **kwargs)
         return await loop.run_in_executor(None, to_run)
-    
+
     return wrapper
 
 def call(func, *args, exception=Exception, ret=False, **kwargs):

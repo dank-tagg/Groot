@@ -220,7 +220,7 @@ class TicTacToe(Game):
 
 class Battleship(Game):
     class Board:
-        def __init__(self, bot, owner: discord.Member, hidden=False, board=None):
+        def __init__(self, bot: GrootBot, owner: discord.Member, hidden=False, board=None):
             # If it is a hidden board it inherits the grid from the given board
             self.bot = bot
 
@@ -649,7 +649,7 @@ class RockPaperSciccors(Game):
 
 
 class Games(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         self.active_games: List[Game] = []
 

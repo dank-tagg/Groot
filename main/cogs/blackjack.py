@@ -10,7 +10,7 @@ from utils.useful import Cooldown, Embed
 
 
 class Blackjack(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         self.faces = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
         self.values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]

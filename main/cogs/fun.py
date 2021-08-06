@@ -13,7 +13,7 @@ from utils.paginations import UrbanSource
 
 
 class Fun(commands.Cog, description="Fun commands"):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @commands.command(

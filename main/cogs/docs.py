@@ -43,7 +43,7 @@ class SphinxObjectFileReader:
                 pos = buf.find(b'\n')
 
 class Docs(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     def parse_object_inv(self, stream, url):

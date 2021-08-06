@@ -8,7 +8,7 @@ from utils.useful import Embed
 
 
 class Support(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @commands.command(name="report")
@@ -66,8 +66,8 @@ class Support(commands.Cog):
                 raise commands.BadArgument(
                     "`60s` are over. I ended your report session, since you didn't answer fast enough. Next time please be quicker."
                 )
-    
-    
+
+
     @commands.command(name="suggest")
     async def _suggest_feature(self, ctx: customContext, *, suggestion):
         """Used to suggest a feature for Groot."""

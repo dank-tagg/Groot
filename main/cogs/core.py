@@ -11,7 +11,7 @@ from utils.useful import Embed, Cooldown
 from cogs.games import GameExit
 
 class Core(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         self.cache = {}
         self.cache_usage = {}
@@ -156,6 +156,7 @@ class Core(commands.Cog):
         }
 
         await self.handle_error(ctx, exc_info)
+        self.bot.logger.exception(exc_info['error'])
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -168,6 +169,7 @@ class Core(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
+        self.bot.logger.info(f'Joined guild {guild.name}')
         query_a = "INSERT INTO guilds VALUES (?)"
         await self.bot.db.execute(query_a, (guild.id,))
         query_b = "INSERT INTO guild_config (guild_id) VALUES (?)"
@@ -175,6 +177,7 @@ class Core(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
+        self.bot.logger.info(f'Left guild {guild.name}')
         query_c = "DELETE FROM guilds WHERE guild_id = ?"
         await self.bot.db.execute(query_c, (guild.id,))
 

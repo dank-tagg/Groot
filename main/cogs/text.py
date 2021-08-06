@@ -7,9 +7,9 @@ import random
 from discord.ext import commands
 
 class Text(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
-    
+
     @commands.command()
     async def post(self, ctx: customContext):
         """
@@ -18,7 +18,7 @@ class Text(commands.Cog):
         if not ctx.message.attachments:
             await ctx.reply('No attachments were supplied to post.')
             return
-        
+
         target = ctx.message.attachments[0]
         extension = target.filename.split('.')[1]
         text = (await target.read()).decode('ascii')
@@ -43,7 +43,7 @@ class Text(commands.Cog):
             "/": ":heavy_division_sign:",
             "#": ":hash:"
         }
-        
+
         numbers = [':zero:',':one:',':two:',':three:',':four:', ':five:',':six:',':seven:',':eight:',':nine:']
 
         new = ""
@@ -55,31 +55,31 @@ class Text(commands.Cog):
             else:
                 new += special_chars.get(char, char)
         await ctx.send(new)
-    
+
     @commands.command()
     async def clap(self, ctx: customContext, *, text: str):
         """
         Returns a text with 👏 in between.
         """
         await ctx.send(text.replace('', ' 👏 '))
-    
+
     @commands.command(usage='[text]')
     async def codeblock(self, ctx: customContext, *, text: str):
         """
         Posts a piece of text in codeblock.
         """
         await ctx.send(f'```\n{text}```')
-    
+
     @commands.command()
     async def rawtext(self, ctx: customContext, *, text: str):
         escape_markdown = discord.utils.escape_markdown(text)
         escape_mentions = discord.utils.escape_mentions(escape_markdown.replace('<', '\\<'))
         await ctx.send(escape_mentions)
-    
+
     @commands.command()
     async def spoiler(self, ctx: customContext, *, text: str):
         await ctx.send(''.join(f'||{c}||' for c in text))
-    
+
     @commands.command()
     async def lenny(self, ctx: customContext):
         lenny = random.choice([
@@ -88,7 +88,7 @@ class Text(commands.Cog):
             "ヽ༼ຈل͜ຈ༽ﾉ"
         ])
         await ctx.send(lenny)
-    
+
     @commands.command()
     async def reversecase(self, ctx: customContext, *, text: str):
         transform = lambda e: [e.lower(), e.upper()][e.islower()]
@@ -97,12 +97,12 @@ class Text(commands.Cog):
     @commands.command()
     async def charcount(self, ctx: customContext, *, text: str):
         await ctx.reply(f'Your text is `{len(text)}` characters long.')
-    
+
     @commands.command()
     async def wordcount(self, ctx: customContext, *, text: str):
         await ctx.reply(f'Your text is `{len(text.split(" "))}` words long.')
-    
-    
+
+
 
 def setup(bot):
     bot.add_cog(Text(bot))

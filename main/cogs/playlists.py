@@ -20,7 +20,7 @@ class Playlist:
         self.id = kwargs['id']
         self.length = kwargs['length']
         self.songs = kwargs['songs'] # In tuples (song_name, url, song_id)
-    
+
     async def play(self, ctx: customContext, wavelink, player, requester, **kwargs):
         amt_of_songs = kwargs['songs']
         msg = await ctx.reply(f"<a:loading:856978168476205066> | `(0/{amt_of_songs})` Queueing songs... please be patient.\n_This might take a while_")
@@ -41,8 +41,8 @@ class Playlist:
         await msg.edit(content=f"<:greenTick:814504388139155477> | `({loaded_songs}/{amt_of_songs})` Queued songs! Now playing...")
         await asyncio.sleep(0.5)
         await player.play_next()
-        
-    
+
+
     async def remove_song(self, db, song_id):
         songs = [tup[2] for tup in self.songs]
         if song_id not in songs:
@@ -62,9 +62,9 @@ async def get_playlist(db, playlist_id: int):
                     FROM playlists
                     WHERE playlists.playlist_id = ?
                 )
-            FROM playlist_songs 
+            FROM playlist_songs
             WHERE playlist_id = (
-                SELECT playlist_id FROM playlists 
+                SELECT playlist_id FROM playlists
                 WHERE playlist_id = ?
             )
             """
@@ -81,12 +81,12 @@ async def get_playlist(db, playlist_id: int):
         "songs": [(name, url, song_id) for name, url, song_id, _ in data]
     }
     return Playlist(**playlist_info)
-    
+
 
 class Playlists(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
-    
+
         # Playlists -
     async def is_playlistOwner(self, user_id, playlist):
         query = "SELECT user_id FROM playlists WHERE playlist_id = ?"
@@ -95,7 +95,7 @@ class Playlists(commands.Cog):
         if not owner:
             return None
         return user_id == owner[0]
-    
+
     async def new_id(self):
         query = "SELECT playlist_id FROM playlists ORDER BY playlist_id DESC"
         cur = await self.bot.db.execute(query)
@@ -107,15 +107,15 @@ class Playlists(commands.Cog):
         cur = await self.bot.db.execute(query)
         _id = await cur.fetchone()
         return (0 if not _id else _id[0]) + 1
-    
- 
+
+
     @commands.group(invoke_without_command=True, case_insensitive=True)
     async def playlist(self, ctx: customContext):
         """Shows the user's playlists."""
         query = """
-                SELECT playlist_name, playlist_id, 
+                SELECT playlist_name, playlist_id,
                 (
-                    SELECT Count(*) 
+                    SELECT Count(*)
                     FROM playlist_songs
                     WHERE playlist_songs.playlist_id = playlists.playlist_id
                 )
@@ -124,7 +124,7 @@ class Playlists(commands.Cog):
                 """
         cur = await self.bot.db.execute(query, (ctx.author.id, ))
         playlists = await cur.fetchall()
-        
+
         formatted = [f"{i+1}. Playlist **{playlist[0]}** with `ID {playlist[1]}` and `{playlist[2]}` songs" for i, playlist in enumerate(playlists)]
         em = Embed(
             description="\n".join(formatted)
@@ -132,7 +132,7 @@ class Playlists(commands.Cog):
         em.set_author(name=f"{ctx.author.name}'s playlists [{len(formatted)}/5]", icon_url=ctx.author.avatar.url)
 
         await ctx.reply(embed=em)
-    
+
     @playlist.command(name="info", usage="<id> [page]")
     async def _playlist_info(self, ctx: customContext, playlist_id: int):
         """Shows information about a playlist."""
@@ -144,7 +144,7 @@ class Playlists(commands.Cog):
         entries = [f"`ID {tup[2]}`. [{get_title(tup[0])}]({tup[1]})" for tup in playlist.songs]
         menu = menus.MenuPages(paginations.PlaylistSource(entries, playlist))
         await menu.start(ctx)
-    
+
     @playlist.command(name="create", usage="<name>")
     @commands.check(Cooldown(1, 60, 1, 30, commands.BucketType.user))
     async def _playlist_create(self, ctx: customContext, *, name):
@@ -155,11 +155,11 @@ class Playlists(commands.Cog):
 
         if number_of_playlists[0] == 5:
             return await ctx.reply(f"{self.bot.icons['redTick']} | You only can have up to 5 playlists")
-        
+
         query = "INSERT INTO playlists VALUES (?, ?, ?)"
         _id = await self.new_id()
         cur = await self.bot.db.execute(query, (ctx.author.id, name, _id))
-        
+
         await ctx.reply(f"{self.bot.icons['greenTick']} | Created playlist **{name}** with `ID {_id}`")
 
     @playlist.command(name="delete", aliases=["del"], usage="<id>")
@@ -186,12 +186,12 @@ class Playlists(commands.Cog):
         query.strip('<>')
         if not URL_REG.match(query):
             query = f'ytsearch:{query}'
-        
+
         tracks = await self.bot.wavelink.get_tracks(query)
-        
+
         if not tracks:
             return await ctx.reply(f"{self.bot.icons['redTick']} | The provided song was invalid. Try again with a different URL.")
-        
+
         if isinstance(tracks, wavelink.TrackPlaylist):
             return await ctx.reply(f"{self.bot.icons['redTick']} | You can not add a playlist to a playlist...")
         else:
@@ -202,8 +202,8 @@ class Playlists(commands.Cog):
                     """
             await self.bot.db.execute(query, (playlist_id, track.title, track.uri, await self.new_song_id()))
             await ctx.reply(f"{self.bot.icons['plus']} | Added the song **{track.title}** to playlist with `ID {playlist_id}`.\nSong url: <{track.uri}>")
-        
-    
+
+
     @playlist.command(name="removesong", aliases=["rmsong", "rmsongs"], usage="<playlist ID> <song ID/song IDs>")
     async def _playlist_removesong(self, ctx: customContext, playlist_id:int, *songs):
         """Removes a song from a playlist."""
@@ -213,12 +213,12 @@ class Playlists(commands.Cog):
             return await ctx.reply(f"{self.bot.icons['redTick']} | You do not own this playlist.")
         elif check is None:
             return await ctx.reply(f"{self.bot.icons['redTick']} | This playlist doesn't seem to exist.")
-        
+
         playlist = await get_playlist(self.bot.db, playlist_id)
 
         if not playlist:
             return await ctx.reply(f"{self.bot.icons['redTick']} | No playlist data was found with `ID {playlist_id}` (Empty or does not exist)")
-        
+
         affected_rows = 0
         fails = []
         for song_id in songs:
@@ -235,7 +235,7 @@ class Playlists(commands.Cog):
             await ctx.reply(f"{self.bot.icons['redTick']} | The song(s) with `ID {', '.join(fails)}` does not belong to the playlist you supplied. Deleted **{affected_rows}** songs.")
         else:
             await ctx.reply(f"{self.bot.icons['minus']} | Deleted **{affected_rows}** songs in total.")
-    
+
     @playlist.command(name="play", usage="<playlist ID>")
     @commands.check(Cooldown(1, 60, 1, 30, commands.BucketType.user))
     async def _playlist_play(self, ctx: customContext, playlist_id: int):
@@ -244,12 +244,12 @@ class Playlists(commands.Cog):
             return await ctx.reply(f"{self.bot.icons['redTick']} | You do not own this playlist.")
         elif check is None:
             return await ctx.reply(f"{self.bot.icons['redTick']} | This playlist doesn't seem to exist.")
-        
+
         player = self.bot.get_cog("Music").get_player(ctx)
 
         if not player.is_connected:
             await ctx.invoke(self.bot.get_cog("Music")._connect, invoked_from=ctx.command)
-        
+
         playlist = await get_playlist(self.bot.db, playlist_id)
         await playlist.play(ctx, self.bot.wavelink, self.bot.get_cog("Music").get_player(ctx), requester=ctx.author, songs=playlist.length)
 

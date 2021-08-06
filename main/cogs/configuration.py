@@ -8,7 +8,7 @@ from utils.useful import RoleConvert, Cooldown
 
 
 class Configuration(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @commands.command(name="tips", usage="<on|off>", brief="Toggles tips on or off")
@@ -34,7 +34,7 @@ class Configuration(commands.Cog):
         return await ctx.send(
             f"{self.bot.icons['greenTick']} Toggled your tips to `{mode.upper()}`"
         )
-    
+
     @commands.command(usage='<on|off>')
     @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def mentions(self, ctx: customContext, *, mode: str):
@@ -192,7 +192,7 @@ class Configuration(commands.Cog):
         if m.content.lower() != 'yes':
             await ctx.send("Ok... your data won't be deleted.")
             return
-        
+
         await ctx.send(f"⚠️⚠️⚠️ Are you **REALLY** sure you want to remove **ALL** your data?⚠️⚠️⚠️\n_Respond with `yes` or `no`_")
         m = await self.bot.wait_for('message', check=lambda m: m.author == ctx.author)
         if m.content.lower() != 'yes':
@@ -200,7 +200,7 @@ class Configuration(commands.Cog):
             return
         # Removed currency.
         await ctx.send(f"{self.bot.greenTick} Removed all your data")
-        
+
 
 def setup(bot):
     bot.add_cog(Configuration(bot), cat_name="Configuration")

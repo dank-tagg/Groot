@@ -17,7 +17,7 @@ from utils.useful import Embed
 
 
 class Information(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     def format_commit(self, commit):

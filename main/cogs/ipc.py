@@ -8,14 +8,14 @@ from discord.ext import commands, ipc
 
 
 class Ipc(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @ipc.server.route()
     async def get_member_count(self, data):
         guild = self.bot.get_guild(data.guild_id)
         return guild.member_count
-    
+
     @ipc.server.route()
     async def get_stats(self, data):
         stats = {
@@ -25,7 +25,7 @@ class Ipc(commands.Cog):
             "uptime": humanize.precisedelta(discord.utils.utcnow() - self.bot.launch_time, format='%.0f')
         }
         return stats
-    
+
 
     # Events
     @ipc.server.route()

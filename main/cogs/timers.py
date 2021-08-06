@@ -93,7 +93,7 @@ class Timer:
         return cls(record=pseudo)
 
 class Reminders(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         self._have_data = asyncio.Event(loop=bot.loop)
         self._current_timer = None

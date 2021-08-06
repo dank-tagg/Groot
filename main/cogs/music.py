@@ -54,11 +54,11 @@ class Player(wavelink.Player):
         self.skip_votes = set()
         self.stop_votes = set()
         self.shuffle_votes = set()
-    
+
     async def play_next(self):
         if self.is_playing or self.waiting or self.loading:
             return
-        
+
         self.skip_votes.clear()
         self.stop_votes.clear()
         self.shuffle_votes.clear()
@@ -68,7 +68,7 @@ class Player(wavelink.Player):
             await self.play(track)
             self.waiting = False
             return
-        
+
         try:
             self.waiting = True
             with async_timeout.timeout(300):
@@ -76,14 +76,14 @@ class Player(wavelink.Player):
         except asyncio.TimeoutError:
             self.waiting = False
             return await self.teardown()
-        
+
         await self.play(track)
         await self.send_embed()
-        
+
         self.previous = track
         self.waiting = False
         self.looping = False
-    
+
     async def stop(self):
         """Custom stop method"""
         self.looping = False
@@ -102,7 +102,7 @@ class Player(wavelink.Player):
         )
 
         fields = {
-            "Author": (track.author, True), 
+            "Author": (track.author, True),
             "Duration": (convert(int(track.length)), True),
             "Looping": (f"{self.ctx.bot.icons['greenTick'] if self.looping else self.ctx.bot.icons['redTick']}", True),
             "Requested by": (track.requester.mention, True),
@@ -111,7 +111,7 @@ class Player(wavelink.Player):
         }
         for k, v in fields.items():
             em.add_field(name=k, value=v[0], inline=True)
-        
+
         em.set_thumbnail(url=track.thumb)
         em.set_footer(text=f"Queue index: 1/{self.queue.qsize()+1}", icon_url=track.requester.avatar.url)
         await self.ctx.reply(content=f"Now playing: **{track.title}**", embed=em)
@@ -122,28 +122,28 @@ class Player(wavelink.Player):
             await self.destroy()
         except KeyError:
             pass
-    
+
     def update_context(self, ctx: customContext):
         self.ctx = ctx
 
 class Music(commands.Cog, wavelink.WavelinkMixin):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
         if not hasattr(bot, 'wavelink'):
             self.bot.wavelink = wavelink.Client(bot=bot)
-        
+
         self.bot.loop.create_task(self.start_nodes())
-    
+
     async def start_nodes(self):
         await self.bot.wait_until_ready()
-        
+
         if self.bot.wavelink.nodes:
             previous = self.bot.wavelink.nodes.copy()
 
             for node in previous.values():
                 await node.destroy()
-        
+
         created = False
         node_num = 1
 
@@ -160,7 +160,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             except wavelink.errors.NodeOccupied:
                 node_num += 1
                 created = True
-    
+
     def required(self, ctx: customContext):
         """Method which returns required votes based on amount of members in a channel."""
         player = self.get_player(ctx)
@@ -172,12 +172,12 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
                 required = 2
 
         return required
-    
+
     def get_player(self, ctx: customContext):
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
         player.update_context(ctx)
         return player
-    
+
     def is_privileged(self, ctx: customContext):
         player = self.get_player(ctx)
         return ctx.author in [player.dj, getattr(player.current, "requester", None)] or ctx.author.guild_permissions.kick_members
@@ -241,19 +241,19 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         channel = getattr(ctx.author.voice, "channel", channel)
         if not channel:
             raise commands.BadArgument(f"{self.bot.icons['redTick']} | No channel to join. Either join one, or specify a valid channel to join.")
-        
+
         if channel == getattr(ctx.guild.me.voice, "channel", False):
             raise commands.BadArgument(f"{self.bot.icons['redTick']} | Already connected to {channel.mention} !")
 
         if not invoked_from:
             await ctx.reply(f"{self.bot.icons['greenTick']} | Connected to {channel.mention}")
         await player.connect(channel.id)
-    
+
     @commands.command(name='disconnect')
     async def _disconnect(self, ctx: customContext):
         """Disconnects from a voice channel if the bot was in one."""
         player = self.get_player(ctx)
-        
+
         if self.is_privileged(ctx):
             await ctx.reply(f"{self.bot.icons['greenTick']} | The song requester/DJ ({ctx.author.mention}) has disconnected the bot.")
             player.stop_votes.clear()
@@ -269,29 +269,29 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_connected:
             await ctx.invoke(self._connect, invoked_from=ctx.command)
-        
+
         query = query.strip('<>')
         if not URL_REG.match(query):
             query = f'ytsearch:{query}'
-        
+
         tracks = await self.bot.wavelink.get_tracks(query)
         if not tracks:
             raise commands.BadArgument(f"{self.bot.icons['redTick']} | No song was found with the given query. Try again.")
-        
+
         if isinstance(tracks, wavelink.TrackPlaylist):
             for track in tracks.tracks:
                 track = Track(track.id, track.info, requester=ctx.author)
                 await player.queue.put(track)
-            
+
             await ctx.reply(f"{self.bot.icons['plus']} | Added the playlist {tracks.data['playlistInfo']['name']} to the queue.")
         else:
             track = Track(tracks[0].id, tracks[0].info, requester=ctx.author)
             await ctx.reply(f"{self.bot.icons['plus']} | Added the song **{track.title}** to the queue.")
             await player.queue.put(track)
-        
+
         if not player.is_playing:
             await player.play_next()
-    
+
     @commands.command(name="loop")
     @commands.check(Cooldown(1, 10, 1, 3, commands.BucketType.user))
     async def _loop(self, ctx: customContext):
@@ -304,23 +304,23 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         else:
             player.looping = True
             message = f"Looping **{player.current.title}**..."
-        
+
         return await ctx.reply(f"{self.bot.icons['greenTick']} | {message}")
-        
+
     @commands.command(name="skip", aliases=["next"])
     async def _skip(self, ctx: customContext):
         """Skips the current song"""
         player = self.get_player(ctx)
-        
+
 
         if not player.is_connected:
             raise commands.BadArgument(f"{self.bot.icons['redTick']} | No song is playing.")
-        
+
         if self.is_privileged(ctx):
             await ctx.reply(f"{self.bot.icons['greenTick']} | The song requester/DJ ({ctx.author.mention}) has skipped the song.")
             player.skip_votes.clear()
             return await player.stop()
-        
+
         required = self.required(ctx)
         player.skip_votes.add(ctx.author)
         if (votes := len(player.skip_votes)) >= required:
@@ -334,15 +334,15 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     async def _stop(self, ctx: customContext):
         """Stops the current player"""
         player = self.get_player(ctx)
-        
+
         if not player.is_connected:
             return
-        
+
         if self.is_privileged(ctx):
             await ctx.reply(f"{self.bot.icons['greenTick']} | The song requester/DJ ({ctx.author.mention}) has stopped the player.")
             player.stop_votes.clear()
             return await player.teardown()
-        
+
         required = self.required(ctx)
         player.stop_votes.add(ctx.author)
 
@@ -364,12 +364,12 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if player.queue.qsize() == 0:
             await ctx.reply(f"{self.bot.icons['redTick']} | No more songs in the queue. Add some songs to the queue and try again.")
             return
-        
+
 
         entries = [f"**{i+1}**. [{track.title}]({track.uri}) | `{convert(int(track.length))}`" for i, track in enumerate(player.queue._queue, start=1)]
         menu = menus.MenuPages(paginations.QueueSource(entries, player))
         await menu.start(ctx)
-    
+
     @queue.command(name="remove")
     async def _remove(self, ctx: customContext, position: int):
         """Removes a song from the queue by it's position."""
@@ -379,7 +379,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             return
 
         size = player.queue.qsize() + 1
-        
+
         if position > size or position == 1:
             raise commands.BadArgument(f"{self.bot.icons['redTick']} | The given song number to remove must be inside the queue (and not the current playing one).")
 
@@ -387,7 +387,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         del player.queue._queue[position-2]
         await ctx.reply(f"{self.bot.icons['minus']} | Removed **{position}. {track.title}** from the queue.")
 
-    
+
     @commands.command(name="volume")
     async def _volume(self, ctx: customContext, volume: int):
         """Changes the volume"""
@@ -398,10 +398,10 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not self.is_privileged(ctx):
             return await ctx.reply(f"{self.bot.icons['redTick']} | Only the requester or the DJ can change volume value.")
-        
+
         if not 0 < volume < 101:
             return await ctx.reply(f"{self.bot.icons['redTick']} | The volume value must be in between 0 and 100")
-        
+
         await player.set_volume(volume)
         await ctx.reply(f"{self.bot.icons['greenTick']} | Changed volume to {volume}%")
 
@@ -412,7 +412,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_connected:
             raise commands.BadArgument(f"{self.bot.icons['redTick']} | No song is playing.")
-        
+
         if player.queue.qsize() < 3:
             return await ctx.reply(f"{self.bot.icons['redTick']} | Add more songs to the queue first before shuffling.")
 
@@ -429,7 +429,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await ctx.reply(f"{self.bot.icons['greenTick']} | Shuffled playlist.")
         else:
             await ctx.reply(f'{ctx.author.mention} has voted to shuffle the playlist. (`{votes}/{required}`)')
-    
+
     @commands.command(name="nowplaying", aliases=["np", "current"])
     async def _nowplaying(self, ctx: customContext):
         """Shows the current playing song"""
@@ -437,7 +437,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_connected:
             raise commands.BadArgument(f"{self.bot.icons['redTick']} | No song is playing.")
-        
+
         await player.send_embed()
 
     @commands.command(aliases=['eq'], usage="<flat|boost|metal|piano>")
@@ -447,7 +447,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_connected:
             raise commands.BadArgument(f"{self.bot.icons['redTick']} | No song is playing.")
-        
+
         if not self.is_privileged(ctx):
             return await ctx.reply(f"{self.bot.icons['redTick']} | Only privileged members (DJ/requester) can change the equalizer.")
 
@@ -477,7 +477,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not self.is_privileged(ctx):
             return await ctx.reply(f"{self.bot.icons['redTick']} | Only admins and the DJ may use this command.")
-        
+
         channel = self.bot.get_channel(int(player.channel_id))
         members = channel.members
 

@@ -5,6 +5,7 @@ import functools
 import time
 
 from discord.ext import commands
+from utils.useful import Embed
 from discord.types.interactions import (
     ApplicationCommandInteractionDataOption as CommandOption
 )
@@ -16,8 +17,6 @@ class SlashMeta(commands.Command):
         self.slash = True
         self.beta = kwargs.get('beta')
         super().__init__(func, **kwargs)
-
-
 
 SlashCommand = functools.partial(commands.command, cls=SlashMeta)
 
@@ -68,7 +67,7 @@ PRIVATE_URL = 'https://discord.com/api/v8/applications/{app}/guilds/{guild}/comm
 
 class Slash(commands.Cog):
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         self.bot.loop.create_task(self.ready_commands())
 
@@ -141,9 +140,26 @@ class Slash(commands.Cog):
             f"{self.bot.icons['typing']} ** | Typing**: {round(typing_ping, 1)} ms\n{self.bot.icons['groot']} ** | Websocket**: {round(self.bot.latency*1000)} ms\n{self.bot.icons['database']} ** | Database**: {round(sql_ping, 1)} ms"
         )
 
-    @SlashCommand(beta=True)
-    async def test(self, ctx: customContext):
-        await ctx.interaction.response.send_message('hello')
+    @SlashCommand()
+    async def meme(self, ctx: customContext):
+        """Shows a meme from r/memes."""
+        res = await self.bot.session.get("https://www.reddit.com/r/memes/random/.json")
+        data = await res.json()
+
+        image = data[0]["data"]["children"][0]["data"]["url"]
+        permalink = data[0]["data"]["children"][0]["data"]["permalink"]
+        url = f"https://reddit.com{permalink}"
+        title = data[0]["data"]["children"][0]["data"]["title"]
+        ups = data[0]["data"]["children"][0]["data"]["ups"]
+        downs = data[0]["data"]["children"][0]["data"]["downs"]
+        comments = data[0]["data"]["children"][0]["data"]["num_comments"]
+
+        em = Embed(colour=discord.Color.blurple(), title=title, url=url)
+        em.set_image(url=image)
+        em.set_footer(text=f"👍 {ups} 👎 {downs} 💬 {comments}")
+
+        await ctx.interaction.response.send_message(embed=em)
+
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction):

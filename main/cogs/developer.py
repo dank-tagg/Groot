@@ -23,7 +23,7 @@ async def show_result(self, menu, entry):
 class Developer(commands.Cog):
     """dev-only commands that make the bot dynamic."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     # Rerun edited messages
@@ -62,7 +62,8 @@ class Developer(commands.Cog):
     @commands.group(invoke_without_command=True, case_insensitive=True)
     async def dev(self, ctx: customContext):
         """It literally returns and does nothing."""
-        return
+        if ctx.invoked_with is None:
+            await ctx.send_help(ctx.command)
 
     @dev.command(name="update")
     async def _update(self, ctx: customContext, link: str, *, message: str):
@@ -89,7 +90,7 @@ class Developer(commands.Cog):
         f = io.StringIO()
         with contextlib.redirect_stdout(f):
             await jsk(ctx, argument=code)
-        
+
         stdout = f.getvalue()
         if stdout:
             await ctx.send(f"```ps\n[stdout] {stdout}```")
@@ -116,7 +117,7 @@ class Developer(commands.Cog):
 
     @dev.command(name="sync")
     async def _sync(self, ctx: customContext):
-        '''"Syncs" the bot by reloading all the cogs.'''
+        """'Syncs' the bot by reloading all the cogs and pulling from GitHub"""
 
         text = await self.git(arguments="pull")
         fail = ""
@@ -168,7 +169,7 @@ class Developer(commands.Cog):
     @dev.command(name="reload")
     async def _reload_ext(self, ctx: customContext, *, to_search: str):
         """Reloads a cog."""
-        
+
         all_cogs = [cog.lower() for cog in self.bot.cogs]
         try:
             ext = fuzzy.finder(to_search, all_cogs, lazy=False)[0]

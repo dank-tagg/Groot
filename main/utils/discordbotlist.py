@@ -3,7 +3,7 @@ from utils._type import *
 import aiohttp
 
 class Client:
-    def __init__(self, bot, token):
+    def __init__(self, bot: GrootBot, token):
         self.auth = {"Authorization": token}
         self.bot = bot
         self.api = "https://discordbotlist.com/api/v1"

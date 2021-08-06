@@ -169,7 +169,7 @@ class GrootHelp(commands.HelpCommand):
 
 
 class Help(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         help_command = GrootHelp()
         help_command.cog = self

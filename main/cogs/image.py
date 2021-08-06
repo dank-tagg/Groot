@@ -20,13 +20,13 @@ async def get_bytes(ctx: customContext, image: Union[discord.Emoji, discord.Part
             digit = f'{ord(image):x}'
             url = f'https://twemoji.maxcdn.com/v/latest/72x72/{digit}.png'
         else:
-            raise commands.BadArgument('Invalid image link provided. Try again with a different image.')    
+            raise commands.BadArgument('Invalid image link provided. Try again with a different image.')
     elif isinstance(image, discord.Member):
         url = image.avatar.replace(format="png", size=1024).url
-    
+
     elif isinstance(image, discord.Emoji) or isinstance(image, discord.PartialEmoji):
         url = image.url
-    
+
     elif image is None:
         if attachments := ctx.message.attachments:
             url = attachments[0].url
@@ -52,7 +52,7 @@ def edit_image(byte: bytes, method: str, args: tuple = (), kwargs: dict = {}) ->
 ImageConvert = Optional[Union[discord.Emoji, discord.PartialEmoji, discord.Member, str]]
 
 class Image(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @commands.command(name='flip', help = "Flips a member's profile picture.")
@@ -61,7 +61,7 @@ class Image(commands.Cog):
         async with ctx.processing(ctx, delete_after=True) as process:
             byt = await get_bytes(ctx, obj, self.bot.session)
             res = await edit_image(byt, method='flipv')
-        
+
         em = Embed(title=f'{ctx.command.name.title()} command took {process.time*1000:0.2f} ms')
         em.set_image(url=f'attachment://{ctx.command.name}.png')
         await ctx.send(embed=em, file=discord.File(res, filename=f'{ctx.command.name}.png'))
@@ -72,7 +72,7 @@ class Image(commands.Cog):
         async with ctx.processing(ctx, delete_after=True) as process:
             byt = await get_bytes(ctx, obj, self.bot.session)
             res = await edit_image(byt, method='apply_gradient')
-        
+
         em = Embed(title=f'{ctx.command.name.title()} command took {process.time*1000:0.2f} ms')
         em.set_image(url=f'attachment://{ctx.command.name}.png')
         await ctx.send(embed=em, file=discord.File(res, filename=f'{ctx.command.name}.png'))
@@ -83,7 +83,7 @@ class Image(commands.Cog):
         async with ctx.processing(ctx, delete_after=True) as process:
             byt = await get_bytes(ctx, obj, self.bot.session)
             res = await edit_image(byt, method='fliph')
-        
+
         em = Embed(title=f'{ctx.command.name.title()} command took {process.time*1000:0.2f} ms')
         em.set_image(url=f'attachment://{ctx.command.name}.png')
         await ctx.send(embed=em, file=discord.File(res, filename=f'{ctx.command.name}.png'))
@@ -94,7 +94,7 @@ class Image(commands.Cog):
         async with ctx.processing(ctx, delete_after=True) as process:
             byt = await get_bytes(ctx, obj, self.bot.session)
             res = await edit_image(byt, method='box_blur')
-        
+
         em = Embed(title=f'{ctx.command.name.title()} command took {process.time*1000:0.2f} ms')
         em.set_image(url=f'attachment://{ctx.command.name}.png')
         await ctx.send(embed=em, file=discord.File(res, filename=f'{ctx.command.name}.png'))
@@ -105,7 +105,7 @@ class Image(commands.Cog):
         async with ctx.processing(ctx, delete_after=True) as process:
             byt = await get_bytes(ctx, obj, self.bot.session)
             res = await edit_image(byt, method='invert')
-        
+
         em = Embed(title=f'{ctx.command.name.title()} command took {process.time*1000:0.2f} ms')
         em.set_image(url=f'attachment://{ctx.command.name}.png')
         await ctx.send(embed=em, file=discord.File(res, filename=f'{ctx.command.name}.png'))
@@ -115,11 +115,11 @@ class Image(commands.Cog):
     async def _resize(self, ctx: customContext, height: int, width: int, obj: ImageConvert):
         if width > 1000 or height > 1000:
             return await ctx.send("The dimensions can't be over 1000 pixels")
-        
+
         async with ctx.processing(ctx, delete_after=True) as process:
             byt = await get_bytes(ctx, obj, self.bot.session)
             res = await edit_image(byt, method='resize', args=(width,height,1))
-        
+
         em = Embed(title=f'{ctx.command.name.title()} command took {process.time*1000:0.2f} ms')
         em.set_image(url=f'attachment://{ctx.command.name}.png')
         await ctx.send(embed=em, file=discord.File(res, filename=f'{ctx.command.name}.png'))

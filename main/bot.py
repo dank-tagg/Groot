@@ -12,8 +12,8 @@ import configparser
 from pathlib import Path
 from ext.category import Category
 from discord.ext import commands, ipc
-from utils.cache import CacheManager
 from utils.context import customContext
+from utils.cache import CacheManager
 from utils.useful import (Cooldown, ListCall, call,
                           print_exception)
 from utils.json import read_json

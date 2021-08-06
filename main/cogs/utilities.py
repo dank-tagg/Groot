@@ -20,7 +20,7 @@ from discord.utils import _URL_REGEX
 from matplotlib import pyplot as plt
 
 class Utilities(commands.Cog, description="Handy dandy utils"):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
         self.index = 0
         self.snipe_cache = {}

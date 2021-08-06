@@ -8,7 +8,7 @@ from discord.ext import commands
 
 
 class Tags(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GrootBot):
         self.bot = bot
 
     @commands.group(invoke_without_command=True, case_insensitive=True)
