@@ -1,8 +1,15 @@
+# .sqlite files
 *.sqlite3
 *.sqlite3-journal
+
+# config files
 *.env
-*.log
-*.pyc
-*.json
+config.*
 .git-credentials
 *.ini
+
+# logs
+*.log
+
+# bytecode
+*.pyc

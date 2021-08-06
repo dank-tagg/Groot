@@ -1,0 +1,30 @@
+{
+    "apps":[
+       {
+          "name":"Groot",
+          "cwd":"/home/dank-tagg/Groot/main",
+          "script":"/home/dank-tagg/Groot/main/launcher.py",
+          "args": "-B",
+          "interpreter":"/home/dank-tagg/env/bin/python"
+       },
+       {
+          "name":"GrootDev",
+          "cwd":"/home/dank-tagg/Groot/dev",
+          "script":"/home/dank-tagg/Groot/dev/main.py",
+          "args": "-B",
+          "interpreter":"/home/dank-tagg/env/bin/python"
+       },
+       {
+          "name":"GrootWeb",
+          "cwd":"/home/dank-tagg/Groot/website",
+          "script":"/home/dank-tagg/Groot/website/app.py",
+          "args": "-B",
+          "interpreter":"/home/dank-tagg/env/bin/python"
+       },
+       {
+          "name":"Lavalink",
+          "cwd":"/home/dank-tagg/Lavalink",
+          "script":"java -jar Lavalink.jar"
+       }
+    ]
+}
