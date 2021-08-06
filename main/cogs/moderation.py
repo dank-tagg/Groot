@@ -539,35 +539,5 @@ class Moderation(commands.Cog, description="Moderation commands"):
         menu.add_pages([em, emb, emb1])
         await menu.open()
 
-    @role.command(name="create", usage="<name> <color> [...]")
-    @commands.has_permissions(manage_roles=True)
-    async def _create(self, ctx: customContext, name: str, color, hoist=False, mentionable=False):
-        """
-        **Optional Parameters:**
-        __hoist__ (`bool`) – Indicates if the role should be shown separately in the member list. Defaults to `False`
-
-        __mentionable__ (`bool`) – Indicates if the role should be mentionable by others. Defaults to `False`
-
-        **Full example:** `role create RoleName #FFEEFF True False`
-        """
-        color = await ColourConverter().convert(ctx, color)
-        role = await ctx.guild.create_role(
-            name=name, color=color, permissions=0, hoist=hoist, mentionable=mentionable
-        )
-        em = Embed(
-            colour=role.color,
-            description=f"{role.mention}\nID - `{role.id}`\n"
-            f"Color: {role.color}\n"
-            "**Created at:** {}\n".format(
-                role.created_at.strftime("%a, %b %d, %Y %H:%M %p")
-            )
-            + f"**Members**: {len(role.members)} | **Position**: {role.position}\n",
-        )
-        em.add_field(name="Role mentionable", value="Yes" if role.mentionable else "No")
-        em.set_author(name=f"Created role {role.name}")
-        em.set_footer(text="Basic Info")
-        await ctx.reply(embed=em)
-
-
 def setup(bot):
     bot.add_cog(Moderation(bot), cat_name="Moderation")
