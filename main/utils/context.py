@@ -63,6 +63,7 @@ class Processing:
 class customContext(commands.Context):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.interaction: discord.Interaction = None
         self.processing = Processing
 
     @property

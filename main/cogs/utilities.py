@@ -431,6 +431,8 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
             file = await self.make_pie()
             em = Embed(title='Here\'s the pie chart')
             em.set_image(url='attachment://piechart.png')
+            button.disabled = True
+            await interaction.response.edit_message(view=self)
             await interaction.channel.send(embed=em, file=file)
 
 
@@ -445,6 +447,10 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         `-title|question|t <title>`
         `-option|op <option>`
         """
+
+        if any(flags.option.count(option) > 1 for option in flags.option):
+            raise commands.BadArgument('The specified options can not have the same values.')
+
         view = self.PollView(flags.title, flags.option)
         msg = await ctx.send(f'{ctx.author.mention}: {flags.title}', view=view)
         await msg.add_reaction('⏹️')
@@ -475,6 +481,15 @@ class Utilities(commands.Cog, description="Handy dandy utils"):
         )
         await ctx.send(embed=em, view=self.PollFinishView(results=[(percentage(option), option) for option in flags.option if int(percentage(option)) != 0]))
 
+
+    @commands.command(aliases=['ezpoll'])
+    async def quickpoll(self, ctx: customContext, *, question: str):
+        """Sends a simple yes/no poll"""
+        em = Embed(description=question)
+        em.set_author(name=f'{ctx.author.display_name} asks', icon_url=ctx.author.avatar.url)
+        msg = await ctx.send(embed=em)
+        for emote in ['👍', '👎']:
+            await msg.add_reaction(emote)
 
 def setup(bot):
     bot.add_cog(Utilities(bot), cat_name="Utilities")

@@ -16,7 +16,7 @@ class Moderator(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
 
-    class ModFlags(commands.FlagConverter, prefix='--', delimiter=' '):
+    class ModFlags(commands.FlagConverter, prefix='-', delimiter=' '):
         mode: str = commands.Flag(default='add')
 
     @mod.command(name="blacklist", hidden=True, aliases=["bl", "poo"])
