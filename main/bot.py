@@ -1,18 +1,16 @@
-import datetime
 import itertools
 import logging
 import operator
 import os
 import re
-from pathlib import Path
-
+import logging
 import aiohttp
 import aiosqlite
 import discord
 
+from pathlib import Path
 from ext.category import Category
 from discord.ext import commands, ipc
-
 from utils.cache import CacheManager
 from utils.context import customContext
 from utils.useful import (Cooldown, ListCall, call,
@@ -20,7 +18,6 @@ from utils.useful import (Cooldown, ListCall, call,
 from utils.json import read_json
 
 to_call = ListCall()
-
 
 class GrootBot(commands.Bot):
     def __init__(self, **kwargs):
@@ -45,7 +42,10 @@ class GrootBot(commands.Bot):
 
     def add_command(self, command):
         """Overwrite add_command to add a default cooldown to every command"""
+        if getattr(command, 'slash', False):
+            command.name += '_slashCommand'
         super().add_command(command)
+
         command.cooldown_after_parsing = True
 
         if (
@@ -99,6 +99,33 @@ class GrootBot(commands.Bot):
         }
         self.colors = colors
         return self.colors
+
+    @to_call.append
+    def setup_logging(self):
+        # Set up BOT logging
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.DEBUG)
+
+        handler = logging.FileHandler(filename=f"{self.cwd}/config/logs/bot.log", encoding='utf-8')
+        formatter = logging.Formatter(
+            fmt='[{asctime}] {levelname:<10} | {name:<10}: {message}',
+            datefmt="%d-%b-%y %H:%M:%S",
+            style="{",
+        )
+
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        self.logger = logger
+
+        # Change discord's logging to WARNING and the handler
+        logger = logging.getLogger('discord')
+        logger.setLevel(logging.WARNING)
+
+        handler = logging.FileHandler(filename=f"{self.cwd}/config/logs/discord.log", encoding='utf-8')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+        return self.logger
 
     @to_call.append
     def loading_cogs(self):
@@ -246,12 +273,12 @@ class GrootBot(commands.Bot):
             try:
                 self.ipc.start()
             except Exception as e:
-                logging.warning("Couldn't connect to IPC:", e)
+                self.logger.exception("Couldn't connect to IPC:", e)
             self.run(self.token)
 
     # Events
     async def on_ready(self):
-        logging.warning(f"Logged in as {self.user}, SQLite3 database initialized.")
+        self.logger.info(f"Logged in as {self.user}, SQLite3 database initialized.")
         print(f"Logged in as {self.user}")
 
         # Edit restart message
@@ -262,4 +289,4 @@ class GrootBot(commands.Bot):
             await msg.edit(content=f"Back online {self.owner.mention}!")
 
     async def on_ipc_error(self, endpoint, error):
-        logging.warning(f"{endpoint} raised {error}")
+        self.logger.error(f"{endpoint} raised {error}")
