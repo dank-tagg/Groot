@@ -61,8 +61,8 @@ class Developer(commands.Cog):
 
     @commands.group(invoke_without_command=True, case_insensitive=True)
     async def dev(self, ctx: customContext):
-        """It literally returns and does nothing."""
-        if ctx.invoked_with is None:
+        """Group name for developer related commands."""
+        if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
 
     @dev.command(name="update")
@@ -93,7 +93,7 @@ class Developer(commands.Cog):
 
         stdout = f.getvalue()
         if stdout:
-            await ctx.send(f"```ps\n[stdout] {stdout}```")
+            await ctx.send(f"```py\n{stdout}```")
 
     @dev.command(name="inviteme")
     async def _inviteme(self, ctx: customContext, *, guildid: int):
@@ -165,6 +165,13 @@ class Developer(commands.Cog):
                 await ctx.send(
                     f"Oops, an exception occured while handling an exception. Error was send here: {str(paste)}"
                 )
+
+    @dev.command()
+    async def logs(self, ctx: customContext, *, log='bot'):
+        with open(f'{self.bot.cwd}/config/logs/{log}.log', 'r', encoding='utf-8') as f:
+            content = f.read()
+        file = discord.File(io.BytesIO(content.encode('utf-8')), f'{log}.log')
+        await ctx.send(file=file)
 
     @dev.command(name="reload")
     async def _reload_ext(self, ctx: customContext, *, to_search: str):
