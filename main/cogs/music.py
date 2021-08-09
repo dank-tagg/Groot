@@ -153,7 +153,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
                     host='127.0.0.1',
                     port=2333,
                     rest_uri='http://127.0.0.1:2333',
-                    password=self.bot.config.get('password'),
+                    password=self.bot.config.get('Other', 'password'),
                     identifier=f"Node {node_num}",
                     region=f"us_central"
                 )

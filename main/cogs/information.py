@@ -196,5 +196,21 @@ class Information(commands.Cog):
         em.add_field(name="Uptime:", value=humanize.precisedelta(discord.utils.utcnow() - self.bot.launch_time, format='%.0f'))
         await ctx.send(embed=em)
 
+    @commands.command()
+    async def donate(self, ctx: customContext):
+        class DonateView(discord.ui.View):
+            def __init__(self):
+                super().__init__(timeout=30)
+                self.add_item(discord.ui.Button(label='Donate to Groot!', url='https://grootdiscordbot.xyz/donate'))
+
+        em = Embed(title='Donate to Groot')
+        em.set_thumbnail(url=self.bot.user.avatar.url)
+        em.description = 'Donating money to Groot will help out the developer a lot with service fees for Groot among others. \
+                         Note that this is not required to access any exclusive content on the bot! \
+                         The sole purpose of donating is to support Groot\'s development.'
+
+        await ctx.send(embed=em, view=DonateView())
+
+
 def setup(bot):
     bot.add_cog(Information(bot), cat_name="Information")
