@@ -26,6 +26,11 @@ class Core(commands.Cog):
         await ctx.send(embed=em)
 
     async def handle_error(self, ctx: customContext, exc_info: dict):
+        # Shortcut if the invoking user was the bot owner
+        if ctx.author == self.bot.owner:
+            await self.send_error(ctx, exc_info)
+            return
+
         traceback = exc_info['error'].replace('``', '`\u200b`')
 
         paginator = commands.Paginator(prefix='```py')
@@ -115,7 +120,10 @@ class Core(commands.Cog):
             return
 
         elif isinstance(error, commands.BadUnionArgument):
-            await ctx.send(embed=ctx.bot.help_command.get_command_help(ctx.command))
+            await ctx.send_help(ctx.command)
+            return
+
+        elif isinstance(error, commands.TooManyArguments):
             return
 
         # Not found (member, role, command)
