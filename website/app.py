@@ -16,7 +16,7 @@ app = Quart(__name__)
 ipc_client = ipc.Client(secret_key="GrootBotAdmin")
 app.config["SECRET_KEY"] = "Groot"
 app.config["DISCORD_CLIENT_ID"] = 812395879146717214
-app.config["DISCORD_CLIENT_SECRET"] = "83JNyFPtPQBZj6qz95c3uHPTHjc7aQhd"
+app.config["DISCORD_CLIENT_SECRET"] = environ.get('CLIENT_SECRET')
 app.config["DISCORD_REDIRECT_URI"] = "http://www.grootdiscordbot.xyz/api/callback"
 
 
@@ -81,6 +81,11 @@ async def server():
 @app.route("/source")
 async def source():
     return redirect("https://github.com/dank-tagg/Groot")
+
+@app.route("/donate")
+async def donate():
+    return redirect("https://www.patreon.com/danktagg")
+
 
 # API (discord etc)
 
