@@ -241,15 +241,6 @@ async def get_grole(self, ctx: customContext):
     return data[0]
 
 
-async def get_frozen(self, guild: discord.Guild, member: discord.Member):
-    cur = await self.bot.db.execute(
-        "SELECT * FROM frozen_names WHERE guild_id = ? AND user_id = ?",
-        (guild.id, member.id),
-    )
-    rows = await cur.fetchall()
-    return rows
-
-
 async def send_traceback(
     destination: discord.abc.Messageable, ctx, edit, verbosity: int, *exc_info
 ):

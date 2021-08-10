@@ -2,8 +2,6 @@ aiohttp
 jishaku
 discord.py
 humanize
-stringcase
-Unidecode
 tabulate
 discord
 discord.ext.menus
