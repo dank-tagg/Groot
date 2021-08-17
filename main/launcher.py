@@ -8,11 +8,9 @@ from utils._type import *
 environ["JISHAKU_NO_UNDERSCORE"] = "True"
 environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
 
-intents = discord.Intents.all()
 mentions = discord.AllowedMentions(roles=False, everyone=False)
 
 bot_data = {
-    "intents": intents,
     "case_insensitive": True,
     "help_command": None,
     "allowed_mentions": mentions,

@@ -10,8 +10,8 @@ import discord
 import configparser
 
 from pathlib import Path
-from ext.category import Category
 from discord.ext import commands, ipc
+from ext.shard import override_discord
 from utils.context import customContext
 from utils.cache import CacheManager
 from utils.useful import (Cooldown, ListCall, call,
@@ -33,7 +33,6 @@ class GrootBot(commands.Bot):
         self.ipc = ipc.Server(
             self, host="0.0.0.0", secret_key="GrootBotAdmin"
         )
-        self.categories = {}
         self.testers = [396805720353275924]
 
     async def after_db(self):
@@ -42,6 +41,10 @@ class GrootBot(commands.Bot):
 
     def add_command(self, command):
         """Overwrite add_command to add a default cooldown to every command"""
+        print(command.name, 1)
+        if command.cog is None: # prevent non-cog commands...
+            return
+
         if getattr(command, 'slash', False):
             command.name += '_slashCommand'
         super().add_command(command)
@@ -59,11 +62,6 @@ class GrootBot(commands.Bot):
         return str(Path(__file__).parents[0])
 
     @property
-    def owner(self):
-        """Gets the discord.User of the owner"""
-        return self.get_user(396805720353275924)
-
-    @property
     def log_channel(self):
         """Gets the error channel for the bot to log."""
         return self.owner
@@ -73,6 +71,11 @@ class GrootBot(commands.Bot):
         config = configparser.ConfigParser()
         config.read(f'{self.cwd}/config/config.ini')
         return config
+
+    @to_call.append
+    def monkey_patch(self):
+        override_discord()
+        return
 
     @to_call.append
     def loading_emojis(self):
@@ -138,8 +141,7 @@ class GrootBot(commands.Bot):
         """Loads the cogs"""
         cogs = ()
         for file in os.listdir(f"{self.cwd}/cogs"):
-            if file.endswith(".py"):
-                cogs += (file[:-3],)
+            cogs += (file,)
 
         cogs += ("jishaku", 'ext.krypton')
         for cog in cogs:
@@ -188,10 +190,11 @@ class GrootBot(commands.Bot):
         self.cache["users"] = {}
         self.cache['afk_users'] = {}
 
+    # Other functions
     async def get_prefix(self, message):
         """Handles custom prefixes, this function is invoked every time process_command method is invoke thus returning
         the appropriate prefixes depending on the guild."""
-        if message.author == self.owner:
+        if message.author == getattr(self, 'owner', None):
             return ["", "g."]
         query = "SELECT prefix FROM guild_config WHERE guild_id=?"
         snowflake_id = getattr(message.guild, "id", message.author.id)
@@ -208,23 +211,9 @@ class GrootBot(commands.Bot):
             return match.group(1)
         return prefix
 
-    def add_cog(self, cog: commands.Cog, cat_name: str = "Unlisted"):
-        category = self.get_category(cat_name)
-
-        if not category:
-            category = Category(cat_name)
-            self.categories[category.name] = category
-
-        category.add_cog(cog)
-        super().add_cog(cog)
-
     def get_message(self, message_id):
         """Gets the message from the cache"""
         return self._connection._get_message(message_id)
-
-    def get_category(self, name):
-        """Gets the category with the given name."""
-        return self.categories.get(name)
 
     async def get_context(self, message, *, cls=None):
         """Override get_context to use a custom Context"""
@@ -238,7 +227,7 @@ class GrootBot(commands.Bot):
 
         # Checks etc for blacklist ...
         ctx = await self.get_context(message)
-        if message.author.id == self.owner.id:
+        if message.author.id == 396805720353275924:
             await self.invoke(ctx)
             return
 
@@ -287,9 +276,14 @@ class GrootBot(commands.Bot):
         self.logger.info(f"Logged in as {self.user}, SQLite3 database initialized.")
         print(f"Logged in as {self.user}")
 
+        self.owner = await self.fetch_user(396805720353275924)
+
         # Edit restart message
         data = read_json('config')
         channel = self.get_channel(data['messages']['lastChannel'])
+        if channel is None:
+            return
+
         msg = await channel.fetch_message(data['messages']['lastMessage'])
         if msg is not None:
             await msg.edit(content=f"Back online {self.owner.mention}!")
