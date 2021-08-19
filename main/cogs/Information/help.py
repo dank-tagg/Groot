@@ -1,7 +1,7 @@
 from utils._type import *
 
 import discord
-import contextlib
+import difflib
 
 from datetime import datetime
 from discord.ext import commands
@@ -138,6 +138,14 @@ class GrootHelp(commands.HelpCommand):
             channel = self.get_destination()
             await channel.send(embed=em)
             return None
+
+        close_matches = difflib.get_close_matches(
+            command,
+            list(self.context.bot.cogs) + list(self.context.bot.all_commands)
+        )
+        if close_matches:
+            await self.context.send_help(close_matches[0])
+            return
 
         return f"No command/category called `{command}` found."
 
