@@ -1,9 +1,8 @@
 aiohttp
 jishaku
-discord.py
+git+https://github.com/Rapptz/discord.py
 humanize
 tabulate
-discord
 discord.ext.menus
 mystbin.py
 discord_ext_ipc
