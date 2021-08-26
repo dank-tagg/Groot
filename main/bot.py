@@ -27,7 +27,7 @@ class GrootBot(commands.Bot):
         self.colors = {}
         self.non_sync = ["music", "core", "rtfm"]
         self.token = self.config.get('Groot', 'token')
-        self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession(loop=self.loop)
         self.maintenance = False
         self.cache = CacheManager()
         self.ipc = ipc.Server(
