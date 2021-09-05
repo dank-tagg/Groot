@@ -1,6 +1,6 @@
 aiohttp
 jishaku
-git+https://github.com/Rapptz/discord.py
+git+https://github.com/Pycord-Development/pycord
 humanize
 tabulate
 discord.ext.menus

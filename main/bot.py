@@ -41,8 +41,6 @@ class GrootBot(commands.Bot):
 
     def add_command(self, command):
         """Overwrite add_command to add a default cooldown to every command"""
-        if getattr(command, 'slash', False):
-            command.name += '_slashCommand'
         super().add_command(command)
 
         command.cooldown_after_parsing = True
