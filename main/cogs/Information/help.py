@@ -1,3 +1,4 @@
+from ext.shard import ShardGroup
 from utils._type import *
 
 import discord
@@ -42,7 +43,7 @@ class GrootHelp(commands.HelpCommand):
             inline=False
         )
 
-        if not isinstance(command, commands.Group) or not command.commands:
+        if not isinstance(command, ShardGroup) or not command.commands:
             return em
 
         # Subcommands

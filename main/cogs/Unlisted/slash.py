@@ -147,7 +147,7 @@ class Slash(commands.Shard):
         )
 
     @SlashCommand(beta=True)
-    async def source(self, ctx: customContext, *, command: str = None):
+    async def source(self, ctx: customContext, command: str):
         """Displays my full source code or for a specific command.
         To display the source code of a subcommand you can separate it by
         periods, e.g. tag.create for the create subcommand of the tag command

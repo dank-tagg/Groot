@@ -205,7 +205,7 @@ class Core(commands.Shard):
         await self.bot.change_presence(
             activity=discord.Activity(
                 type=0,
-                name=f"g.help | {len(self.bot.users)} users | {len(self.bot.guilds)} guilds.",
+                name=f"g.help | {len(self.bot.guilds)} guilds.",
             )
         )
 
