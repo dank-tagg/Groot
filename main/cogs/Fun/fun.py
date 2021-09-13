@@ -24,7 +24,7 @@ class Fun(commands.Shard):
     async def gtn(self, ctx: customContext):
         """Play a guess the number game! You have three chances to guess the number 1-10"""
 
-        no = random.randint(1, 10) # randrange to randint
+        no = random.randint(1, 10)
         await ctx.send(
             "A number between **1 and 10** has been chosen, You have 3 attempts to guess the right number! Type your guess in the chat as a valid number!"
             # no f
